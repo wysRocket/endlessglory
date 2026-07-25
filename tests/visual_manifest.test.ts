@@ -198,9 +198,12 @@ describe('character visual manifest', () => {
     expect(visibleAttachmentsForGraphics(VISUALS.npc_knight).map((a) => a.url)).toContain(
       'models/weapons/sword_1handed.glb',
     );
-    // The kawaii class bodies model their gear in, so player classes attach no
-    // separate weapon props (no gear-driven swap).
-    expect(VISUALS.player_warrior.attach).toBeUndefined();
+    // The kawaii warrior body ships weaponless, so it attaches a fixed one-handed
+    // sword to the Mixamo `RightHand` bone (scaled up for the tiny normalized rig).
+    const warriorAttach = visibleAttachmentsForGraphics(VISUALS.player_warrior);
+    expect(warriorAttach.map((a) => a.url)).toContain('models/weapons/adv_sword_1handed.glb');
+    expect(warriorAttach[0].bone).toBe('RightHand');
+    // The remaining kawaii classes still attach no separate weapon prop.
     expect(VISUALS.player_rogue.attach).toBeUndefined();
   });
 

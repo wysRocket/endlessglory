@@ -351,9 +351,20 @@ function attachProp(
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip, att.url);
-  } else if (att.position || att.rotationY !== undefined) {
+  } else if (
+    att.position ||
+    att.rotationX !== undefined ||
+    att.rotationY !== undefined ||
+    att.rotationZ !== undefined ||
+    att.scale !== undefined
+  ) {
+    // Non-handslot bone (e.g. the kawaii rig's Mixamo `RightHand`): explicit
+    // local transform, no weapon-pack grip. Euler order stays the default XYZ.
     if (att.position) payload.position.set(...att.position);
+    if (att.rotationX !== undefined) payload.rotation.x = att.rotationX;
     if (att.rotationY !== undefined) payload.rotation.y = att.rotationY;
+    if (att.rotationZ !== undefined) payload.rotation.z = att.rotationZ;
+    if (att.scale !== undefined) payload.scale.setScalar(att.scale);
   } else if (att.gripRef) {
     const ref = findAccessoryNode(root, att.gripRef);
     if (ref) copyAccessoryTransform(payload, ref);

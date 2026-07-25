@@ -51,6 +51,15 @@ export interface AttachDef {
   bone: string;
   position?: [number, number, number];
   rotationY?: number;
+  /** Full-orientation overrides for a NON-handslot bone (e.g. the Mixamo-named
+   *  `RightHand` on the kawaii rig, which has no tuned VariantGrip). Applied as
+   *  local Euler radians alongside `position`/`rotationY`; ignored on handslot
+   *  bones (those resolve their grip from the weapon-pack tables). */
+  rotationX?: number;
+  rotationZ?: number;
+  /** Uniform local scale for the attached prop (default 1). Lets a weapon authored
+   *  for a full-size rig sit correctly on the smaller kawaii hand bone. */
+  scale?: number;
   /** Copy grip from a built-in accessory node on the character rig (e.g. Spellbook_open). */
   gripRef?: string;
 }
@@ -517,7 +526,23 @@ export const VISUALS: Record<string, VisualDef> = {
   // rig pass) so they all reuse the shared walk/attack clip donors via
   // KAWAII_ANIM_URLS and the bind-pose breathing idle each base GLB carries.
   // Weapons are fixed (no gear-driven swap); the priest keeps its Light halo.
-  player_warrior: kawaiiClass('warrior'),
+  player_warrior: {
+    ...kawaiiClass('warrior'),
+    // Fixed sword in the right hand (the kawaii warrior GLB ships weaponless).
+    // RightHand is a Mixamo-named bone with no VariantGrip, so the transform is
+    // hand-tuned via the AttachDef position/rotation/scale overrides.
+    attach: [
+      {
+        url: `${WEAPONS}/adv_sword_1handed.glb`,
+        bone: 'RightHand',
+        // The kawaii rig is authored tiny and normalized up at render time, so the
+        // RightHand bone's world scale is ~0.015; scale 26 brings the weapon back to
+        // a hand-appropriate size. rotationZ stands the blade upright in the grip.
+        scale: 26,
+        rotationZ: -Math.PI / 2,
+      },
+    ],
+  },
   player_paladin: kawaiiClass('paladin'),
   player_hunter: kawaiiClass('hunter'),
   player_rogue: kawaiiClass('rogue'),
