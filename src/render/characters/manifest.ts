@@ -51,15 +51,6 @@ export interface AttachDef {
   bone: string;
   position?: [number, number, number];
   rotationY?: number;
-  /** Full-orientation overrides for a NON-handslot bone (e.g. the Mixamo-named
-   *  `RightHand` on the kawaii rig, which has no tuned VariantGrip). Applied as
-   *  local Euler radians alongside `position`/`rotationY`; ignored on handslot
-   *  bones (those resolve their grip from the weapon-pack tables). */
-  rotationX?: number;
-  rotationZ?: number;
-  /** Uniform local scale for the attached prop (default 1). Lets a weapon authored
-   *  for a full-size rig sit correctly on the smaller kawaii hand bone. */
-  scale?: number;
   /** Copy grip from a built-in accessory node on the character rig (e.g. Spellbook_open). */
   gripRef?: string;
 }
@@ -224,6 +215,16 @@ const kawaiiClass = (key: string): VisualDef => ({
   animUrls: KAWAII_ANIM_URLS,
   height: HUMANOID_H,
   clips: kawaii(),
+});
+
+// The pure-melee kawaii class bodies ship with empty weapon hands, so each carries a
+// fixed signature weapon in its right hand. The Mixamo `RightHand` bone auto-fits and
+// stands the weapon upright via applyKawaiiHandGrip (assets.ts), so the entry is just a
+// model plus the bone: no per-weapon transform tuning here. (The caster/hunter bodies
+// already model a focus into their hands, so they are NOT armed this way.)
+const kawaiiArmed = (key: string, weapon: string): VisualDef => ({
+  ...kawaiiClass(key),
+  attach: [{ url: `${WEAPONS}/${weapon}.glb`, bone: 'RightHand' }],
 });
 
 // Quaternius 2021 animal rig (wolf/bull/alpaca/fox/stag)
@@ -526,26 +527,15 @@ export const VISUALS: Record<string, VisualDef> = {
   // rig pass) so they all reuse the shared walk/attack clip donors via
   // KAWAII_ANIM_URLS and the bind-pose breathing idle each base GLB carries.
   // Weapons are fixed (no gear-driven swap); the priest keeps its Light halo.
-  player_warrior: {
-    ...kawaiiClass('warrior'),
-    // Fixed sword in the right hand (the kawaii warrior GLB ships weaponless).
-    // RightHand is a Mixamo-named bone with no VariantGrip, so the transform is
-    // hand-tuned via the AttachDef position/rotation/scale overrides.
-    attach: [
-      {
-        url: `${WEAPONS}/adv_sword_1handed.glb`,
-        bone: 'RightHand',
-        // The kawaii rig is authored tiny and normalized up at render time, so the
-        // RightHand bone's world scale is ~0.015; scale 26 brings the weapon back to
-        // a hand-appropriate size. rotationZ stands the blade upright in the grip.
-        scale: 26,
-        rotationZ: -Math.PI / 2,
-      },
-    ],
-  },
-  player_paladin: kawaiiClass('paladin'),
+  // Only the three pure-melee classes ship with empty weapon hands, so they get a
+  // signature weapon. The other six (hunter/priest/shaman/mage/warlock/druid) model
+  // a thematic focus into their own hands already (a bomb, orb, axe, broom, skull,
+  // staff), so arming them would double up: they are left as-is. The paladin already
+  // carries a baked shield on its off arm, so the added sword reads as sword-and-board.
+  player_warrior: kawaiiArmed('warrior', 'adv_sword_1handed'),
+  player_paladin: kawaiiArmed('paladin', 'adv_sword_1handed'),
   player_hunter: kawaiiClass('hunter'),
-  player_rogue: kawaiiClass('rogue'),
+  player_rogue: kawaiiArmed('rogue', 'adv_dagger'),
   player_priest: { ...kawaiiClass('priest'), halo: 0xffd766 },
   player_shaman: kawaiiClass('shaman'),
   player_mage: kawaiiClass('mage'),

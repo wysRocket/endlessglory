@@ -198,13 +198,24 @@ describe('character visual manifest', () => {
     expect(visibleAttachmentsForGraphics(VISUALS.npc_knight).map((a) => a.url)).toContain(
       'models/weapons/sword_1handed.glb',
     );
-    // The kawaii warrior body ships weaponless, so it attaches a fixed one-handed
-    // sword to the Mixamo `RightHand` bone (scaled up for the tiny normalized rig).
-    const warriorAttach = visibleAttachmentsForGraphics(VISUALS.player_warrior);
-    expect(warriorAttach.map((a) => a.url)).toContain('models/weapons/adv_sword_1handed.glb');
-    expect(warriorAttach[0].bone).toBe('RightHand');
-    // The remaining kawaii classes still attach no separate weapon prop.
-    expect(VISUALS.player_rogue.attach).toBeUndefined();
+    // The pure-melee kawaii classes ship with empty weapon hands, so each carries a
+    // fixed signature weapon on the Mixamo `RightHand` bone (auto-fit + stood upright
+    // by applyKawaiiHandGrip). Guards against them silently going empty-handed.
+    const ARMED = ['warrior', 'paladin', 'rogue'] as const;
+    const weaponUrlSet = new Set(allWeaponUrls);
+    for (const cls of ARMED) {
+      const attach = visibleAttachmentsForGraphics(VISUALS[`player_${cls}`]);
+      expect(attach.length, `${cls} has a weapon attach`).toBeGreaterThan(0);
+      expect(attach[0].bone, `${cls} weapon is on the hand bone`).toBe('RightHand');
+      expect(weaponUrlSet.has(attach[0].url), `${cls} weapon model ${attach[0].url} resolves`).toBe(
+        true,
+      );
+    }
+    // The caster/hunter bodies model their own focus prop, so they are NOT armed here
+    // (arming would double up). Guards against a stray attach reintroducing a clash.
+    for (const cls of ['hunter', 'priest', 'shaman', 'mage', 'warlock', 'druid'] as const) {
+      expect(VISUALS[`player_${cls}`].attach, `${cls} is not double-armed`).toBeUndefined();
+    }
   });
 
   it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {
