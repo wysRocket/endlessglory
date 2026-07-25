@@ -244,15 +244,11 @@ describe('Chronomancy Phase 3 balance targets', () => {
     // to be re-tuned after playtest). The floor still enforces a clear >=22% gap so
     // Chronomancy never rivals a pure-DPS spec.
     //
-    // KNOWN FIRE REGRESSION, owner re-tuning tracked: after the fire rework, fire's BEST
-    // sustained option (scorch spam, 39.0 DPS; the Hot-Streak weave is only 36.8) sits just
-    // ~18% above conservative Chronomancy (33.0), UNDER the 22% design floor. Frost still
-    // clears at ~31% (43.4 DPS). This is fire-specific: fire sustained DPS narrowed against
-    // Chronomancy and needs a source-side fire/arcane re-tune to restore the intended >=22%
-    // gap. Until that owner tuning lands, the FIRE floor is pinned at its current measured
-    // reality (>=1.15) so the suite reflects live behavior; FROST keeps the full 1.22 floor,
-    // and both still enforce that a DPS spec clearly out-sustains the healer spec.
-    expect(piro.dps).toBeGreaterThanOrEqual(consOff.dps * 1.15);
+    // Both damage specs must clearly out-sustain the healer spec: the fire rework had
+    // narrowed fire's sustained scorch-spam DPS to ~18% over conservative Chronomancy
+    // (under this 22% floor), so Scald was re-budgeted up (34-42) to restore the gap.
+    // Frost was already comfortably above at ~31%.
+    expect(piro.dps).toBeGreaterThanOrEqual(consOff.dps * 1.22);
     expect(cryo.dps).toBeGreaterThanOrEqual(consOff.dps * 1.22);
   });
 

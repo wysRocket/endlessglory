@@ -2037,7 +2037,10 @@ export const ABILITIES: Record<string, AbilityDef> = {
     // four made the cast itself mobile (the fire mage's on-the-run filler).
     castWhileMoving: true,
     effects: [
-      { type: 'directDamage', min: 32, max: 40 },
+      // Re-budgeted up (32-40 -> 34-42) so fire's sustained scorch-spam rotation
+      // clears the design's >=22% DPS gap over conservative Chronomancy again; the
+      // fire rework had narrowed the gap under that floor (see chronomancy_balance).
+      { type: 'directDamage', min: 34, max: 42 },
       { type: 'selfBuff', kind: 'buff_speed', value: 1.2, duration: 3 },
     ],
     description:
