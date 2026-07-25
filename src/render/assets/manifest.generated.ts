@@ -733,6 +733,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/props/rock_tall_a.glb": "/media/models/props/rock_tall_a.300efd9a16b9.glb",
   "models/props/rock_tall_h.glb": "/media/models/props/rock_tall_h.8cdfdde55594.glb",
   "models/props/rowboat.glb": "/media/models/props/rowboat.4532f6dee8c6.glb",
+  "models/props/statue_archangel.glb": "/media/models/props/statue_archangel.692e38d000de.glb",
   "models/props/statue_block.glb": "/media/models/props/statue_block.522cacbeb3b0.glb",
   "models/props/statue_head.glb": "/media/models/props/statue_head.2835dc7f475e.glb",
   "models/props/tailoring_loom.glb": "/media/models/props/tailoring_loom.4af33206d520.glb",

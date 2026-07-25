@@ -112,6 +112,10 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   columnBroken: { url: '/models/props/column_broken.glb', kit: 'nature' },
   statueHead: { url: '/models/props/statue_head.glb', kit: 'nature' },
   statueBlock: { url: '/models/props/statue_block.glb', kit: 'nature' },
+  // Golden Archangel: the town-square centerpiece (Meshy-generated, decimated +
+  // webp/meshopt compressed). Its own kit so its embedded gold texture is not
+  // merged with the untextured nature-kit statues.
+  statueArchangel: { url: '/models/props/statue_archangel.glb', kit: 'statue' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
@@ -895,10 +899,8 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     // unchanged (the statue reuses the well footprint).
     const townSquare = Math.abs(w.x) < 0.5 && Math.abs(w.z - 2) < 0.5;
     if (townSquare) {
-      const plinth = propAsset('statueBlock');
-      addParts(g, 'statueBlock', { scale: 1.5 / plinth.size.y });
-      const figure = propAsset('statueHead');
-      addParts(g, 'statueHead', { y: 1.45, scale: 2.2 / figure.size.y });
+      const a = propAsset('statueArchangel');
+      addParts(g, 'statueArchangel', { scale: 4.2 / a.size.y });
     } else {
       const a = propAsset('well');
       addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
