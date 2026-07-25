@@ -225,6 +225,9 @@ const kawaiiClass = (key: string): VisualDef => ({
 const kawaiiArmed = (key: string, weapon: string): VisualDef => ({
   ...kawaiiClass(key),
   attach: [{ url: `${WEAPONS}/${weapon}.glb`, bone: 'RightHand' }],
+  // Gear-driven: the equipped mainhand model swaps into attach[0] (the listed
+  // weapon is the unarmed default). applyKawaiiHandGrip re-fits whatever lands.
+  weaponSlots: [0],
 });
 
 // Quaternius 2021 animal rig (wolf/bull/alpaca/fox/stag)

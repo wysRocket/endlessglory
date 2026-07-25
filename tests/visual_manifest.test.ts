@@ -199,17 +199,20 @@ describe('character visual manifest', () => {
       'models/weapons/sword_1handed.glb',
     );
     // The pure-melee kawaii classes ship with empty weapon hands, so each carries a
-    // fixed signature weapon on the Mixamo `RightHand` bone (auto-fit + stood upright
-    // by applyKawaiiHandGrip). Guards against them silently going empty-handed.
+    // gear-driven weapon on the Mixamo `RightHand` bone (auto-fit + stood upright by
+    // applyKawaiiHandGrip). The listed model is the unarmed default; weaponSlots[0]
+    // swaps in the equipped mainhand. Guards against them going empty-handed.
     const ARMED = ['warrior', 'paladin', 'rogue'] as const;
     const weaponUrlSet = new Set(allWeaponUrls);
     for (const cls of ARMED) {
-      const attach = visibleAttachmentsForGraphics(VISUALS[`player_${cls}`]);
+      const def = VISUALS[`player_${cls}`];
+      const attach = visibleAttachmentsForGraphics(def);
       expect(attach.length, `${cls} has a weapon attach`).toBeGreaterThan(0);
       expect(attach[0].bone, `${cls} weapon is on the hand bone`).toBe('RightHand');
       expect(weaponUrlSet.has(attach[0].url), `${cls} weapon model ${attach[0].url} resolves`).toBe(
         true,
       );
+      expect(def.weaponSlots, `${cls} mainhand is gear-driven`).toContain(0);
     }
     // The caster/hunter bodies model their own focus prop, so they are NOT armed here
     // (arming would double up). Guards against a stray attach reintroducing a clash.
