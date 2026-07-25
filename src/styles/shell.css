@@ -1148,16 +1148,17 @@
     max-width: 472px;
     margin-inline: auto;
     padding: 26px 26px 22px;
-    /* Match the auth-panel-premium container style */
-    background: linear-gradient(180deg, rgba(21, 21, 31, 0.96) 0%, rgba(11, 11, 18, 0.98) 100%);
+    /* Translucent so the hero trailer reads through the play card
+       (landing-responsiveness pass); a light blur keeps PLAY + the tip legible. */
+    background: linear-gradient(180deg, rgba(21, 21, 31, 0.4) 0%, rgba(11, 11, 18, 0.52) 100%);
     border: 2px solid var(--color-border-default);
     border-radius: var(--radius-md);
     box-shadow:
-      0 10px 30px rgba(0, 0, 0, 0.8),
-      inset 0 0 20px rgba(0, 0, 0, 0.6),
+      0 10px 30px rgba(0, 0, 0, 0.55),
+      inset 0 0 20px rgba(0, 0, 0, 0.35),
       inset 0 1px 0 rgba(255, 255, 255, 0.05);
-    -webkit-backdrop-filter: blur(12px);
-    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(4px);
+    backdrop-filter: blur(4px);
   }
 
   .official-site-copy {
@@ -6704,25 +6705,43 @@
   }
   body.mobile-touch .footer-lang-row {
     width: 100%;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
+    flex-direction: row;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: stretch;
+    gap: 5px;
   }
-  /* Stacked layout: language selector, graphics selector, and the contrast
-     toggle share one width so they read as a single settings column instead
-     of three differently-sized blocks. */
+  /* Single-row layout: language selector, graphics selector, and the contrast
+     toggle share the width as equal thirds (min-width:0 lets the two selects
+     clip instead of forcing a wrap), so the footer stays one compact strip
+     instead of a tall stacked column. */
   body.mobile-touch .language-selector,
   body.mobile-touch .landing-graphics-control,
   body.mobile-touch .landing-contrast-toggle {
-    width: 100%;
-    max-width: 200px;
+    width: auto;
+    max-width: none;
+    flex: 1 1 0;
+    min-width: 0;
+    padding-left: 8px;
+    padding-right: 8px;
+    font-size: 12px;
+    justify-content: center;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+  }
+  /* Language label is the longest, so it grows more than the other two thirds. */
+  body.mobile-touch .language-selector {
+    flex-grow: 1.5;
   }
   body.mobile-touch .lang-select-dropdown {
     width: 100%;
+    min-width: 0;
   }
   body.mobile-touch .landing-graphics-select {
-    flex: 1;
+    flex: 1 1 0;
     min-width: 0;
+    padding-right: 20px;
   }
 
   @media (max-width: 860px) {
@@ -6803,27 +6822,43 @@
     }
     .footer-lang-row {
       width: 100%;
-      flex-direction: column;
-      align-items: center;
-      gap: 8px;
+      flex-direction: row;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      gap: 5px;
     }
-    /* Stacked layout: language selector, graphics selector, and the contrast
-       toggle share one width so they read as a single settings column instead
-       of three differently-sized blocks. */
+    /* Single-row layout: language selector, graphics selector, and the contrast
+       toggle share the width as equal thirds (min-width:0 lets the two selects
+       clip instead of forcing a wrap), so the footer stays one compact strip
+       instead of a tall stacked column. */
     .language-selector,
     .landing-graphics-control,
     .landing-contrast-toggle {
-      width: 100%;
-      max-width: 200px;
+      width: auto;
+      max-width: none;
+      flex: 1 1 0;
+      min-width: 0;
+      padding-left: 8px;
+      padding-right: 8px;
+      font-size: 12px;
+      justify-content: center;
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    /* Language label is the longest, so it grows more than the other two thirds. */
+    .language-selector {
+      flex-grow: 1.5;
     }
     .lang-select-dropdown {
       width: 100%;
-      font-size: 16px; /* Prevents mobile Safari auto-zoom */
-      padding: 10px 36px 10px 16px; /* Increases height for a better touch target */
+      min-width: 0;
+      padding: 10px 8px; /* Compact touch target that fits the shared third */
     }
     .landing-graphics-select {
-      flex: 1;
+      flex: 1 1 0;
       min-width: 0;
+      padding-right: 20px;
     }
 
     /* Mobile First Responsive Footer */

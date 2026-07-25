@@ -1339,7 +1339,7 @@ describe('client HTML shell', () => {
       'body.mobile-touch .header-actions {\n    width: 100%;\n    display: flex;\n    flex-direction: column;\n    align-items: center;',
     );
     expect(shellCss).toContain(
-      'body.mobile-touch .footer-lang-row {\n    width: 100%;\n    flex-direction: column;\n    align-items: center;',
+      'body.mobile-touch .footer-lang-row {\n    width: 100%;\n    flex-direction: row;\n    flex-wrap: nowrap;\n    justify-content: center;\n    align-items: stretch;',
     );
     // This backdrop pair is authored -webkit-first (Lightning drops the std otherwise).
     expect(shellCss).toContain(
