@@ -37,7 +37,7 @@ export const ZONE1_ZONE: ZoneDef = {
     { x: -84, z: -64, label: 'Copper Dig', id: 'copper_dig' },
     { x: 76, z: -76, label: 'Bandit Camp', id: 'bandit_camp' },
     { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
-    { x: 18, z: 6, label: 'Reliquary Hill', id: 'reliquary_hill' },
+    { x: -148, z: 120, label: 'Reliquary Hill', id: 'reliquary_hill' },
     { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
     { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
   ],
@@ -1406,5 +1406,5 @@ export const ZONE1_PROPS: ZonePropsDef = {
     { x: -14, z: -14 },
     { x: 4, z: -56 },
   ],
-  delveMarkers: [{ x: 18, z: 6, delveId: 'collapsed_reliquary' }],
+  delveMarkers: [{ x: -148, z: 120, delveId: 'collapsed_reliquary' }],
 };

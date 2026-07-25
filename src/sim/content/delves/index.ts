@@ -12,12 +12,13 @@ export const BROTHER_HALVEN: NpcDef = {
   id: 'brother_halven',
   name: 'Brother Halven',
   title: 'Reliquary Keeper',
-  // World-design pass: relocated from the far southern hill (-5,-52) to the NE
-  // corner of the town square so the delve entrance sits right on the plaza.
-  pos: { x: 18, z: 6 },
-  // Faces roughly SW toward the square center (0,2) so he greets players crossing
-  // the plaza, with the delve mouth framed behind him.
-  facing: -1.79,
+  // World-design pass: a remote frontier ruin. Placed at the foothills of the
+  // eastern mountains (-148,120), far from the town spawn, where the peaks loom
+  // behind the delve mouth.
+  pos: { x: -148, z: 120 },
+  // Faces back toward the town/spawn (0,2), so he greets players who make the
+  // trek out, with the mountain-set delve mouth framed behind him.
+  facing: 2.24,
   // Near-black charcoal: the hooded keeper reads dark/dirty under the 'entity'
   // tint of npc_reliquary_keeper (was 0xd4c5a0 light tan, too friendly).
   color: 0x2b2620,
