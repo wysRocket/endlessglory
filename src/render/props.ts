@@ -116,6 +116,9 @@ const PROP_ASSET_DEFS: Record<string, PropAssetDef> = {
   // webp/meshopt compressed). Its own kit so its embedded gold texture is not
   // merged with the untextured nature-kit statues.
   statueArchangel: { url: '/models/props/statue_archangel.glb', kit: 'statue' },
+  // Lava House: a Meshy-generated molten dwelling standing where the Reliquary
+  // portal used to be (-5,-52). Own kit for its embedded lava texture.
+  lavaHouse: { url: '/models/props/lava_house.glb', kit: 'lavahouse' },
   dockPlatform: { url: '/models/props/dock_platform.glb', kit: 'pirate' },
   rowboat: { url: '/models/props/rowboat.glb', kit: 'pirate' },
   graveRound: { url: '/models/props/gravestone_round.glb', kit: 'grave' },
@@ -911,6 +914,21 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     g.rotation.y = propRand(w.x, w.z, 1) * Math.PI;
     group.add(shadowed(g));
     registerHideable(g, circleFootprint(w.x, w.z, w.r, ground(w.x, w.z) + 3.7));
+  }
+
+  // ---- Lava House landmark (world-design pass) -----------------------------
+  // A single molten dwelling on the old Reliquary portal site (-5,-52), now that
+  // the delve entrance has moved out to the mountains.
+  {
+    const lx = -5,
+      lz = -52;
+    const g = new THREE.Group();
+    const a = propAsset('lavaHouse');
+    addParts(g, 'lavaHouse', { scale: 4.5 / a.size.y });
+    g.position.set(lx, ground(lx, lz) - 0.1, lz);
+    g.rotation.y = propRand(lx, lz, 1) * Math.PI;
+    group.add(shadowed(g));
+    registerHideable(g, circleFootprint(lx, lz, 4, ground(lx, lz) + 5));
   }
 
   // ---- graveyards: 4 headstone shapes, leaning, instanced ------------------
