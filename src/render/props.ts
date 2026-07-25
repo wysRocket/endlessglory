@@ -900,10 +900,9 @@ export function buildProps(seed: number, delveLabel?: (delveId: string) => strin
     const townSquare = Math.abs(w.x) < 0.5 && Math.abs(w.z - 2) < 0.5;
     if (townSquare) {
       const a = propAsset('statueArchangel');
-      // Height ~3.2 (raw model is 1.9 tall): a monument scale that keeps the
-      // wingspan within the old well's footprint (~2.6 wide) instead of dwarfing
-      // the plaza.
-      addParts(g, 'statueArchangel', { scale: 3.2 / a.size.y });
+      // Height ~9.6 (raw model is 1.9 tall): a towering golden landmark that
+      // rises over the town square, visible across the plaza.
+      addParts(g, 'statueArchangel', { scale: 9.6 / a.size.y });
     } else {
       const a = propAsset('well');
       addParts(g, 'well', { scale: [2.6 / a.size.x, 3.6 / a.size.y, 2.9 / a.size.z] });
