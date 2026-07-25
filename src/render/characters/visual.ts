@@ -395,9 +395,15 @@ export class CharacterVisual {
     const wantPitch = s.swimming && !s.dead ? proneAngle : 0;
     this.swimPitch += (wantPitch - this.swimPitch) * Math.min(1, dt * 8);
     this.poseWrap.rotation.x = this.swimPitch;
-    this.poseWrap.rotation.z = 0;
-    this.poseWrap.position.y =
-      s.swimming && !s.dead
+    // A kawaii-style rig whose "death" clip is only its idle (mob_hallow and the
+    // kawaii classes) never lies down on its own, so tip the whole body over so
+    // the corpse reads as fallen, matching the far-mesh corpse. Rigs with a real
+    // death clip keep rotation.z at 0 and animate down through the clip.
+    const deadNoClip = s.dead && this.def.clips.death === this.def.clips.idle;
+    this.poseWrap.rotation.z = deadNoClip ? Math.PI / 2 : 0;
+    this.poseWrap.position.y = deadNoClip
+      ? this.height * 0.16
+      : s.swimming && !s.dead
         ? SWIM_RISE + Math.sin(performance.now() / 500 + this.bobPhase) * 0.08
         : 0;
 
