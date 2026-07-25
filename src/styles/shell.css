@@ -96,6 +96,14 @@
     filter: drop-shadow(0 0 10px rgba(199, 148, 26, 0.3)) drop-shadow(1px 1px 2px #000);
   }
 
+  /* On the mode-select landing the large hero lockup (#title-logo) is the brand
+     moment, so the small header emblem right above it reads as the same logo
+     shown twice. Hide it there; it returns on inner panels (login, char select)
+     where #title-logo is hidden and the header carries the branding alone. */
+  body[data-start-panel="mode-select"] .header-logo-container {
+    visibility: hidden;
+  }
+
   #title-logo {
     /* Smaller on phones so the hero video reads behind the lockup rather than
        being covered by an oversized logo (landing-responsiveness pass). */
