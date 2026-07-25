@@ -1042,8 +1042,12 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: var(--spacing-lg);
-    justify-content: center;
+    gap: var(--spacing-md);
+    /* Anchor the lockup to the top of the trailer band instead of centering it,
+       so there is no dead space above the logo and more of the video reads
+       below the play card (landing-responsiveness pass). */
+    justify-content: flex-start;
+    padding-top: clamp(8px, 3vh, 32px);
     min-height: min-content;
   }
 
@@ -1911,6 +1915,50 @@
     .footer-left {
       justify-content: center;
     }
+  }
+
+  /* Landing footer: collapse the stacked blocks into a slim two-line strip.
+     .footer-bar is the real flex container (it holds all three rows). Flowing it
+     as a centered wrapping row lets social + version + legal share one line; the
+     controls row is forced full-width so it sits on its own compact line below. */
+  body[data-start-panel="mode-select"] .homepage-footer {
+    padding-top: var(--spacing-xs);
+    padding-bottom: var(--spacing-xs);
+  }
+  body[data-start-panel="mode-select"] .footer-bar {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
+    align-items: center;
+    column-gap: 20px;
+    row-gap: 8px;
+  }
+  body[data-start-panel="mode-select"] .footer-left {
+    flex-direction: row;
+    align-items: center;
+    gap: 10px;
+  }
+  /* Shrink the version stamp so social + version + legal fit one slim line. */
+  body[data-start-panel="mode-select"] #game-version {
+    font-size: 11px;
+  }
+  body[data-start-panel="mode-select"] .footer-legal-row {
+    gap: 12px;
+  }
+  /* Controls take their own centered line; cap the (wide) language picker so the
+     three fit without overflow, and keep wrap as a safety net on narrow widths. */
+  body[data-start-panel="mode-select"] .footer-lang-row {
+    width: 100%;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  body[data-start-panel="mode-select"] .footer-lang-row .language-selector {
+    width: 100%;
+    max-width: 240px;
+  }
+  body[data-start-panel="mode-select"] .footer-lang-row .lang-select-dropdown {
+    width: 100%;
   }
 
   .footer-text-row {
