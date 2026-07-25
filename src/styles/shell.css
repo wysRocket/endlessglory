@@ -1051,6 +1051,28 @@
     min-height: min-content;
   }
 
+  /* Single-column landing hierarchy (mobile + narrow desktop, below the 1024px
+     side-by-side breakpoint): Logo, then the PLAY card (which carries the token
+     pill and tip), then the verbose SEO copy demoted below the fold. This puts
+     PLAY and the contract address at the top of the fold instead of burying them
+     under a paragraph, while the SEO copy stays rendered for crawlers. */
+  @media (max-width: 1023.98px) {
+    #hero-view > #title-logo {
+      order: 1;
+    }
+    #hero-view > #mode-select {
+      order: 2;
+    }
+    #hero-view > .official-site-copy {
+      order: 3;
+      margin: 22px auto 0;
+      opacity: 0.85;
+    }
+    #hero-view > .official-site-copy .official-site-copy__body {
+      font-size: 12px;
+    }
+  }
+
   /* Larger screens: side-by-side layout so the video backdrop is visible behind. */
   @media (min-width: 1024px) {
     #hero-view {
@@ -2439,12 +2461,19 @@
     align-items: center;
     gap: var(--spacing-sm);
   }
+  /* Eyebrow pill: a small machined badge rather than bare text, so the token
+     label reads as a deliberate tag above the address. */
   .token-ca-label {
+    display: inline-block;
+    padding: 3px 12px;
+    border: 1px solid rgba(199, 148, 26, 0.4);
+    border-radius: 999px;
+    background: rgba(199, 148, 26, 0.08);
     font-family: var(--font-heading);
     color: var(--color-primary);
     text-transform: uppercase;
-    letter-spacing: 1.2px;
-    font-size: 12px;
+    letter-spacing: 1.4px;
+    font-size: 11px;
     text-shadow:
       0 0 8px var(--color-primary-glow),
       1px 1px 2px #000;
@@ -2466,13 +2495,15 @@
     transition:
       border-color var(--transition-speed) var(--transition-ease),
       box-shadow var(--transition-speed) var(--transition-ease),
-      background var(--transition-speed) var(--transition-ease);
+      background var(--transition-speed) var(--transition-ease),
+      transform 0.35s cubic-bezier(0.32, 0.72, 0, 1);
   }
   .token-ca-pill:hover,
   .token-ca-pill:focus-visible {
     border-color: var(--color-primary);
     background: rgba(11, 11, 18, 0.85);
     box-shadow: 0 0 12px var(--color-primary-glow);
+    transform: translateY(-1px);
     outline: none;
   }
   .token-ca-addr {
