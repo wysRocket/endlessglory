@@ -97,7 +97,9 @@
   }
 
   #title-logo {
-    width: min(216px, 50vw);
+    /* Smaller on phones so the hero video reads behind the lockup rather than
+       being covered by an oversized logo (landing-responsiveness pass). */
+    width: min(176px, 38vw);
     height: auto;
     filter: drop-shadow(0 0 20px rgba(199, 148, 26, 0.25)) drop-shadow(2px 2px 4px #000);
     animation: logo-pulse 2.5s ease-in-out infinite alternate;
@@ -1867,8 +1869,10 @@
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 8px;
-    padding: var(--spacing-md) var(--spacing-lg);
+    /* Tightened so the footer does not eat a large band of the landing
+       (landing-responsiveness pass). */
+    gap: 5px;
+    padding: var(--spacing-sm) var(--spacing-lg);
     flex-shrink: 0;
     text-align: center;
     margin-top: auto;
