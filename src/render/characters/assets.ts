@@ -339,6 +339,12 @@ function applyVariantGrip(
 // applies to a fixed class weapon AND to any gear-driven swap the same way.
 const KAWAII_HAND_BONES = new Set(['RightHand', 'LeftHand']);
 const KAWAII_HAND_FALLBACK_WORLD_SCALE = 0.0152;
+// Local quaternion that stands a blade-along-+Y weapon UPRIGHT in the right hand.
+// The Mixamo `RightHand` idle pose is angled, so a plain roll left the blade lying
+// diagonally across the chest; this cancels the hand bone's idle world orientation
+// (measured on the shared kawaii rig) so the blade points up and the weapon still
+// swings with the hand in animation. Right hand only (the sole armed slot today).
+const KAWAII_RIGHT_HAND_UPRIGHT = new THREE.Quaternion(-0.6923, 0.1793, -0.1798, 0.6755);
 // Target in-hand length (world units, longest weapon dimension) per family. Scaling
 // each weapon to a per-family length keeps sizes consistent across source packs
 // (adv_ vs KayKit have different native units) while preserving relative reach
@@ -398,8 +404,14 @@ function applyKawaiiHandGrip(payload: THREE.Object3D, bone: THREE.Object3D, url:
   const longest = Math.max(kawaiiGripSizeVec.x, kawaiiGripSizeVec.y, kawaiiGripSizeVec.z) || 1;
   const target = KAWAII_HAND_TARGET_LEN[kawaiiWeaponFamily(url)] ?? KAWAII_HAND_DEFAULT_LEN;
   payload.scale.setScalar(target / (longest * s));
-  const [rx, ry, rz] = kawaiiHandRotation(url);
-  payload.rotation.set(rx, ry, rz);
+  // Stand the blade upright in the hand (see KAWAII_RIGHT_HAND_UPRIGHT); a plain
+  // Euler roll left it lying diagonally across the chest in the idle pose.
+  if (bone.name.replace(/[[\].:/]/g, '') === 'RightHand') {
+    payload.quaternion.copy(KAWAII_RIGHT_HAND_UPRIGHT);
+  } else {
+    const [rx, ry, rz] = kawaiiHandRotation(url);
+    payload.rotation.set(rx, ry, rz);
+  }
   payload.position.set(0, 0, 0);
 }
 
