@@ -529,16 +529,15 @@ export const VISUALS: Record<string, VisualDef> = {
   // its gear modeled in, auto-rigged to one shared 24-bone skeleton (the Blender
   // rig pass) so they all reuse the shared walk/attack clip donors via
   // KAWAII_ANIM_URLS and the bind-pose breathing idle each base GLB carries.
-  // Weapons are fixed (no gear-driven swap); the priest keeps its Light halo.
-  // Only the three pure-melee classes ship with empty weapon hands, so they get a
-  // signature weapon. The other six (hunter/priest/shaman/mage/warlock/druid) model
-  // a thematic focus into their own hands already (a bomb, orb, axe, broom, skull,
-  // staff), so arming them would double up: they are left as-is. The paladin already
-  // carries a baked shield on its off arm, so the added sword reads as sword-and-board.
+  // Only the WARRIOR ships with empty weapon hands, so it is the one class that
+  // gets a gear-driven weapon (weaponSlots[0] shows its equipped mainhand). Every
+  // other class already models a weapon/focus into its own hand (paladin sword,
+  // rogue dagger, hunter bomb, priest orb, shaman axe, mage broom, warlock skull,
+  // druid staff), so arming them would double up in the same hand.
   player_warrior: kawaiiArmed('warrior', 'adv_sword_1handed'),
-  player_paladin: kawaiiArmed('paladin', 'adv_sword_1handed'),
+  player_paladin: kawaiiClass('paladin'),
   player_hunter: kawaiiClass('hunter'),
-  player_rogue: kawaiiArmed('rogue', 'adv_dagger'),
+  player_rogue: kawaiiClass('rogue'),
   player_priest: { ...kawaiiClass('priest'), halo: 0xffd766 },
   player_shaman: kawaiiClass('shaman'),
   player_mage: kawaiiClass('mage'),

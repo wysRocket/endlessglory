@@ -198,25 +198,29 @@ describe('character visual manifest', () => {
     expect(visibleAttachmentsForGraphics(VISUALS.npc_knight).map((a) => a.url)).toContain(
       'models/weapons/sword_1handed.glb',
     );
-    // The pure-melee kawaii classes ship with empty weapon hands, so each carries a
-    // gear-driven weapon on the Mixamo `RightHand` bone (auto-fit + stood upright by
-    // applyKawaiiHandGrip). The listed model is the unarmed default; weaponSlots[0]
-    // swaps in the equipped mainhand. Guards against them going empty-handed.
-    const ARMED = ['warrior', 'paladin', 'rogue'] as const;
-    const weaponUrlSet = new Set(allWeaponUrls);
-    for (const cls of ARMED) {
-      const def = VISUALS[`player_${cls}`];
-      const attach = visibleAttachmentsForGraphics(def);
-      expect(attach.length, `${cls} has a weapon attach`).toBeGreaterThan(0);
-      expect(attach[0].bone, `${cls} weapon is on the hand bone`).toBe('RightHand');
-      expect(weaponUrlSet.has(attach[0].url), `${cls} weapon model ${attach[0].url} resolves`).toBe(
-        true,
-      );
-      expect(def.weaponSlots, `${cls} mainhand is gear-driven`).toContain(0);
-    }
-    // The caster/hunter bodies model their own focus prop, so they are NOT armed here
-    // (arming would double up). Guards against a stray attach reintroducing a clash.
-    for (const cls of ['hunter', 'priest', 'shaman', 'mage', 'warlock', 'druid'] as const) {
+    // Only the WARRIOR ships with empty weapon hands, so it is the sole class armed
+    // here: a gear-driven weapon on the Mixamo `RightHand` bone (auto-fit + stood
+    // upright by applyKawaiiHandGrip). The listed model is the unarmed default;
+    // weaponSlots[0] swaps in the equipped mainhand. Guards against empty hands.
+    const warrior = VISUALS.player_warrior;
+    const warriorAttach = visibleAttachmentsForGraphics(warrior);
+    expect(warriorAttach.length, 'warrior has a weapon attach').toBeGreaterThan(0);
+    expect(warriorAttach[0].bone, 'warrior weapon is on the hand bone').toBe('RightHand');
+    expect(new Set(allWeaponUrls).has(warriorAttach[0].url), 'warrior weapon resolves').toBe(true);
+    expect(warrior.weaponSlots, 'warrior mainhand is gear-driven').toContain(0);
+    // Every other class already models a weapon/focus into its own hand, so arming
+    // them would double up in the same hand. Guards against a stray attach clash.
+    const CLEAN = [
+      'paladin',
+      'hunter',
+      'rogue',
+      'priest',
+      'shaman',
+      'mage',
+      'warlock',
+      'druid',
+    ] as const;
+    for (const cls of CLEAN) {
       expect(VISUALS[`player_${cls}`].attach, `${cls} is not double-armed`).toBeUndefined();
     }
   });
