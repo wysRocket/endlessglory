@@ -217,11 +217,17 @@ const kawaiiClass = (key: string): VisualDef => ({
   clips: kawaii(),
 });
 
-// The warrior body ships with empty weapon hands, so it carries a signature weapon
-// in its right hand. It uses the SAME `handslot.r` bone name as every other rig: the
-// kawaii bodies are Mixamo-rigged and have no authored handslot, so assets.ts
+// A kawaii body that carries a live weapon on the standard `handslot.r` bone. The
+// kawaii bodies are Mixamo-rigged with no authored handslot, so assets.ts
 // synthesizes the socket on the wrist (kawaiiHandSocket) and the standard grip path
 // (VariantGrip + WEAPON_GRIP_OVERRIDES) sizes and orients the weapon from there.
+//
+// Unused today. The warrior is the one body with empty hands, but its rig cannot
+// hold anything: `RightHand` carries zero skin weight and the joint sits 0.2 units
+// past the end of the arm, so a weapon there floats free of the fist (it shipped
+// that way and was visibly wrong). Keep this for the next body that ships
+// empty-handed, and check the rig FIRST: `tests/kawaii_rig_hands.test.ts` pins
+// which bodies have a hand bone that actually owns the fist.
 const kawaiiArmed = (key: string, weapon: string): VisualDef => ({
   ...kawaiiClass(key),
   attach: [{ url: `${WEAPONS}/${weapon}.glb`, bone: 'handslot.r' }],
@@ -531,7 +537,7 @@ export const VISUALS: Record<string, VisualDef> = {
   // other class already models a weapon/focus into its own hand (paladin sword,
   // rogue dagger, hunter bomb, priest orb, shaman axe, mage broom, warlock skull,
   // druid staff), so arming them would double up in the same hand.
-  player_warrior: kawaiiArmed('warrior', 'adv_sword_1handed'),
+  player_warrior: kawaiiClass('warrior'),
   player_paladin: kawaiiClass('paladin'),
   player_hunter: kawaiiClass('hunter'),
   player_rogue: kawaiiClass('rogue'),

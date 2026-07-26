@@ -1704,9 +1704,8 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 2,
         "rare": false,
         "templateId": "forest_wolf",
-        "model": "mob_wolf",
-        "tint": "#445c3a",
-        "still": "/guide-stills/mob_wolf__445c3a.webp"
+        "model": "mob_hallow",
+        "still": "/guide-stills/mob_hallow.webp"
       },
       {
         "name": "Wild Boar",
@@ -3660,11 +3659,10 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.1,
     "tintStrength": 0.35
   },
-  "mob_wolf": {
-    "url": "models/creatures/wolf_basic.glb",
-    "idle": "Idle",
-    "height": 1.6,
-    "tintStrength": 0.35
+  "mob_hallow": {
+    "url": "models/kawaii/mob_hallow.glb",
+    "idle": "idle",
+    "height": 1.8
   },
   "greyjaw": {
     "url": "models/creatures/greyjaw.glb",
@@ -3716,6 +3714,12 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "idle": "Idle_Combat",
     "height": 2.5,
     "tintStrength": 0.25
+  },
+  "mob_wolf": {
+    "url": "models/creatures/wolf_basic.glb",
+    "idle": "Idle",
+    "height": 1.6,
+    "tintStrength": 0.35
   },
   "mob_troll": {
     "url": "models/creatures/orc.glb",
