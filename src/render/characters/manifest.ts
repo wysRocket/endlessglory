@@ -217,14 +217,14 @@ const kawaiiClass = (key: string): VisualDef => ({
   clips: kawaii(),
 });
 
-// The warrior body ships with empty weapon hands, so it carries a fixed signature
-// weapon in its right hand. The Mixamo `RightHand` bone auto-fits and stands the
-// weapon upright via applyKawaiiHandGrip (assets.ts), so the entry is just a model
-// plus the bone: no per-weapon transform tuning here. The weapon is FIXED (not
-// gear-driven) so it is always the one, known, correctly-gripped model.
+// The warrior body ships with empty weapon hands, so it carries a signature weapon
+// in its right hand. It uses the SAME `handslot.r` bone name as every other rig: the
+// kawaii bodies are Mixamo-rigged and have no authored handslot, so assets.ts
+// synthesizes the socket on the wrist (kawaiiHandSocket) and the standard grip path
+// (VariantGrip + WEAPON_GRIP_OVERRIDES) sizes and orients the weapon from there.
 const kawaiiArmed = (key: string, weapon: string): VisualDef => ({
   ...kawaiiClass(key),
-  attach: [{ url: `${WEAPONS}/${weapon}.glb`, bone: 'RightHand' }],
+  attach: [{ url: `${WEAPONS}/${weapon}.glb`, bone: 'handslot.r' }],
 });
 
 // Quaternius 2021 animal rig (wolf/bull/alpaca/fox/stag)

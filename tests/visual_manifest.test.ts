@@ -199,12 +199,13 @@ describe('character visual manifest', () => {
       'models/weapons/sword_1handed.glb',
     );
     // Only the WARRIOR ships with empty weapon hands, so it is the sole class armed
-    // here: a fixed sword on the Mixamo `RightHand` bone (auto-fit + stood upright by
-    // applyKawaiiHandGrip). Guards against it going empty-handed.
+    // here. It uses the standard `handslot.r` bone like every other rig: the kawaii
+    // body has no authored handslot, so assets.ts synthesizes the socket on the
+    // Mixamo wrist and the normal VariantGrip path applies. Guards empty hands.
     const warrior = VISUALS.player_warrior;
     const warriorAttach = visibleAttachmentsForGraphics(warrior);
     expect(warriorAttach.length, 'warrior has a weapon attach').toBeGreaterThan(0);
-    expect(warriorAttach[0].bone, 'warrior weapon is on the hand bone').toBe('RightHand');
+    expect(warriorAttach[0].bone, 'warrior weapon is on the hand bone').toBe('handslot.r');
     expect(new Set(allWeaponUrls).has(warriorAttach[0].url), 'warrior weapon resolves').toBe(true);
     // Every other class already models a weapon/focus into its own hand, so arming
     // them would double up in the same hand. Guards against a stray attach clash.

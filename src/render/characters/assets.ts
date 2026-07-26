@@ -329,90 +329,60 @@ function applyVariantGrip(
   payload.scale.setScalar(t.scale);
 }
 
-// --- Kawaii-rig hand grip -------------------------------------------------
-// The Meshy kawaii player/NPC rig uses Mixamo-named hand bones (`RightHand`/
-// `LeftHand`), which have no KayKit-style VariantGrip. It is also authored tiny
-// then normalized up at render time, so a prop parented to a hand inherits a
-// ~0.015 world scale. We therefore derive the local scale from the bone's LIVE
-// world scale (so the fit survives a change to the rig's normalize/height) and
-// stand the weapon upright in the grip. This grip is keyed off the bone, so it
-// applies to a fixed class weapon AND to any gear-driven swap the same way.
-const KAWAII_HAND_BONES = new Set(['RightHand', 'LeftHand']);
-const KAWAII_HAND_FALLBACK_WORLD_SCALE = 0.0152;
-// Local quaternion that stands a blade-along-+Y weapon UPRIGHT in the right hand.
-// The Mixamo `RightHand` idle pose is angled, so a plain roll left the blade lying
-// diagonally across the chest; this cancels the hand bone's idle world orientation
-// (measured on the shared kawaii rig) so the blade points up and the weapon still
-// swings with the hand in animation. Right hand only (the sole armed slot today).
-const KAWAII_RIGHT_HAND_UPRIGHT = new THREE.Quaternion(-0.6923, 0.1793, -0.1798, 0.6755);
-// Target in-hand length (world units, longest weapon dimension) per family. Scaling
-// each weapon to a per-family length keeps sizes consistent across source packs
-// (adv_ vs KayKit have different native units) while preserving relative reach
-// (a dagger reads short, a staff tall). Tuned against the ~1.8-unit chibi body.
-const KAWAII_HAND_TARGET_LEN: Record<string, number> = {
-  dagger: 0.34,
-  wand: 0.4,
-  sword1: 0.72,
-  sword2: 0.98,
-  axe: 0.66,
-  hammer: 0.62,
-  staff: 1.02,
-  bow: 0.88,
+// --- Kawaii-rig hand sockets ----------------------------------------------
+// The whole held-weapon system (VariantGrip sizing, the per-weapon
+// WEAPON_GRIP_OVERRIDES, back-carry, stow, offhand, weapon skins) keys off the
+// KayKit `handslot.r`/`handslot.l` bones: purpose-authored empty nodes sitting in
+// the palm at the grip orientation. The Meshy kawaii bodies are Mixamo-rigged, so
+// they only have the `RightHand`/`LeftHand` WRIST joints and no such socket, which
+// left every grip helper silently no-opping and the weapon adrift.
+//
+// Rather than hand-tune a raw wrist joint per pose, synthesize the missing socket:
+// an empty child of the wrist carrying the constant local transform an authored
+// handslot would have. Downstream code then sees a normal handslot bone and the
+// upstream grip machinery applies unchanged.
+const KAWAII_WRIST_FOR_SIDE: Record<'r' | 'l', string> = {
+  r: 'RightHand',
+  l: 'LeftHand',
 };
-const KAWAII_HAND_DEFAULT_LEN = 0.68;
-const kawaiiGripScaleVec = new THREE.Vector3();
-const kawaiiGripSizeVec = new THREE.Vector3();
-const kawaiiGripBox = new THREE.Box3();
+// World scale the socket is normalized to. The kawaii rig is authored tiny and
+// scaled up at render time (wrist world scale ~0.015), so without this a weapon
+// placed by the variant grip would be millimetres tall. 0.4056 reproduces the
+// in-hand size measured as correct on the chibi body (a 1H sword ~0.72 units on a
+// ~1.8-unit character). Derived per instance from the LIVE wrist scale, so it
+// survives a change to the rig's normalize/height.
+const KAWAII_SOCKET_WORLD_SCALE = 0.4056;
+const KAWAII_WRIST_FALLBACK_WORLD_SCALE = 0.0152;
+// Constant local rotation of the socket, i.e. the inverse of the wrist's rest-pose
+// world orientation on the shared kawaii rig. The Mixamo wrist rests at an angle,
+// so a weapon parented straight to it lay diagonally across the chest; cancelling
+// that angle once (exactly what an authored handslot node bakes in) stands the
+// grip axis upright, and the socket still swings with the wrist during animation.
+const KAWAII_SOCKET_ROT = new THREE.Quaternion(-0.6923, 0.1793, -0.1798, 0.6755);
+const kawaiiSocketScaleVec = new THREE.Vector3();
 
-function isKawaiiHandBone(name: string): boolean {
-  return KAWAII_HAND_BONES.has(name.replace(/[[\].:/]/g, ''));
-}
-
-function kawaiiWeaponFamily(url: string): string {
-  const b = modelBasename(url);
-  if (/dagger/.test(b)) return 'dagger';
-  if (/wand/.test(b)) return 'wand';
-  if (/(2handed|2h|greatsword|_two)/.test(b)) return 'sword2';
-  if (/(sword|blade)/.test(b)) return 'sword1';
-  if (/axe/.test(b)) return 'axe';
-  if (/(hammer|mace|maul)/.test(b)) return 'hammer';
-  if (/(staff|stave)/.test(b)) return 'staff';
-  if (/bow/.test(b)) return 'bow';
-  return 'sword1';
-}
-
-// Per weapon-family upright rotation (local Euler radians). The weapon models are
-// authored grip-at-origin with the blade/head along one axis, so a single -90 deg
-// roll stands most upright in the hand; bows carry with the opposite roll. Extend
-// this table, not the call sites, when a new family sits wrong.
-function kawaiiHandRotation(url: string): [number, number, number] {
-  return kawaiiWeaponFamily(url) === 'bow' ? [0, 0, Math.PI / 2] : [0, 0, -Math.PI / 2];
-}
-
-// Fit + stand a weapon in a Mixamo hand bone. Scale is derived from the bone's LIVE
-// world scale (so the fit survives a change to the rig's normalize/height) and the
-// weapon's own bounding box, so any model from any pack lands at a sensible length.
-function applyKawaiiHandGrip(payload: THREE.Object3D, bone: THREE.Object3D, url: string): void {
-  // The bone's world matrix may be stale when a prop is attached during model
-  // assembly (before the rig is added to a scene / matrices are flushed); flush it
-  // so getWorldScale is the real normalized-rig scale, not a bind-pose leftover.
-  bone.updateWorldMatrix(true, false);
-  let s = bone.getWorldScale(kawaiiGripScaleVec).x;
-  if (!(s > 0.005 && s < 0.05)) s = KAWAII_HAND_FALLBACK_WORLD_SCALE;
-  kawaiiGripBox.setFromObject(payload);
-  kawaiiGripBox.getSize(kawaiiGripSizeVec);
-  const longest = Math.max(kawaiiGripSizeVec.x, kawaiiGripSizeVec.y, kawaiiGripSizeVec.z) || 1;
-  const target = KAWAII_HAND_TARGET_LEN[kawaiiWeaponFamily(url)] ?? KAWAII_HAND_DEFAULT_LEN;
-  payload.scale.setScalar(target / (longest * s));
-  // Stand the blade upright in the hand (see KAWAII_RIGHT_HAND_UPRIGHT); a plain
-  // Euler roll left it lying diagonally across the chest in the idle pose.
-  if (bone.name.replace(/[[\].:/]/g, '') === 'RightHand') {
-    payload.quaternion.copy(KAWAII_RIGHT_HAND_UPRIGHT);
-  } else {
-    const [rx, ry, rz] = kawaiiHandRotation(url);
-    payload.rotation.set(rx, ry, rz);
-  }
-  payload.position.set(0, 0, 0);
+/** The synthesized handslot socket for a kawaii rig, created on first use.
+ *  Returns null for a rig that has neither the socket nor a Mixamo wrist (i.e. a
+ *  normal KayKit rig, whose real handslot bone resolve()d before we got here). */
+function kawaiiHandSocket(root: THREE.Object3D, handslotName: string): THREE.Object3D | null {
+  const side = handSide(handslotName);
+  const wrist = resolveBone(root, KAWAII_WRIST_FOR_SIDE[side]);
+  if (!wrist) return null;
+  const socketName = `handslot${side}`;
+  const existing = wrist.children.find((c) => c.name === socketName);
+  if (existing) return existing;
+  // Flush first: during model assembly the rig is not in a scene yet, so the
+  // wrist's world matrix can still be a bind-pose leftover.
+  wrist.updateWorldMatrix(true, false);
+  let s = wrist.getWorldScale(kawaiiSocketScaleVec).x;
+  if (!(s > 0.005 && s < 0.05)) s = KAWAII_WRIST_FALLBACK_WORLD_SCALE;
+  const socket = new THREE.Object3D();
+  socket.name = socketName;
+  socket.quaternion.copy(KAWAII_SOCKET_ROT);
+  socket.scale.setScalar(KAWAII_SOCKET_WORLD_SCALE / s);
+  wrist.add(socket);
+  socket.updateMatrixWorld(true);
+  return socket;
 }
 
 function attachProp(
@@ -437,9 +407,6 @@ function attachProp(
   const variantGrip = isHandslotBone(att.bone) ? variantGripFor(att.url) : null;
   if (variantGrip) {
     applyVariantGrip(payload, att.bone, variantGrip, att.url);
-  } else if (isKawaiiHandBone(att.bone)) {
-    // Kawaii Mixamo hand bone: auto-fit + stand upright (works for swaps too).
-    applyKawaiiHandGrip(payload, bone, att.url);
   } else if (att.position || att.rotationY !== undefined) {
     if (att.position) payload.position.set(...att.position);
     if (att.rotationY !== undefined) payload.rotation.y = att.rotationY;
@@ -746,7 +713,12 @@ function attachTargetBone(
   att: AttachDef,
   stowed: boolean,
 ): THREE.Object3D | null {
-  return resolveBone(root, stowed && isHandslotBone(att.bone) ? STOW_BONE : att.bone);
+  const name = stowed && isHandslotBone(att.bone) ? STOW_BONE : att.bone;
+  const direct = resolveBone(root, name);
+  if (direct) return direct;
+  // A kawaii (Mixamo-rigged) body has no authored handslot bone: synthesize the
+  // socket on its wrist so the standard grip path applies (see kawaiiHandSocket).
+  return isHandslotBone(name) ? kawaiiHandSocket(root, name) : null;
 }
 
 // Attach every authored prop: swappable slots take the equipped item's model (or an
