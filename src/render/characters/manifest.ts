@@ -217,17 +217,14 @@ const kawaiiClass = (key: string): VisualDef => ({
   clips: kawaii(),
 });
 
-// The pure-melee kawaii class bodies ship with empty weapon hands, so each carries a
-// fixed signature weapon in its right hand. The Mixamo `RightHand` bone auto-fits and
-// stands the weapon upright via applyKawaiiHandGrip (assets.ts), so the entry is just a
-// model plus the bone: no per-weapon transform tuning here. (The caster/hunter bodies
-// already model a focus into their hands, so they are NOT armed this way.)
+// The warrior body ships with empty weapon hands, so it carries a fixed signature
+// weapon in its right hand. The Mixamo `RightHand` bone auto-fits and stands the
+// weapon upright via applyKawaiiHandGrip (assets.ts), so the entry is just a model
+// plus the bone: no per-weapon transform tuning here. The weapon is FIXED (not
+// gear-driven) so it is always the one, known, correctly-gripped model.
 const kawaiiArmed = (key: string, weapon: string): VisualDef => ({
   ...kawaiiClass(key),
   attach: [{ url: `${WEAPONS}/${weapon}.glb`, bone: 'RightHand' }],
-  // Gear-driven: the equipped mainhand model swaps into attach[0] (the listed
-  // weapon is the unarmed default). applyKawaiiHandGrip re-fits whatever lands.
-  weaponSlots: [0],
 });
 
 // Quaternius 2021 animal rig (wolf/bull/alpaca/fox/stag)

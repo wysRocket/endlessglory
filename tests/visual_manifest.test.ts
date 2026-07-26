@@ -199,15 +199,13 @@ describe('character visual manifest', () => {
       'models/weapons/sword_1handed.glb',
     );
     // Only the WARRIOR ships with empty weapon hands, so it is the sole class armed
-    // here: a gear-driven weapon on the Mixamo `RightHand` bone (auto-fit + stood
-    // upright by applyKawaiiHandGrip). The listed model is the unarmed default;
-    // weaponSlots[0] swaps in the equipped mainhand. Guards against empty hands.
+    // here: a fixed sword on the Mixamo `RightHand` bone (auto-fit + stood upright by
+    // applyKawaiiHandGrip). Guards against it going empty-handed.
     const warrior = VISUALS.player_warrior;
     const warriorAttach = visibleAttachmentsForGraphics(warrior);
     expect(warriorAttach.length, 'warrior has a weapon attach').toBeGreaterThan(0);
     expect(warriorAttach[0].bone, 'warrior weapon is on the hand bone').toBe('RightHand');
     expect(new Set(allWeaponUrls).has(warriorAttach[0].url), 'warrior weapon resolves').toBe(true);
-    expect(warrior.weaponSlots, 'warrior mainhand is gear-driven').toContain(0);
     // Every other class already models a weapon/focus into its own hand, so arming
     // them would double up in the same hand. Guards against a stray attach clash.
     const CLEAN = [

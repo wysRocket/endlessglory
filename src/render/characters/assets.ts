@@ -387,6 +387,10 @@ function kawaiiHandRotation(url: string): [number, number, number] {
 // world scale (so the fit survives a change to the rig's normalize/height) and the
 // weapon's own bounding box, so any model from any pack lands at a sensible length.
 function applyKawaiiHandGrip(payload: THREE.Object3D, bone: THREE.Object3D, url: string): void {
+  // The bone's world matrix may be stale when a prop is attached during model
+  // assembly (before the rig is added to a scene / matrices are flushed); flush it
+  // so getWorldScale is the real normalized-rig scale, not a bind-pose leftover.
+  bone.updateWorldMatrix(true, false);
   let s = bone.getWorldScale(kawaiiGripScaleVec).x;
   if (!(s > 0.005 && s < 0.05)) s = KAWAII_HAND_FALLBACK_WORLD_SCALE;
   kawaiiGripBox.setFromObject(payload);
