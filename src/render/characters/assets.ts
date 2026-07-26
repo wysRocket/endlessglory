@@ -19,6 +19,7 @@ import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
+import { handSocketTransform } from './hand_socket_core';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import {
   type AttachDef,
@@ -345,21 +346,16 @@ const KAWAII_WRIST_FOR_SIDE: Record<'r' | 'l', string> = {
   r: 'RightHand',
   l: 'LeftHand',
 };
-// World scale the socket is normalized to. The kawaii rig is authored tiny and
-// scaled up at render time (wrist world scale ~0.015), so without this a weapon
-// placed by the variant grip would be millimetres tall. 0.4056 reproduces the
-// in-hand size measured as correct on the chibi body (a 1H sword ~0.72 units on a
-// ~1.8-unit character). Derived per instance from the LIVE wrist scale, so it
-// survives a change to the rig's normalize/height.
-const KAWAII_SOCKET_WORLD_SCALE = 0.4056;
-const KAWAII_WRIST_FALLBACK_WORLD_SCALE = 0.0152;
-// Constant local rotation of the socket, i.e. the inverse of the wrist's rest-pose
-// world orientation on the shared kawaii rig. The Mixamo wrist rests at an angle,
-// so a weapon parented straight to it lay diagonally across the chest; cancelling
-// that angle once (exactly what an authored handslot node bakes in) stands the
-// grip axis upright, and the socket still swings with the wrist during animation.
-const KAWAII_SOCKET_ROT = new THREE.Quaternion(-0.6923, 0.1793, -0.1798, 0.6755);
+// The socket's own transform (rotation cancelling the wrist rest pose, scale
+// normalizing the tiny authored rig) is DERIVED per side and per rig by the pure
+// `hand_socket_core`; this half only reads the live poses and builds the Object3D.
+// Both reads are taken relative to the rig ROOT, never world space: a socket is
+// synthesized during assembly (model space) AND later on a runtime gear swap, when
+// the model already sits in-scene under the normalize scale/yaw.
 const kawaiiSocketScaleVec = new THREE.Vector3();
+const kawaiiSocketRootScaleVec = new THREE.Vector3();
+const kawaiiSocketQuat = new THREE.Quaternion();
+const kawaiiSocketRootQuat = new THREE.Quaternion();
 
 /** The synthesized handslot socket for a kawaii rig, created on first use.
  *  Returns null for a rig that has neither the socket nor a Mixamo wrist (i.e. a
@@ -374,12 +370,19 @@ function kawaiiHandSocket(root: THREE.Object3D, handslotName: string): THREE.Obj
   // Flush first: during model assembly the rig is not in a scene yet, so the
   // wrist's world matrix can still be a bind-pose leftover.
   wrist.updateWorldMatrix(true, false);
-  let s = wrist.getWorldScale(kawaiiSocketScaleVec).x;
-  if (!(s > 0.005 && s < 0.05)) s = KAWAII_WRIST_FALLBACK_WORLD_SCALE;
+  root.updateWorldMatrix(true, false);
+  const wq = wrist.getWorldQuaternion(kawaiiSocketQuat);
+  const rq = root.getWorldQuaternion(kawaiiSocketRootQuat);
+  const t = handSocketTransform(
+    [wq.x, wq.y, wq.z, wq.w],
+    [rq.x, rq.y, rq.z, rq.w],
+    wrist.getWorldScale(kawaiiSocketScaleVec).x,
+    root.getWorldScale(kawaiiSocketRootScaleVec).x,
+  );
   const socket = new THREE.Object3D();
   socket.name = socketName;
-  socket.quaternion.copy(KAWAII_SOCKET_ROT);
-  socket.scale.setScalar(KAWAII_SOCKET_WORLD_SCALE / s);
+  socket.quaternion.fromArray(t.rotation);
+  socket.scale.setScalar(t.scale);
   wrist.add(socket);
   socket.updateMatrixWorld(true);
   return socket;
