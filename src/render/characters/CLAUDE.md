@@ -37,6 +37,14 @@ no procedural-rig path here anymore. Reads the world; never mutates the sim.
   independent held-item layout.
 - `portrait.ts`: offscreen-WebGL headshot factory: renders a (class/visual-key, skin)
   PNG at the requested `PortraitFraming` from the real model, caches the data URL.
+- `hand_socket_core.ts`: pure, three-free transform for the handslot socket
+  `assets.ts` synthesizes on a Mixamo-rigged (kawaii) body with no authored
+  `handslot` node. Rotation and scale are DERIVED per side and per rig against
+  the rig ROOT: never measured constants (the right wrist's value is wrong on
+  the left, which rests ~85 degrees away) and never world space (a socket is
+  built at assembly AND on a runtime gear swap, when the model already sits
+  under the normalize transform). `tests/hand_socket_core.test.ts` pins the math
+  and gates every shipped kawaii body on both hands.
 - `weapon_grip.ts`: pure, three-free per-weapon grip nudges
   (`WEAPON_GRIP_OVERRIDES`) layered on the family `VariantGrip`; shared with
   the asset pipeline's live inspector.
