@@ -1,3 +1,4 @@
+import { readFileSync } from 'node:fs';
 import { describe, expect, it } from 'vitest';
 import { VISUALS } from '../src/render/characters/manifest';
 import {
@@ -8,6 +9,19 @@ import {
 import { WARRIOR_SHOUT_COLORS, warriorCastVisualPlan } from '../src/render/warrior_cast_fx_core';
 import { ABILITIES } from '../src/sim/data';
 
+/**
+ * Clip names straight out of a GLB's JSON chunk. A GLB is a 12-byte header then
+ * length(4) + type(4) + data chunks, and animation names live in the JSON one, so
+ * this needs no glTF library and no buffer or meshopt decoding.
+ */
+function glbClipNames(path: string): string[] {
+  const buf = readFileSync(path);
+  if (buf.readUInt32LE(0) !== 0x46546c67) throw new Error(`not a GLB: ${path}`);
+  const jsonLen = buf.readUInt32LE(12);
+  const gltf = JSON.parse(buf.subarray(20, 20 + jsonLen).toString('utf8'));
+  return (gltf.animations ?? []).map((a: { name?: string }) => a.name ?? '');
+}
+
 describe('winning Warrior attack animation routing', () => {
   it('selects a swing from the actual live hands, including Titan Grip', () => {
     expect(weaponAttackStyle('worn_sword', null)).toBeNull();
@@ -17,20 +31,26 @@ describe('winning Warrior attack animation routing', () => {
     expect(weaponAttackStyle('missing_item', 'rusty_dagger')).toBeNull();
   });
 
-  it('drives the kawaii Warrior from the shared kawaii-roster animation donors', () => {
+  it('drives the kawaii Warrior from clips baked into its own body GLB', () => {
     const def = VISUALS.player_warrior;
     // Fast-path kawaii body: gear is modeled in, so no attach / gear-driven swap.
     expect(def.url).toBe('models/kawaii/warrior.glb');
     expect(def.attach).toBeUndefined();
     expect(def.weaponSlots).toBeUndefined();
-    // Reuses the shared walk/attack clip donors grafted by bone name; the single
-    // generic 'attack' swing plays for every ability (no per-ability map).
-    expect(def.animUrls).toEqual([
-      'models/kawaii/warrior_walk.glb',
-      'models/kawaii/warrior_attack.glb',
-    ]);
+    // Unlike its roster siblings the warrior does NOT graft the shared donors: its
+    // bind pose diverges from the shared skeleton, so the donors (which store
+    // absolute local rotations) would replay distorted. It carries its own
+    // retargeted copies instead, which is why there are no animUrls.
+    expect(def.animUrls).toBeUndefined();
+    // The single generic 'attack' swing plays for every ability (no per-ability map).
     expect(def.clips.attack).toEqual(['attack']);
     expect(def.clips.attackByAbility).toBeUndefined();
+    // With no donors, the body GLB is the ONLY clip source: if it stops carrying
+    // these three, the warrior silently loses its animation and nothing else fails.
+    const baked = glbClipNames(`public/${def.url}`);
+    for (const name of [def.clips.idle, def.clips.walk, ...def.clips.attack]) {
+      expect(baked, `${name} missing from ${def.url}`).toContain(name);
+    }
   });
 
   it('normalizes damage-event display names and preserves the whirlwind spin cue', () => {
