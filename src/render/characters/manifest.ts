@@ -542,9 +542,11 @@ const VELOCIRAPTOR: ClipMap = {
 export const VISUALS: Record<string, VisualDef> = {
   // -- player classes ------------------------------------------------------
   // Kawaii Adventurers roster: every class is a Meshy-generated chibi body with
-  // its gear modeled in, auto-rigged to one shared 24-bone skeleton (the Blender
-  // rig pass) so they all reuse the shared walk/attack clip donors via
-  // KAWAII_ANIM_URLS and the bind-pose breathing idle each base GLB carries.
+  // its gear modeled in. All but the warrior are auto-rigged to one shared 24-bone
+  // skeleton (the Blender rig pass) and reuse the shared walk/attack clip donors via
+  // KAWAII_ANIM_URLS plus the bind-pose breathing idle each base GLB carries; the
+  // warrior's bind diverges from that skeleton, so it carries its own retargeted
+  // copies of the same three clips instead (see `kawaiiSelfAnimated`).
   // EVERY class models its weapon/focus into its own hand (warrior sword, paladin sword,
   // rogue dagger, hunter bomb, priest orb, shaman axe, mage broom, warlock skull, druid
   // staff), so none takes a live weapon attach: arming one would double up in the same

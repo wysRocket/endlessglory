@@ -3,19 +3,21 @@
 // until something is attached to it, and then the weapon floats free of the fist
 // with nothing in the code to blame.
 //
-// The warrior is exactly that: `RightHand` carries 0.0 total skin weight and its
-// joint sits ~0.2 units PAST the end of the arm mesh, so the whole arm rides
-// `RightArm` and an attached sword hangs in the air beside the body. No amount of
-// socket transform math fixes it, because the bone is not in the hand.
+// The warrior was exactly that: `RightHand` carried 0.0 total skin weight and its
+// joint sat ~0.2 units PAST the end of the arm mesh, so the whole arm rode `RightArm`
+// and an attached sword hung in the air beside the body. No amount of socket transform
+// math fixed it, because the bone was not in the hand.
 //
-// Re-rigging it is not a quick fix either: Meshy auto-rigging, which produces a
-// clean skeleton for a plain chibi, fails on this body (17 of 24 joints unweighted)
-// because the cape and pauldrons merge the limbs into one silhouette, and its own
-// docs require "clearly defined limbs". So the warrior stays unarmed for now.
+// Patching the weights was not the answer either: auto-rigging that shipped body failed
+// outright (17 of 24 joints unweighted) because its hero pose merged arms, cape and
+// pauldrons into one silhouette, and the rigger documents a "clearly defined limbs"
+// precondition. The body was re-generated instead, in an A-pose already holding its
+// sword, and both of its hands now carry real weight.
 //
-// So before a body is armed via `kawaiiArmed`, its hand bone has to be real. This
-// reads the shipped GLBs and pins which bodies have a usable hand, so arming one
-// that does not fails here instead of in someone's screenshot.
+// So before a body is armed via `kawaiiArmed`, or ships with a weapon modeled into its
+// fist, its hand bone has to be real. This reads the shipped GLBs and pins which bodies
+// have a usable hand, so arming one that does not fails here instead of in someone's
+// screenshot.
 import { readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { MeshoptDecoder } from 'three/addons/libs/meshopt_decoder.module.js';
