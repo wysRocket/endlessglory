@@ -162,15 +162,18 @@ describe('kawaii rig hands', () => {
       'player_mage',
       'player_paladin',
       'player_shaman',
-      'player_warrior',
     ]);
   });
 
-  // The specific defect that put a floating sword in the game, kept as a regression
-  // marker: if a re-rig ever lands, this fails and the body can be armed again.
-  it('records the warrior hand bones as unrigged', () => {
+  // The warrior is why this suite exists: `RightHand` carried 0.0 skin weight, so an
+  // attached sword floated free of the fist and the class shipped unarmed. Rather than
+  // patch weights, the body was re-generated already holding its sword, in an A-pose
+  // with the limbs separated (auto-rigging needs that; the old hero pose merged arms,
+  // cape and pauldrons into one silhouette and left 17 of 24 joints unweighted). Both
+  // hands now carry real weight, which is what keeps the baked sword on the fist.
+  it('the re-generated warrior owns both fists, which is what carries its baked sword', () => {
     const w = jointWeights(`${repoRoot}public/models/kawaii/warrior.glb`);
-    expect(w.RightHand).toBe(0);
-    expect(w.LeftHand).toBeLessThan(1);
+    expect(w.RightHand).toBeGreaterThan(USABLE_HAND_WEIGHT);
+    expect(w.LeftHand).toBeGreaterThan(USABLE_HAND_WEIGHT);
   });
 });

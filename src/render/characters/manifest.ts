@@ -217,6 +217,19 @@ const kawaiiClass = (key: string): VisualDef => ({
   clips: kawaii(),
 });
 
+// A kawaii body carrying its OWN idle/walk/attack instead of grafting the shared donors.
+// The donors store ABSOLUTE local rotations authored against the shared bind pose, so a
+// body whose bind differs replays them distorted; this body's shoulders sit ~81 degrees
+// off the shared skeleton and collapse under them. Its clips are those same three motions
+// retargeted onto its own bind (R_new = B_new * B_old^-1 * R_old, rotation tracks only)
+// and baked into the body GLB, so it needs no animUrls. Sharing the donors stays the
+// default: only reach for this when a body's bind genuinely diverges.
+const kawaiiSelfAnimated = (key: string): VisualDef => ({
+  url: `models/kawaii/${key}.glb`,
+  height: HUMANOID_H,
+  clips: kawaii(),
+});
+
 // A kawaii body that carries a live weapon on the standard `handslot.r` bone. The
 // kawaii bodies are Mixamo-rigged with no authored handslot, so assets.ts
 // synthesizes the socket on the wrist (kawaiiHandSocket) and the standard grip path
@@ -532,12 +545,13 @@ export const VISUALS: Record<string, VisualDef> = {
   // its gear modeled in, auto-rigged to one shared 24-bone skeleton (the Blender
   // rig pass) so they all reuse the shared walk/attack clip donors via
   // KAWAII_ANIM_URLS and the bind-pose breathing idle each base GLB carries.
-  // Only the WARRIOR ships with empty weapon hands, so it is the one class that
-  // gets a gear-driven weapon (weaponSlots[0] shows its equipped mainhand). Every
-  // other class already models a weapon/focus into its own hand (paladin sword,
-  // rogue dagger, hunter bomb, priest orb, shaman axe, mage broom, warlock skull,
-  // druid staff), so arming them would double up in the same hand.
-  player_warrior: kawaiiClass('warrior'),
+  // EVERY class models its weapon/focus into its own hand (warrior sword, paladin sword,
+  // rogue dagger, hunter bomb, priest orb, shaman axe, mage broom, warlock skull, druid
+  // staff), so none takes a live weapon attach: arming one would double up in the same
+  // hand. The warrior used to be the exception, shipping empty-handed because its rig
+  // could not hold anything (`RightHand` carried zero skin weight). Its body was
+  // re-generated already holding the sword, which is why it is `kawaiiSelfAnimated`.
+  player_warrior: kawaiiSelfAnimated('warrior'),
   player_paladin: kawaiiClass('paladin'),
   player_hunter: kawaiiClass('hunter'),
   player_rogue: kawaiiClass('rogue'),
