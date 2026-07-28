@@ -142,7 +142,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "45c59c2f",
+      "state": "3fe25bf4",
       "events": "8ed17988",
       "rng": {
         "draws": 8,
@@ -153,7 +153,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 419,
-      "state": "bb00cb74",
+      "state": "775b635f",
       "events": "24d8b356",
       "rng": {
         "draws": 17,
@@ -164,7 +164,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 419,
-      "state": "0aefc902",
+      "state": "e94060a5",
       "events": "c557f06b",
       "rng": {
         "draws": 94,
@@ -175,7 +175,7 @@
       "tick": 72,
       "time": 3.6,
       "nextId": 419,
-      "state": "43767a5e",
+      "state": "cf092511",
       "events": "741638a5",
       "rng": {
         "draws": 146,
@@ -215,8 +215,7 @@
               "rusty_dagger"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [

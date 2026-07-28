@@ -140,7 +140,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 422,
-      "state": "efb6486a",
+      "state": "0a76921d",
       "events": "84a2f9f0",
       "rng": {
         "draws": 16,
@@ -151,7 +151,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 422,
-      "state": "c720050d",
+      "state": "88756b22",
       "events": "741638a5",
       "rng": {
         "draws": 16,
@@ -162,7 +162,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 422,
-      "state": "a159f225",
+      "state": "573d7ada",
       "events": "c9a898d3",
       "rng": {
         "draws": 109,
@@ -173,7 +173,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 422,
-      "state": "af865bdf",
+      "state": "db89847c",
       "events": "741638a5",
       "rng": {
         "draws": 190,
@@ -184,7 +184,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 422,
-      "state": "c835bf23",
+      "state": "fe8d0810",
       "events": "283d0279",
       "rng": {
         "draws": 308,
@@ -195,7 +195,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 422,
-      "state": "35898cb6",
+      "state": "99e72a19",
       "events": "741638a5",
       "rng": {
         "draws": 430,
@@ -206,7 +206,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 422,
-      "state": "7e153cc4",
+      "state": "2b734497",
       "events": "741638a5",
       "rng": {
         "draws": 430,
@@ -246,8 +246,7 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -571,7 +570,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 422,
-      "state": "d800713a",
+      "state": "338013ed",
       "events": "741638a5",
       "rng": {
         "draws": 518,
@@ -582,7 +581,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 422,
-      "state": "c5e0f7ab",
+      "state": "9a6b4e58",
       "events": "741638a5",
       "rng": {
         "draws": 635,
@@ -593,7 +592,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 422,
-      "state": "2183eef1",
+      "state": "5f93a316",
       "events": "741638a5",
       "rng": {
         "draws": 783,
@@ -604,7 +603,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 422,
-      "state": "2183eef1",
+      "state": "5f93a316",
       "events": "741638a5",
       "rng": {
         "draws": 783,
@@ -644,8 +643,7 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [

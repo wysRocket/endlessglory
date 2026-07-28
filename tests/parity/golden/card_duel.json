@@ -62,7 +62,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "86a17e7d",
+      "state": "a4e51323",
       "events": "7ee777aa",
       "rng": {
         "draws": 38,
@@ -73,7 +73,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 419,
-      "state": "dabcee22",
+      "state": "1ad7261c",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -84,7 +84,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 419,
-      "state": "aeba1dc7",
+      "state": "98329525",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -95,7 +95,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 419,
-      "state": "52ae35c3",
+      "state": "7c4c7981",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -106,7 +106,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 419,
-      "state": "9a85221e",
+      "state": "a2b75e88",
       "events": "741638a5",
       "rng": {
         "draws": 38,
@@ -117,7 +117,7 @@
       "tick": 41,
       "time": 2.05,
       "nextId": 419,
-      "state": "67596d33",
+      "state": "30b1c131",
       "events": "741638a5",
       "rng": {
         "draws": 42,
@@ -152,8 +152,7 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "delveClears": {},
@@ -208,8 +207,7 @@
               "spring_water"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "delveClears": {},

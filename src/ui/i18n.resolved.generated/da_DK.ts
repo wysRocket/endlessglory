@@ -686,7 +686,8 @@ export const da_DK: EnTranslations = {
         "classic": "Klassisk guld",
         "midnight": "Midnat",
         "parchment": "Pergament",
-        "highContrast": "Høj kontrast"
+        "highContrast": "Høj kontrast",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Accent",

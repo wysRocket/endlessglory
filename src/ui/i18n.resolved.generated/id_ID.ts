@@ -686,7 +686,8 @@ export const id_ID: EnTranslations = {
         "classic": "Emas Klasik",
         "midnight": "Tengah Malam",
         "parchment": "Perkamen",
-        "highContrast": "Kontras Tinggi"
+        "highContrast": "Kontras Tinggi",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Aksen",

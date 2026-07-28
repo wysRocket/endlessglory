@@ -778,6 +778,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': 'Полночь',
   'hudChrome.theme.presets.parchment': 'Пергамент',
   'hudChrome.theme.presets.highContrast': 'Высокий контраст',
+  'hudChrome.theme.presets.emberwood': 'Эмбервуд',
   'hudChrome.theme.knob.accent': 'Акцент',
   'hudChrome.theme.knob.border': 'Рамка',
   'hudChrome.theme.knob.panel': 'Панель',
@@ -5116,7 +5117,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
     'Земноводные обитатели топей, что кишат на мелководье шумными, оберегающими свою территорию стаями.',
   'guide.family.burrower.name': 'Землекопы',
   'guide.family.golem.name': 'Големы',
-  'guide.family.golem.desc': 'Оживлённые изваяния из камня и янтаря, медлительные, но сокрушительно сильные, что охраняют места, к которым привязаны.',
+  'guide.family.golem.desc':
+    'Оживлённые изваяния из камня и янтаря, медлительные, но сокрушительно сильные, что охраняют места, к которым привязаны.',
   'guide.family.burrower.desc':
     'Землекопы, покрытые коркой грязи, что наводняют шахты и норы, яростно охраняя свою руду.',
   'guide.family.humanoid.name': 'Гуманоиды',

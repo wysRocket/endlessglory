@@ -686,7 +686,8 @@ export const en_XA: EnTranslations = {
         "classic": "[Çļáššíç Ĝóļð]",
         "midnight": "[Ɱíðñíĝĥţ]",
         "parchment": "[Þáŕçĥɱéñţ]",
-        "highContrast": "[Ĥíĝĥ Çóñţŕášţ]"
+        "highContrast": "[Ĥíĝĥ Çóñţŕášţ]",
+        "emberwood": "[Éɱƀéŕŵóóð]"
       },
       "knob": {
         "accent": "[Áççéñţ]",

@@ -671,7 +671,7 @@ export const MEDIA_ASSETS: Record<string, string> =
   "models/kawaii/rogue.glb": "/media/models/kawaii/rogue.2f8c22e14f54.glb",
   "models/kawaii/shaman.glb": "/media/models/kawaii/shaman.f6a13240211d.glb",
   "models/kawaii/warlock.glb": "/media/models/kawaii/warlock.89cf877b0417.glb",
-  "models/kawaii/warrior.glb": "/media/models/kawaii/warrior.abceb1b8021f.glb",
+  "models/kawaii/warrior.glb": "/media/models/kawaii/warrior.f1796b4d14fd.glb",
   "models/kawaii/warrior_attack.glb": "/media/models/kawaii/warrior_attack.c16d87e1e23a.glb",
   "models/kawaii/warrior_walk.glb": "/media/models/kawaii/warrior_walk.05d6bf05c2ed.glb",
   "models/props/alchemy_cauldron.glb": "/media/models/props/alchemy_cauldron.1ca4fd675ad0.glb",

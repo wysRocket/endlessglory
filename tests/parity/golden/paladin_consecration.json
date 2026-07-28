@@ -137,7 +137,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "c2e8a698",
+      "state": "2454c99b",
       "events": "3d39ec12",
       "rng": {
         "draws": 6,
@@ -148,7 +148,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 419,
-      "state": "7627e741",
+      "state": "11be4e4e",
       "events": "741638a5",
       "rng": {
         "draws": 6,
@@ -159,7 +159,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 419,
-      "state": "a43bfea3",
+      "state": "c81b2958",
       "events": "807152e0",
       "rng": {
         "draws": 84,
@@ -170,7 +170,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 419,
-      "state": "1bcb537a",
+      "state": "9a61468d",
       "events": "741638a5",
       "rng": {
         "draws": 172,
@@ -181,7 +181,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 419,
-      "state": "02df5216",
+      "state": "d41d8f29",
       "events": "e6dfbe2f",
       "rng": {
         "draws": 276,
@@ -192,7 +192,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 419,
-      "state": "bc0dfe57",
+      "state": "a12babbc",
       "events": "741638a5",
       "rng": {
         "draws": 388,
@@ -203,7 +203,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 419,
-      "state": "b6cf272c",
+      "state": "94955fdf",
       "events": "f3a16d96",
       "rng": {
         "draws": 505,
@@ -214,7 +214,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 419,
-      "state": "44f72484",
+      "state": "b792c897",
       "events": "741638a5",
       "rng": {
         "draws": 621,
@@ -225,7 +225,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 419,
-      "state": "20e87d8a",
+      "state": "ad79349d",
       "events": "d4f490da",
       "rng": {
         "draws": 767,
@@ -236,7 +236,7 @@
       "tick": 200,
       "time": 10,
       "nextId": 419,
-      "state": "23996e63",
+      "state": "463b1d98",
       "events": "741638a5",
       "rng": {
         "draws": 922,
@@ -247,7 +247,7 @@
       "tick": 201,
       "time": 10.05,
       "nextId": 419,
-      "state": "883a74f1",
+      "state": "9741eefe",
       "events": "741638a5",
       "rng": {
         "draws": 925,
@@ -288,8 +288,7 @@
               "training_mace"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [

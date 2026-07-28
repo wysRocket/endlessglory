@@ -83,6 +83,21 @@ import {
 } from './theme';
 import { svgIcon } from './ui_icons';
 
+// The FULL translation key for each theme preset's label, spelled out rather than
+// built by template. A `hudChrome.theme.presets.${id}` template has to be cast to
+// TranslationKey, which throws away the one compile-time check that would catch a
+// preset added without its catalog entry. The miss then surfaces at RUNTIME as a t()
+// throw inside renderInterface, blanking the ENTIRE Options > Interface panel, which
+// is how 'emberwood' shipped broken. As a Record<PresetId, TranslationKey>, a new
+// preset with no label is a tsc error instead of a blank panel.
+const THEME_PRESET_LABEL_KEYS: Record<PresetId, TranslationKey> = {
+  classic: 'hudChrome.theme.presets.classic',
+  midnight: 'hudChrome.theme.presets.midnight',
+  parchment: 'hudChrome.theme.presets.parchment',
+  highContrast: 'hudChrome.theme.presets.highContrast',
+  emberwood: 'hudChrome.theme.presets.emberwood',
+};
+
 // The current sub-panel (the main menu plus the eight sub-views).
 type OptionsView = 'main' | OptionsPanelId;
 
@@ -922,12 +937,10 @@ export class OptionsWindow {
     presetName.textContent = t('hudChrome.theme.preset');
     const seg = document.createElement('div');
     seg.className = 'set-seg theme-presets';
-    const presetLabel = (id: PresetId): string =>
-      t(`hudChrome.theme.presets.${id}` as TranslationKey);
     for (const id of PRESET_ORDER) {
       const btn = document.createElement('button');
       btn.className = 'btn set-seg-btn';
-      btn.textContent = presetLabel(id);
+      btn.textContent = t(THEME_PRESET_LABEL_KEYS[id]);
       btn.classList.toggle('active', theme.get().preset === id);
       btn.addEventListener('click', () => {
         audio.click();
