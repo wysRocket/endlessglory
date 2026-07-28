@@ -385,6 +385,11 @@ ALTER TABLE accounts ADD COLUMN IF NOT EXISTS totp_secret TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS totp_pending_secret TEXT;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS totp_enabled_at TIMESTAMPTZ;
 ALTER TABLE accounts ADD COLUMN IF NOT EXISTS totp_last_window BIGINT;
+-- The linked Firebase identity, set once this account has signed in through (or been
+-- background-provisioned onto) Firebase Auth. UNIQUE because the mapping is 1:1, the
+-- same shape as discord_links.discord_user_id and apple_auth_links.apple_subject.
+-- Postgres stays authoritative: this is an identity mirror, never a session.
+ALTER TABLE accounts ADD COLUMN IF NOT EXISTS firebase_uid TEXT UNIQUE;
 -- Single-use 2FA recovery codes. Only the SHA-256 of each code is stored (the
 -- plaintext is shown to the user once at enrolment), and a code is burned by
 -- stamping consumed_at, mirroring the email-change token posture.
@@ -1117,6 +1122,9 @@ export interface AccountRow {
   // Recovery email (nullable): the login path selects it so the handler can tell
   // the client whether a pre-existing account still needs to set one.
   email?: string | null;
+  // Set once this account has a linked Firebase identity (see server/firebase_auth.ts
+  // and the background-provisioning step in auth_routes.ts's loginHandler).
+  firebase_uid?: string | null;
   // Present on the login path (findAccount): null/undefined when 2FA is off.
   totp_secret?: string | null;
   totp_enabled_at?: string | null;
@@ -1405,7 +1413,7 @@ export async function createAccount(
 
 export async function findAccount(username: string): Promise<AccountRow | null> {
   const res = await pool.query(
-    `SELECT id, username, password_hash, email, totp_secret, totp_enabled_at, totp_last_window
+    `SELECT id, username, password_hash, email, firebase_uid, totp_secret, totp_enabled_at, totp_last_window
      FROM accounts WHERE username = $1`,
     [username],
   );
@@ -1459,6 +1467,25 @@ export async function accountForToken(token: string): Promise<number | null> {
     [token],
   );
   return res.rows[0]?.account_id ?? null;
+}
+
+// The two firebase_uid helpers take an explicit `pool` (the apple_auth_db.ts
+// convention) so they unit-test against a fake without a live Postgres, even though
+// this module keeps a real singleton pool for its own call sites.
+export async function accountForFirebaseUid(
+  pool: Pool,
+  firebaseUid: string,
+): Promise<number | null> {
+  const result = await pool.query('SELECT id FROM accounts WHERE firebase_uid = $1', [firebaseUid]);
+  return result.rows[0]?.id ?? null;
+}
+
+export async function setFirebaseUid(
+  pool: Pool,
+  accountId: number,
+  firebaseUid: string,
+): Promise<void> {
+  await pool.query('UPDATE accounts SET firebase_uid = $1 WHERE id = $2', [firebaseUid, accountId]);
 }
 
 // Account + scope for a live token. Mirrors accountForToken but also returns the
