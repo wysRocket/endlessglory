@@ -142,7 +142,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 432,
-      "state": "edce2881",
+      "state": "3bd0eaca",
       "events": "8b064b81",
       "rng": {
         "draws": 1,
@@ -214,7 +214,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 1.519145,
+          "fallStartY": -3.301292,
           "fiveSecondRule": 99,
           "hp": 93,
           "id": 417,
@@ -269,7 +269,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 432,
-      "state": "2948892d",
+      "state": "351915c0",
       "events": "f19269ae",
       "rng": {
         "draws": 1,
@@ -352,7 +352,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 1.506291,
+          "fallStartY": -3.224524,
           "fiveSecondRule": 99.1,
           "hp": 185,
           "id": 417,
@@ -373,9 +373,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 18,
-            "y": 1.506291,
-            "z": 2
+            "x": -148,
+            "y": -3.224524,
+            "z": 116
           },
           "potionCooldownUntil": -1,
           "resource": 100,
@@ -408,7 +408,7 @@
       "tick": 2,
       "time": 0.1,
       "nextId": 432,
-      "state": "2948892d",
+      "state": "351915c0",
       "events": "741638a5",
       "rng": {
         "draws": 1,
@@ -491,7 +491,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0715,
           "dualWielding": true,
-          "fallStartY": 1.506291,
+          "fallStartY": -3.224524,
           "fiveSecondRule": 99.1,
           "hp": 185,
           "id": 417,
@@ -512,9 +512,9 @@
           "overpowerUntil": -1,
           "petMode": "defensive",
           "pos": {
-            "x": 18,
-            "y": 1.506291,
-            "z": 2
+            "x": -148,
+            "y": -3.224524,
+            "z": 116
           },
           "potionCooldownUntil": -1,
           "resource": 100,

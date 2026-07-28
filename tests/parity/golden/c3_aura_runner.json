@@ -372,7 +372,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 419,
-      "state": "f0c79ae6",
+      "state": "98d4e2b9",
       "events": "ea02f49d",
       "rng": {
         "draws": 2,
@@ -383,7 +383,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 419,
-      "state": "d348b820",
+      "state": "662d1883",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -394,7 +394,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 419,
-      "state": "b47a76b3",
+      "state": "930df228",
       "events": "741638a5",
       "rng": {
         "draws": 2,
@@ -405,7 +405,7 @@
       "tick": 35,
       "time": 1.75,
       "nextId": 419,
-      "state": "43b0abd5",
+      "state": "d7e151b2",
       "events": "44cfef69",
       "rng": {
         "draws": 2,
@@ -416,7 +416,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 419,
-      "state": "2e733158",
+      "state": "fe5f1bdb",
       "events": "2f342c26",
       "rng": {
         "draws": 2,
@@ -427,7 +427,7 @@
       "tick": 45,
       "time": 2.25,
       "nextId": 419,
-      "state": "dd7e7bd8",
+      "state": "c74f7e5b",
       "events": "741638a5",
       "rng": {
         "draws": 20,
@@ -438,7 +438,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 419,
-      "state": "2ca64b72",
+      "state": "032e3645",
       "events": "741638a5",
       "rng": {
         "draws": 44,
@@ -449,7 +449,7 @@
       "tick": 55,
       "time": 2.75,
       "nextId": 419,
-      "state": "763b479e",
+      "state": "a1b0a131",
       "events": "741638a5",
       "rng": {
         "draws": 62,
@@ -460,7 +460,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 419,
-      "state": "de640534",
+      "state": "9c9c1887",
       "events": "741638a5",
       "rng": {
         "draws": 79,
@@ -471,7 +471,7 @@
       "tick": 62,
       "time": 3.1,
       "nextId": 419,
-      "state": "8e3c9e0e",
+      "state": "44f34021",
       "events": "741638a5",
       "rng": {
         "draws": 85,
@@ -507,8 +507,7 @@
               "training_mace"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -687,7 +686,7 @@
       "tick": 65,
       "time": 3.25,
       "nextId": 421,
-      "state": "d344ae53",
+      "state": "8ea790c8",
       "events": "9e14430c",
       "rng": {
         "draws": 106,
@@ -698,7 +697,7 @@
       "tick": 70,
       "time": 3.5,
       "nextId": 421,
-      "state": "43b30bf6",
+      "state": "08209b89",
       "events": "741638a5",
       "rng": {
         "draws": 130,
@@ -709,7 +708,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 421,
-      "state": "f6e8e8a0",
+      "state": "ab550103",
       "events": "741638a5",
       "rng": {
         "draws": 153,
@@ -720,7 +719,7 @@
       "tick": 80,
       "time": 4,
       "nextId": 421,
-      "state": "4f91af93",
+      "state": "3feb9088",
       "events": "741638a5",
       "rng": {
         "draws": 165,
@@ -731,7 +730,7 @@
       "tick": 85,
       "time": 4.25,
       "nextId": 421,
-      "state": "2d4e0597",
+      "state": "03a8707c",
       "events": "741638a5",
       "rng": {
         "draws": 195,
@@ -742,7 +741,7 @@
       "tick": 90,
       "time": 4.5,
       "nextId": 421,
-      "state": "c909e5c4",
+      "state": "ca3e1e57",
       "events": "741638a5",
       "rng": {
         "draws": 220,
@@ -753,7 +752,7 @@
       "tick": 95,
       "time": 4.75,
       "nextId": 421,
-      "state": "d5272060",
+      "state": "e7a74143",
       "events": "741638a5",
       "rng": {
         "draws": 259,
@@ -764,7 +763,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 421,
-      "state": "b963c31e",
+      "state": "4278a4b1",
       "events": "741638a5",
       "rng": {
         "draws": 283,
@@ -775,7 +774,7 @@
       "tick": 105,
       "time": 5.25,
       "nextId": 421,
-      "state": "b9f953ff",
+      "state": "4548ed44",
       "events": "90602784",
       "rng": {
         "draws": 307,
@@ -786,7 +785,7 @@
       "tick": 110,
       "time": 5.5,
       "nextId": 421,
-      "state": "99f3ecaf",
+      "state": "6df0e234",
       "events": "741638a5",
       "rng": {
         "draws": 326,
@@ -797,7 +796,7 @@
       "tick": 115,
       "time": 5.75,
       "nextId": 421,
-      "state": "f9a7b93a",
+      "state": "b63ef7cd",
       "events": "741638a5",
       "rng": {
         "draws": 358,
@@ -808,7 +807,7 @@
       "tick": 120,
       "time": 6,
       "nextId": 421,
-      "state": "78cca3ba",
+      "state": "fa9efa4d",
       "events": "741638a5",
       "rng": {
         "draws": 384,
@@ -819,7 +818,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 421,
-      "state": "20708782",
+      "state": "fcfe49d5",
       "events": "741638a5",
       "rng": {
         "draws": 422,
@@ -830,7 +829,7 @@
       "tick": 130,
       "time": 6.5,
       "nextId": 421,
-      "state": "adb9eef8",
+      "state": "4369e2fb",
       "events": "741638a5",
       "rng": {
         "draws": 457,
@@ -841,7 +840,7 @@
       "tick": 135,
       "time": 6.75,
       "nextId": 421,
-      "state": "d8076c8f",
+      "state": "1c8d5114",
       "events": "741638a5",
       "rng": {
         "draws": 495,
@@ -852,7 +851,7 @@
       "tick": 140,
       "time": 7,
       "nextId": 421,
-      "state": "ac928dc9",
+      "state": "4a74b2f6",
       "events": "741638a5",
       "rng": {
         "draws": 530,
@@ -863,7 +862,7 @@
       "tick": 145,
       "time": 7.25,
       "nextId": 421,
-      "state": "92ea1191",
+      "state": "4024ec1e",
       "events": "e5ff279a",
       "rng": {
         "draws": 562,
@@ -874,7 +873,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 421,
-      "state": "b88bdd65",
+      "state": "1dc6ec82",
       "events": "741638a5",
       "rng": {
         "draws": 594,
@@ -885,7 +884,7 @@
       "tick": 155,
       "time": 7.75,
       "nextId": 421,
-      "state": "f9b1acf8",
+      "state": "787ac0fb",
       "events": "741638a5",
       "rng": {
         "draws": 637,
@@ -896,7 +895,7 @@
       "tick": 160,
       "time": 8,
       "nextId": 421,
-      "state": "72d6b620",
+      "state": "afd03683",
       "events": "741638a5",
       "rng": {
         "draws": 656,
@@ -907,7 +906,7 @@
       "tick": 165,
       "time": 8.25,
       "nextId": 421,
-      "state": "bb81f28c",
+      "state": "42581dbf",
       "events": "741638a5",
       "rng": {
         "draws": 685,
@@ -918,7 +917,7 @@
       "tick": 170,
       "time": 8.5,
       "nextId": 421,
-      "state": "42564372",
+      "state": "5db2ae45",
       "events": "741638a5",
       "rng": {
         "draws": 707,
@@ -929,7 +928,7 @@
       "tick": 175,
       "time": 8.75,
       "nextId": 421,
-      "state": "623806f5",
+      "state": "6a8e0cd2",
       "events": "741638a5",
       "rng": {
         "draws": 744,
@@ -940,7 +939,7 @@
       "tick": 180,
       "time": 9,
       "nextId": 421,
-      "state": "01c86903",
+      "state": "6d09e238",
       "events": "741638a5",
       "rng": {
         "draws": 790,
@@ -951,7 +950,7 @@
       "tick": 182,
       "time": 9.1,
       "nextId": 421,
-      "state": "47d04302",
+      "state": "ae698d55",
       "events": "1ce3472f",
       "rng": {
         "draws": 803,
@@ -992,8 +991,7 @@
               "training_mace"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [

@@ -149,7 +149,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 424,
-      "state": "20e75796",
+      "state": "00ae4161",
       "events": "33d473d7",
       "rng": {
         "draws": 62,
@@ -160,7 +160,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 424,
-      "state": "3e3e69cc",
+      "state": "9383aa27",
       "events": "0d5ebe4a",
       "rng": {
         "draws": 103,
@@ -171,7 +171,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 424,
-      "state": "c0a2cbe5",
+      "state": "604306ea",
       "events": "849f3161",
       "rng": {
         "draws": 230,
@@ -182,7 +182,7 @@
       "tick": 60,
       "time": 3,
       "nextId": 424,
-      "state": "490bd682",
+      "state": "00a7a98d",
       "events": "741638a5",
       "rng": {
         "draws": 230,
@@ -220,8 +220,7 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
@@ -701,7 +700,7 @@
       "tick": 64,
       "time": 3.2,
       "nextId": 424,
-      "state": "5cce998d",
+      "state": "888993d2",
       "events": "741638a5",
       "rng": {
         "draws": 250,
@@ -739,8 +738,7 @@
               "worn_sword"
             ],
             "visited": [
-              "poi:eastbrook_vale:eastbrook",
-              "poi:eastbrook_vale:reliquary_hill"
+              "poi:eastbrook_vale:eastbrook"
             ]
           },
           "deedsEarned": [
