@@ -1656,6 +1656,8 @@ export const sv_SE: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Fortsätt med Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Det gick inte att logga in med Apple. Försök igen.",
       "appleChoiceIntro": "Skapa ett nytt konto eller länka Apple till ett konto du redan har.",
       "appleChoiceExpired": "Den här Apple-inloggningen har gått ut. Logga in med Apple igen.",

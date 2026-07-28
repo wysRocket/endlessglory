@@ -1656,6 +1656,8 @@ export const da_DK: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Fortsæt med Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Kunne ikke logge ind med Apple. Prøv igen.",
       "appleChoiceIntro": "Opret en ny konto, eller knyt Apple til en konto, du allerede har.",
       "appleChoiceExpired": "Dette Apple-login er udløbet. Log ind med Apple igen.",

@@ -1656,6 +1656,8 @@ export const ko_KR: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Apple로 계속하기",
+      "googleLoginCta": "Google로 계속하기",
+      "googleError": "Google로 로그인할 수 없습니다. 다시 시도해 주세요.",
       "appleError": "Apple로 로그인할 수 없습니다. 다시 시도해 주세요.",
       "appleChoiceIntro": "새 계정을 만들거나 Apple을 기존 계정에 연결하세요.",
       "appleChoiceExpired": "Apple 로그인이 만료되었습니다. Apple로 다시 로그인해 주세요.",

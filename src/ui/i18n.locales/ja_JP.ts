@@ -460,6 +460,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     'ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',
+  'hudChrome.auth.googleLoginCta': 'Googleで続ける',
+  'hudChrome.auth.googleError': 'Googleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleChoiceIntro':
     '新しいアカウントを作成するか、Appleを既存のアカウントに連携します。',

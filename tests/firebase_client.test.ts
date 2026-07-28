@@ -73,3 +73,23 @@ describe('src/net/firebase_client', () => {
     expect(initializeApp).toHaveBeenCalledTimes(1);
   });
 });
+
+describe('isFirebaseSdkError', () => {
+  // The split decides which message a failed sign-in shows: Firebase's own auth/*
+  // codes are developer diagnostics, so they get one generic line, while a refusal
+  // our server decided (a ban, a rate limit) must still reach the localized
+  // API-error path rather than being flattened into "could not sign in".
+  it('recognizes a Firebase SDK rejection', async () => {
+    const { isFirebaseSdkError } = await import('../src/net/firebase_client');
+    expect(isFirebaseSdkError({ code: 'auth/network-request-failed' })).toBe(true);
+    expect(isFirebaseSdkError({ code: 'auth/popup-blocked' })).toBe(true);
+  });
+
+  it('does not claim a server API error as its own', async () => {
+    const { isFirebaseSdkError } = await import('../src/net/firebase_client');
+    expect(isFirebaseSdkError({ code: 'moderation.banned' })).toBe(false);
+    expect(isFirebaseSdkError({ code: 'firebase_auth.invalid_token' })).toBe(false);
+    expect(isFirebaseSdkError(new Error('request failed (500)'))).toBe(false);
+    expect(isFirebaseSdkError(null)).toBe(false);
+  });
+});

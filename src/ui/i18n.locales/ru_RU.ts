@@ -460,6 +460,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     'Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
+  'hudChrome.auth.googleLoginCta': 'Продолжить с Google',
+  'hudChrome.auth.googleError': 'Не удалось войти через Google. Попробуйте ещё раз.',
   'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
   'hudChrome.auth.appleChoiceIntro':
     'Создайте новую учётную запись или привяжите Apple к существующей.',

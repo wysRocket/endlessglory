@@ -426,6 +426,16 @@ export class Api {
     return {};
   }
 
+  // Exchange a Firebase ID token (from src/net/firebase_client.ts) for the same
+  // session shape every other login path produces. Used by the Google and Discord
+  // web sign-in buttons; the username/password form never calls this.
+  async firebaseLogin(idToken: string): Promise<void> {
+    const data = await this.post('/api/auth/firebase', { idToken });
+    this.token = data.token;
+    this.username = data.username;
+    this.emailMissing = data.emailMissing === true;
+  }
+
   async appleLogin(
     identityToken: string,
     displayName: string,

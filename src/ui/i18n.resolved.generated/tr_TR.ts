@@ -1656,6 +1656,8 @@ export const tr_TR: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Apple ile Devam Et",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Apple ile oturum açılamadı. Lütfen tekrar dene.",
       "appleChoiceIntro": "Yeni bir hesap oluştur veya Apple hesabını mevcut hesabına bağla.",
       "appleChoiceExpired": "Bu Apple oturum açma işleminin süresi doldu. Lütfen Apple ile yeniden oturum aç.",

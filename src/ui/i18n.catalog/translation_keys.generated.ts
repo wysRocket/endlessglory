@@ -4760,6 +4760,8 @@ export type TranslationKeyFlat =
   | 'hudChrome.auth.forgotSubmit'
   | 'hudChrome.auth.forgotTitle'
   | 'hudChrome.auth.forgotUsername'
+  | 'hudChrome.auth.googleError'
+  | 'hudChrome.auth.googleLoginCta'
   | 'hudChrome.auth.resetConfirm'
   | 'hudChrome.auth.resetDone'
   | 'hudChrome.auth.resetErrInvalid'

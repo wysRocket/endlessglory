@@ -464,6 +464,8 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     '피해에 면역이고 행동할 수 없습니다. 생명력을 회복하고 재사용 대기시간을 가속합니다. 우클릭으로 취소할 수 있습니다.',
   'hudChrome.auth.appleLoginCta': 'Apple로 계속하기',
+  'hudChrome.auth.googleLoginCta': 'Google로 계속하기',
+  'hudChrome.auth.googleError': 'Google로 로그인할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.auth.appleError': 'Apple로 로그인할 수 없습니다. 다시 시도해 주세요.',
   'hudChrome.auth.appleChoiceIntro': '새 계정을 만들거나 Apple을 기존 계정에 연결하세요.',
   'hudChrome.auth.appleChoiceExpired':

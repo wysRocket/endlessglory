@@ -57,6 +57,15 @@ export function isSignInCancelled(error: unknown): boolean {
   );
 }
 
+/** True when the rejection came from the Firebase SDK rather than from this game's
+ *  own API. Firebase's `auth/*` codes are developer diagnostics, not player copy, so
+ *  the caller shows one generic message for them and reserves the localized
+ *  API-error path for refusals the server actually decided. */
+export function isFirebaseSdkError(error: unknown): boolean {
+  const code = (error as { code?: unknown } | null)?.code;
+  return typeof code === 'string' && code.startsWith('auth/');
+}
+
 /** Opens the Google sign-in popup; resolves to a Firebase ID token. */
 export async function signInWithGoogle(): Promise<string> {
   const credential = await signInWithPopup(getAuth(firebaseApp()), new GoogleAuthProvider());

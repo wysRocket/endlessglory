@@ -456,6 +456,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     '免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。',
   'hudChrome.auth.appleLoginCta': '透過 Apple 繼續',
+  'hudChrome.auth.googleLoginCta': '透過 Google 繼續',
+  'hudChrome.auth.googleError': '無法透過 Google 登入。請再試一次。',
   'hudChrome.auth.appleError': '無法透過 Apple 登入。請再試一次。',
   'hudChrome.auth.appleChoiceIntro': '建立新帳戶，或將 Apple 連結到現有帳戶。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登入已過期。請再次使用 Apple 登入。',

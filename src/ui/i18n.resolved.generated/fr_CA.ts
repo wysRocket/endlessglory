@@ -1656,6 +1656,8 @@ export const fr_CA: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Continuer avec Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Impossible de se connecter avec Apple. Veuillez réessayer.",
       "appleChoiceIntro": "Créez un nouveau compte ou associez Apple à un compte existant.",
       "appleChoiceExpired": "Cette connexion avec Apple a expiré. Veuillez vous reconnecter avec Apple.",
