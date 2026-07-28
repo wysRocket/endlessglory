@@ -12,33 +12,39 @@ export const pending: Record<string, readonly string[]> = {
   "es": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "es_ES": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "fr_FR": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "fr_CA": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "en_CA": [],
   "it_IT": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "de_DE": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -47,47 +53,56 @@ export const pending: Record<string, readonly string[]> = {
   "pt_BR": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "ru_RU": [],
   "cs_CZ": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "nl_NL": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "pl_PL": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "id_ID": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "tr_TR": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "sv_SE": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "vi_VN": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ],
   "da_DK": [
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
-    "guide.family.golem.name"
+    "guide.family.golem.name",
+    "hudChrome.theme.presets.emberwood"
   ]
 };

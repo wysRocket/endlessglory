@@ -686,7 +686,8 @@ export const zh_TW: EnTranslations = {
         "classic": "經典金色",
         "midnight": "午夜",
         "parchment": "羊皮紙",
-        "highContrast": "高對比"
+        "highContrast": "高對比",
+        "emberwood": "餘燼林"
       },
       "knob": {
         "accent": "強調色",

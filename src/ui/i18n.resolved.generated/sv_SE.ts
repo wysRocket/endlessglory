@@ -686,7 +686,8 @@ export const sv_SE: EnTranslations = {
         "classic": "Klassiskt guld",
         "midnight": "Midnatt",
         "parchment": "Pergament",
-        "highContrast": "Hög kontrast"
+        "highContrast": "Hög kontrast",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Accent",

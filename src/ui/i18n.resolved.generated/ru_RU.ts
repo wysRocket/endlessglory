@@ -686,7 +686,8 @@ export const ru_RU: EnTranslations = {
         "classic": "Классическое золото",
         "midnight": "Полночь",
         "parchment": "Пергамент",
-        "highContrast": "Высокий контраст"
+        "highContrast": "Высокий контраст",
+        "emberwood": "Эмбервуд"
       },
       "knob": {
         "accent": "Акцент",
