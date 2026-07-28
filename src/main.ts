@@ -127,6 +127,7 @@ import {
   isAuthError,
   NATIVE_APP,
 } from './net/online';
+import { resolveOnlineCapability } from './net/online_capability';
 import { realmPopulation } from './net/realm_population';
 import { RECONNECT_CONFLICT_ERROR } from './net/reconnect_policy';
 import {
@@ -3902,6 +3903,14 @@ function loginNavItem(): HTMLElement | null {
   return ($('#nav-btn-login') as HTMLElement).closest('.nav-item') as HTMLElement | null;
 }
 
+// Does this build have a game server to talk to at all? A static-only deployment
+// (client on a CDN, no server behind it) 404s every /api/* call, so showing a login
+// form there only collects credentials nothing can accept. Resolved once at boot;
+// the pure decision lives in net/online_capability.ts.
+const ONLINE_ENABLED = resolveOnlineCapability({
+  offlineOnlyFlag: String(import.meta.env.VITE_OFFLINE_ONLY ?? ''),
+});
+
 const loggedInNavItems = ['#nav-item-account', '#nav-item-logout'];
 
 function enterLoggedInChrome(): void {
@@ -3928,7 +3937,9 @@ function enterLoggedOutChrome(): void {
     if (li) li.hidden = true;
   });
   const li = loginNavItem();
-  if (li) li.hidden = false;
+  // Stays hidden on a server-less build: logging out must not resurrect an entry
+  // point into a form whose every submit would 404.
+  if (li) li.hidden = !ONLINE_ENABLED;
 }
 
 function logoutAccount(): void {
@@ -8456,6 +8467,12 @@ function wireStartScreens(): void {
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });
+  // No server, no sign-in surface: drop the whole nav entry rather than leave a
+  // form that looks live and 404s on submit.
+  if (!ONLINE_ENABLED) {
+    const li = loginNavItem();
+    if (li) li.hidden = true;
+  }
   setupNavBtn($('#nav-btn-account'), '#account-view', () => {
     switchMainView('#account-view');
     void renderAccountPortal();
@@ -8493,7 +8510,7 @@ function wireStartScreens(): void {
   }
   const discordLoginBtn = $('#btn-login-discord');
   const discordOrDivider = document.getElementById('auth-or-divider');
-  if (discordLoginBtn && DISCORD_BUILD_ENABLED) {
+  if (discordLoginBtn && DISCORD_BUILD_ENABLED && ONLINE_ENABLED) {
     discordLoginBtn.hidden = false;
     if (discordOrDivider) discordOrDivider.hidden = false;
     discordLoginBtn.addEventListener('click', (e) => {
@@ -8517,7 +8534,7 @@ function wireStartScreens(): void {
   // developer diagnostics and not player copy), or a refusal from
   // /api/auth/firebase (localized from its stable code like every other API error).
   const googleLoginBtn = $('#btn-login-google');
-  if (googleLoginBtn) {
+  if (googleLoginBtn && ONLINE_ENABLED) {
     googleLoginBtn.hidden = false;
     if (discordOrDivider) discordOrDivider.hidden = false;
     googleLoginBtn.addEventListener('click', (event) => {
