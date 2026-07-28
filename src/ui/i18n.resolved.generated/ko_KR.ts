@@ -686,7 +686,8 @@ export const ko_KR: EnTranslations = {
         "classic": "클래식 골드",
         "midnight": "미드나이트",
         "parchment": "양피지",
-        "highContrast": "고대비"
+        "highContrast": "고대비",
+        "emberwood": "엠버우드"
       },
       "knob": {
         "accent": "강조색",

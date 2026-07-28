@@ -755,6 +755,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': '午夜',
   'hudChrome.theme.presets.parchment': '羊皮紙',
   'hudChrome.theme.presets.highContrast': '高對比',
+  'hudChrome.theme.presets.emberwood': '餘燼林',
   'hudChrome.theme.knob.accent': '強調色',
   'hudChrome.theme.knob.border': '邊框',
   'hudChrome.theme.knob.panel': '框架',
@@ -4845,7 +4846,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.family.mudfin.desc': '兩棲的沼澤居民，成群聚集於淺灘，喧鬧且強烈護衛地盤。',
   'guide.family.burrower.name': '掘地怪',
   'guide.family.golem.name': '魔像',
-  'guide.family.golem.desc': '由石頭與琥珀構成的活體造物，行動遲緩卻力大無窮，守護著它們被束縛之地。',
+  'guide.family.golem.desc':
+    '由石頭與琥珀構成的活體造物，行動遲緩卻力大無窮，守護著它們被束縛之地。',
   'guide.family.burrower.desc': '滿身泥垢的挖掘者，盤踞於礦坑與洞穴中，凶猛地守衛著礦石。',
   'guide.family.humanoid.name': '類人生物',
   'guide.family.humanoid.desc':

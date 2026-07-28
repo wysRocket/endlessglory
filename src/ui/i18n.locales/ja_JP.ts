@@ -778,6 +778,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': 'ミッドナイト',
   'hudChrome.theme.presets.parchment': '羊皮紙',
   'hudChrome.theme.presets.highContrast': 'ハイコントラスト',
+  'hudChrome.theme.presets.emberwood': 'エンバーウッド',
   'hudChrome.theme.knob.accent': 'アクセント',
   'hudChrome.theme.knob.border': '枠線',
   'hudChrome.theme.knob.panel': 'フレーム',
@@ -5057,7 +5058,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '浅瀬に群がる水陸両生の沼地の住人。騒がしく、縄張り意識の強い群れをなします。',
   'guide.family.burrower.name': '穴掘り',
   'guide.family.golem.name': 'ゴーレム',
-  'guide.family.golem.desc': '石と琥珀で造られた動く構造体。動きは遅いが力は絶大で、縛り付けられた場所を守り続ける。',
+  'guide.family.golem.desc':
+    '石と琥珀で造られた動く構造体。動きは遅いが力は絶大で、縛り付けられた場所を守り続ける。',
   'guide.family.burrower.desc':
     '泥にまみれた採掘者たち。鉱山や巣穴にはびこり、自らの鉱石を必死に守ります。',
   'guide.family.humanoid.name': 'ヒューマノイド',

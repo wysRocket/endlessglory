@@ -59,7 +59,13 @@ export const THEME_KNOB_LABEL_KEY: Record<ThemeKnob, string> = {
   energy: 'energy',
 };
 
-export const PRESET_ORDER: PresetId[] = ['classic', 'midnight', 'parchment', 'highContrast', 'emberwood'];
+export const PRESET_ORDER: PresetId[] = [
+  'classic',
+  'midnight',
+  'parchment',
+  'highContrast',
+  'emberwood',
+];
 
 // `classic` reproduces the shipped gold/dark palette; the others are alternates.
 export const THEME_PRESETS: Record<PresetId, ThemeKnobs> = {

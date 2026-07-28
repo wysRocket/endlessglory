@@ -686,7 +686,8 @@ export const tr_TR: EnTranslations = {
         "classic": "Klasik Altın",
         "midnight": "Gece Yarısı",
         "parchment": "Parşömen",
-        "highContrast": "Yüksek Kontrast"
+        "highContrast": "Yüksek Kontrast",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Vurgu",
