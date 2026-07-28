@@ -113,6 +113,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/steam/link',
   '/api/steam/status',
   '/api/welcome/flags',
+  '/api/auth/firebase',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -260,6 +261,8 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/referrals' },
     // The Welcome Screen server flags surface (server/welcome.ts).
     { method: 'GET', path: '/api/welcome/flags' },
+    // The Firebase Auth sign-in surface (server/firebase_auth.ts).
+    { method: 'POST', path: '/api/auth/firebase' },
     // The reports + telemetry surface (server/reports.ts). All POST; the
     // two public beacons (perf-report, site-presence) are registered POST-only so a
     // non-POST delegates to the retained legacy arm (perf-report's 404 fall-through,

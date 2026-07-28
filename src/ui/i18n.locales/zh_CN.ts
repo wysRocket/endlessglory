@@ -456,6 +456,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     '免疫伤害且无法行动；恢复生命并加速冷却。右键点击可取消。',
   'hudChrome.auth.appleLoginCta': '通过 Apple 继续',
+  'hudChrome.auth.googleLoginCta': '通过 Google 继续',
+  'hudChrome.auth.googleError': '无法通过 Google 登录。请重试。',
   'hudChrome.auth.appleError': '无法通过 Apple 登录。请重试。',
   'hudChrome.auth.appleChoiceIntro': '创建新帐户，或将 Apple 关联到现有帐户。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登录已过期。请再次使用 Apple 登录。',
@@ -6682,6 +6684,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': '管理员要求你的一个角色进行改名。',
   'apiError.email.invalid': '请输入有效的邮箱地址。',
   'apiError.email.unchanged': '这已经是你的邮箱地址了。',
+  'apiError.firebase_auth.invalid_token': '无法验证此次登录。请重新登录。',
   'apiError.two_factor.code_invalid': '验证码无效，请重试。',
   'apiError.two_factor.setup_required': '请先开始双重验证设置。',
   'apiError.two_factor.already_enabled': '双重验证已启用。',

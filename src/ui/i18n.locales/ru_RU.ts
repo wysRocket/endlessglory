@@ -460,6 +460,8 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     'Невосприимчивость к урону и невозможность действовать; восстанавливает здоровье и ускоряет способности. Щелкните правой кнопкой, чтобы отменить.',
   'hudChrome.auth.appleLoginCta': 'Продолжить с Apple',
+  'hudChrome.auth.googleLoginCta': 'Продолжить с Google',
+  'hudChrome.auth.googleError': 'Не удалось войти через Google. Попробуйте ещё раз.',
   'hudChrome.auth.appleError': 'Не удалось войти через Apple. Попробуйте ещё раз.',
   'hudChrome.auth.appleChoiceIntro':
     'Создайте новую учётную запись или привяжите Apple к существующей.',
@@ -7143,6 +7145,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': 'Модератор требует переименовать одного из ваших персонажей.',
   'apiError.email.invalid': 'Введите корректный адрес эл. почты.',
   'apiError.email.unchanged': 'Это уже ваш текущий адрес email.',
+  'apiError.firebase_auth.invalid_token': 'Не удалось подтвердить этот вход. Войдите снова.',
   'apiError.two_factor.code_invalid': 'Этот код недействителен, попробуйте ещё раз.',
   'apiError.two_factor.setup_required': 'Сначала начните настройку двухфакторной аутентификации.',
   'apiError.two_factor.already_enabled': 'Двухфакторная аутентификация уже включена.',

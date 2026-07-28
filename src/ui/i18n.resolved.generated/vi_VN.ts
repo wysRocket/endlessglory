@@ -1657,6 +1657,8 @@ export const vi_VN: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Tiếp Tục với Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Không thể đăng nhập bằng Apple. Vui lòng thử lại.",
       "appleChoiceIntro": "Tạo tài khoản mới, hoặc liên kết Apple với tài khoản bạn đã có.",
       "appleChoiceExpired": "Lần đăng nhập bằng Apple đó đã hết hạn. Vui lòng đăng nhập lại bằng Apple.",
@@ -2527,6 +2529,9 @@ export const vi_VN: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

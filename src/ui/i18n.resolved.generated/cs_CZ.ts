@@ -1657,6 +1657,8 @@ export const cs_CZ: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Pokračovat přes Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Přihlášení přes Apple se nezdařilo. Zkus to znovu.",
       "appleChoiceIntro": "Vytvoř nový účet, nebo propoj Apple s účtem, který už máš.",
       "appleChoiceExpired": "Platnost tohoto přihlášení přes Apple vypršela. Přihlas se přes Apple znovu.",
@@ -2527,6 +2529,9 @@ export const cs_CZ: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Neplatný vstup."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

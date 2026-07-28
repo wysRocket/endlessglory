@@ -460,6 +460,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     'ダメージを受けず行動不能になります。体力を回復し、クールダウンを加速します。右クリックで解除できます。',
   'hudChrome.auth.appleLoginCta': 'Appleで続ける',
+  'hudChrome.auth.googleLoginCta': 'Googleで続ける',
+  'hudChrome.auth.googleError': 'Googleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleError': 'Appleでサインインできませんでした。もう一度お試しください。',
   'hudChrome.auth.appleChoiceIntro':
     '新しいアカウントを作成するか、Appleを既存のアカウントに連携します。',
@@ -7027,6 +7029,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'モデレーターがあなたのキャラクターのいずれかに改名を要求しています。',
   'apiError.email.invalid': '有効なメールアドレスを入力してください。',
   'apiError.email.unchanged': 'すでに現在のメールアドレスです。',
+  'apiError.firebase_auth.invalid_token':
+    'このサインインを確認できませんでした。もう一度サインインしてください。',
   'apiError.two_factor.code_invalid': 'そのコードは無効です。もう一度お試しください。',
   'apiError.two_factor.setup_required': 'まず二段階認証の設定を開始してください。',
   'apiError.two_factor.already_enabled': '二段階認証は既に有効です。',

@@ -108,6 +108,8 @@
     "bs58": "^6.0.0",
     "electron-log": "^5.4.4",
     "electron-updater": "^6.8.9",
+    "firebase": "^12.16.0",
+    "firebase-admin": "^14.2.0",
     "n8ao": "^1.10.1",
     "obscenity": "^0.4.6",
     "pg": "^8.21.0",

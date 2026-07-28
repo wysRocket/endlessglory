@@ -1657,6 +1657,8 @@ export const ru_RU: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Продолжить с Apple",
+      "googleLoginCta": "Продолжить с Google",
+      "googleError": "Не удалось войти через Google. Попробуйте ещё раз.",
       "appleError": "Не удалось войти через Apple. Попробуйте ещё раз.",
       "appleChoiceIntro": "Создайте новую учётную запись или привяжите Apple к существующей.",
       "appleChoiceExpired": "Вход через Apple истёк. Войдите через Apple ещё раз.",
@@ -2527,6 +2529,9 @@ export const ru_RU: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Неверные входные данные."
+    },
+    "firebase_auth": {
+      "invalid_token": "Не удалось подтвердить этот вход. Войдите снова."
     }
   },
   "guide": {

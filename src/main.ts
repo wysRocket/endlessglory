@@ -8510,6 +8510,42 @@ function wireStartScreens(): void {
       startDiscordOAuth('login');
     });
   }
+  // "Continue with Google": the Firebase-backed web sign-in. The SDK is imported
+  // lazily so the firebase bundle never loads for a player signing in with a
+  // password. A rejection is one of three things: the player dismissing the popup
+  // (silent), another Firebase-side failure (a generic message, since its codes are
+  // developer diagnostics and not player copy), or a refusal from
+  // /api/auth/firebase (localized from its stable code like every other API error).
+  const googleLoginBtn = $('#btn-login-google');
+  if (googleLoginBtn) {
+    googleLoginBtn.hidden = false;
+    if (discordOrDivider) discordOrDivider.hidden = false;
+    googleLoginBtn.addEventListener('click', (event) => {
+      event.preventDefault();
+      googleLoginBtn.setAttribute('disabled', 'true');
+      void (async () => {
+        const { signInWithGoogle, isSignInCancelled, isFirebaseSdkError, currentFirebaseUid } =
+          await import('./net/firebase_client');
+        try {
+          await api.firebaseLogin(await signInWithGoogle());
+          // Cross-device preference sync (docs/superpowers/specs/
+          // 2026-07-27-firestore-scope-design.md): preferences only, never game
+          // state, and best-effort, so it cannot delay or fail entering the world.
+          const uid = currentFirebaseUid();
+          if (uid) {
+            void import('./net/firestore_sync').then(({ syncPrefsForUid }) => syncPrefsForUid(uid));
+          }
+          await completeOnlineAuth();
+        } catch (error) {
+          if (isSignInCancelled(error)) return;
+          console.error('[firebase] could not sign in with Google', error);
+          loginError(
+            isFirebaseSdkError(error) ? t('hudChrome.auth.googleError') : userFacingApiError(error),
+          );
+        }
+      })().finally(() => googleLoginBtn.removeAttribute('disabled'));
+    });
+  }
   if (discordOrDivider && NATIVE_APP && isNativeIos()) discordOrDivider.hidden = false;
   wireDiscordCtaBanner();
   wireDiscordKeepModal();

@@ -893,6 +893,21 @@ export const SURFACE_INVENTORY: readonly SurfaceRoute[] = [
     limiter: null,
     requireOwnedExpected: null,
   },
+  // Firebase Auth token resolution (server/firebase_auth.ts): the Google/Discord
+  // web sign-in front door. Registry-only RouteDef born after the migration
+  // (new-route rule, server/http/CLAUDE.md): no legacy ladder arm. Public like
+  // every other login endpoint (the caller has no session yet); the Firebase ID
+  // token IS the credential, and the shared per-IP rateLimited window bounds it.
+  {
+    dispatcher: DISPATCH.mainApi,
+    method: 'POST',
+    path: '/api/auth/firebase',
+    handler: 'server/firebase_auth.ts firebaseLoginHandler (registry-only RouteDef)',
+    contentType: PROBLEM_JSON,
+    authScope: AUTH_SCOPE.public,
+    limiter: 'rateLimited',
+    requireOwnedExpected: null,
+  },
   // Daily-rewards player family (v0.19.0, server/daily_rewards.ts): served by
   // the handleDailyRewardApi sub-dispatcher behind the main.ts PREFIX arm
   // `url.startsWith('/api/daily-rewards')`, which runs bearerActiveAccount

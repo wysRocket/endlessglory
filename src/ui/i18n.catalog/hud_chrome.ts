@@ -1683,6 +1683,8 @@ export const hudChromeStrings = {
   // account exists.
   auth: {
     appleLoginCta: 'Continue with Apple',
+    googleLoginCta: 'Continue with Google',
+    googleError: 'Could not sign in with Google. Please try again.',
     appleError: 'Could not sign in with Apple. Please try again.',
     appleChoiceIntro: 'Create a new account, or link Apple to one you already have.',
     appleChoiceExpired: 'That Apple sign-in expired. Please sign in with Apple again.',

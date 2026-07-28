@@ -1,0 +1,35 @@
+rules_version = '2';
+
+// Firestore security rules for World of ClaudeCraft / Endless Glory.
+//
+// Scope spec: docs/superpowers/specs/2026-07-27-firestore-scope-design.md.
+//
+// Firestore holds ONE thing: a signed-in player's own client preferences (keybinds,
+// volumes, graphics tier, HUD chrome toggles). Every piece of game state, and every
+// account and session, lives in Postgres behind the authoritative server, because the
+// server decides all outcomes and a rule here could not enforce that: rules constrain
+// the SHAPE of a write, never its legitimacy. No rule can know whether a player
+// actually killed the mob.
+//
+// So the rules are deliberately narrow rather than clever. There is exactly one
+// readable and writable location, it is keyed by the caller's own uid, and everything
+// else in the database is denied. Adding a collection here is an architecture decision,
+// not a configuration tweak: read the spec first.
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // A player's own preference documents. Read and write only where the path's uid
+    // segment is the caller's authenticated uid, so there is no cross-user access and
+    // no unauthenticated access at all.
+    match /users/{uid}/prefs/{document} {
+      allow read, write: if request.auth != null && request.auth.uid == uid;
+    }
+
+    // Default deny. Anything not matched above is unreachable from a client, which is
+    // what keeps the "preferences only" boundary from eroding by accident: a new
+    // collection does not silently become writable.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}

@@ -1657,6 +1657,8 @@ export const es_ES: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Continuar con Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "No se pudo iniciar sesión con Apple. Inténtalo de nuevo.",
       "appleChoiceIntro": "Crea una cuenta nueva o vincula Apple a una que ya tengas.",
       "appleChoiceExpired": "Ese inicio de sesión con Apple ha caducado. Vuelve a iniciar sesión con Apple.",
@@ -2527,6 +2529,9 @@ export const es_ES: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Entrada no válida."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

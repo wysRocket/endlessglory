@@ -10,40 +10,58 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "es_ES": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "fr_FR": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "fr_CA": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "de_DE": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "zh_CN": [],
@@ -51,58 +69,85 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "nl_NL": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "pl_PL": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "id_ID": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "tr_TR": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "sv_SE": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "vi_VN": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
   "da_DK": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "hudChrome.auth.googleError",
+    "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ]
 };

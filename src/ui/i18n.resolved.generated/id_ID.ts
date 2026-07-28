@@ -1657,6 +1657,8 @@ export const id_ID: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Lanjutkan dengan Apple",
+      "googleLoginCta": "Continue with Google",
+      "googleError": "Could not sign in with Google. Please try again.",
       "appleError": "Tidak dapat masuk dengan Apple. Silakan coba lagi.",
       "appleChoiceIntro": "Buat akun baru, atau tautkan Apple ke akun yang sudah kamu miliki.",
       "appleChoiceExpired": "Sesi masuk dengan Apple itu telah kedaluwarsa. Silakan masuk lagi dengan Apple.",
@@ -2527,6 +2529,9 @@ export const id_ID: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Data yang dimasukkan tidak valid."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

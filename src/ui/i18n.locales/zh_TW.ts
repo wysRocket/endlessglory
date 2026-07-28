@@ -456,6 +456,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.auraEffect.temporalHourglass':
     '免疫傷害且無法行動；恢復生命並加速冷卻。按右鍵可取消。',
   'hudChrome.auth.appleLoginCta': '透過 Apple 繼續',
+  'hudChrome.auth.googleLoginCta': '透過 Google 繼續',
+  'hudChrome.auth.googleError': '無法透過 Google 登入。請再試一次。',
   'hudChrome.auth.appleError': '無法透過 Apple 登入。請再試一次。',
   'hudChrome.auth.appleChoiceIntro': '建立新帳戶，或將 Apple 連結到現有帳戶。',
   'hudChrome.auth.appleChoiceExpired': 'Apple 登入已過期。請再次使用 Apple 登入。',
@@ -6683,6 +6685,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': '管理員要求你的其中一個角色必須改名。',
   'apiError.email.invalid': '請輸入有效的電子郵件地址。',
   'apiError.email.unchanged': '這已經是你目前的電子郵件地址了。',
+  'apiError.firebase_auth.invalid_token': '無法驗證這次登入。請重新登入。',
   'apiError.two_factor.code_invalid': '這組代碼無效，請再試一次。',
   'apiError.two_factor.setup_required': '請先開始雙重驗證設定。',
   'apiError.two_factor.already_enabled': '雙重驗證已啟用。',

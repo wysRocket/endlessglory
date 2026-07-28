@@ -1657,6 +1657,8 @@ export const zh_TW: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "透過 Apple 繼續",
+      "googleLoginCta": "透過 Google 繼續",
+      "googleError": "無法透過 Google 登入。請再試一次。",
       "appleError": "無法透過 Apple 登入。請再試一次。",
       "appleChoiceIntro": "建立新帳戶，或將 Apple 連結到現有帳戶。",
       "appleChoiceExpired": "Apple 登入已過期。請再次使用 Apple 登入。",
@@ -2527,6 +2529,9 @@ export const zh_TW: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "輸入無效。"
+    },
+    "firebase_auth": {
+      "invalid_token": "無法驗證這次登入。請重新登入。"
     }
   },
   "guide": {

@@ -1657,6 +1657,8 @@ export const ja_JP: EnTranslations = {
     },
     "auth": {
       "appleLoginCta": "Appleで続ける",
+      "googleLoginCta": "Googleで続ける",
+      "googleError": "Googleでサインインできませんでした。もう一度お試しください。",
       "appleError": "Appleでサインインできませんでした。もう一度お試しください。",
       "appleChoiceIntro": "新しいアカウントを作成するか、Appleを既存のアカウントに連携します。",
       "appleChoiceExpired": "Appleでのサインインの有効期限が切れました。もう一度お試しください。",
@@ -2527,6 +2529,9 @@ export const ja_JP: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "入力が無効です。"
+    },
+    "firebase_auth": {
+      "invalid_token": "このサインインを確認できませんでした。もう一度サインインしてください。"
     }
   },
   "guide": {

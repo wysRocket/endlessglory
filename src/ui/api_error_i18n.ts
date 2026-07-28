@@ -118,6 +118,9 @@ export const API_ERROR_KEYS = {
   'steam.upstream': 'apiError.steam.upstream',
   'wallet.handoff_invalid': 'apiError.wallet.handoff_invalid',
   'welcome.invalid_input': 'apiError.welcome.invalid_input',
+
+  // firebase_auth: the Firebase ID token exchange (server/firebase_auth.ts).
+  'firebase_auth.invalid_token': 'apiError.firebase_auth.invalid_token',
 } satisfies Record<string, TranslationKey>;
 
 /** The message of an Error, or the string form of any other thrown value. */
