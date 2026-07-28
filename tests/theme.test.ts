@@ -1,4 +1,9 @@
 import { describe, expect, it } from 'vitest';
+// Imported STATICALLY, not with an `await import()` inside the test body: pulling in
+// the resolved i18n table costs well over a second, and paying that inside a test
+// blows the 5s per-test timeout whenever this file runs alongside a heavy suite
+// (parity), which made the label pin flaky. Module load is not subject to that timeout.
+import { t } from '../src/ui/i18n';
 import {
   contrastRatio,
   DEFAULT_THEME,
@@ -165,8 +170,7 @@ describe('theme pure core', () => {
 // renderInterface, leaving the whole Options > Interface panel blank. That is exactly
 // how 'emberwood' shipped. This pins every preset to a real, non-empty label.
 describe('theme preset labels', () => {
-  it('gives every PRESET_ORDER entry a translatable label', async () => {
-    const { t } = await import('../src/ui/i18n');
+  it('gives every PRESET_ORDER entry a translatable label', () => {
     for (const id of PRESET_ORDER) {
       const label = t(`hudChrome.theme.presets.${id}` as never);
       expect(label, id).toBeTruthy();
