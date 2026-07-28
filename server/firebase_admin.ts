@@ -18,6 +18,31 @@ export interface VerifiedFirebaseIdentity {
   uid: string;
   email: string | null;
   emailVerified: boolean;
+  /**
+   * The upstream provider subject ids the token carries, keyed by Firebase provider
+   * id (`'google.com'`, `'apple.com'`, `'oidc.<name>'`, ...). This is what the
+   * account resolver matches an EXISTING linked player on: discord_links stores the
+   * Discord snowflake and apple_auth_links stores Apple's `sub`, and neither table
+   * has ever seen a Firebase uid, so matching on the uid would find nobody and hand
+   * every returning linked player a fresh empty account.
+   */
+  providerSubjects: Record<string, string[]>;
+}
+
+/** Normalizes the `firebase.identities` claim, which is typed `any` per provider:
+ *  a provider's value may arrive as an array of ids or as a bare string, and only
+ *  string ids are usable. Providers left with nothing are dropped entirely, so a
+ *  caller can treat a present key as a non-empty list. */
+function providerSubjectsOf(identities: unknown): Record<string, string[]> {
+  if (!identities || typeof identities !== 'object') return {};
+  const out: Record<string, string[]> = {};
+  for (const [provider, raw] of Object.entries(identities as Record<string, unknown>)) {
+    const list = (Array.isArray(raw) ? raw : [raw]).filter(
+      (id): id is string => typeof id === 'string' && id.length > 0,
+    );
+    if (list.length > 0) out[provider] = list;
+  }
+  return out;
 }
 
 /** Verifies a Firebase ID token server-side (local JWKS-cached verification, no
@@ -32,6 +57,7 @@ export async function verifyFirebaseIdToken(
       uid: decoded.uid,
       email: typeof decoded.email === 'string' ? decoded.email : null,
       emailVerified: decoded.email_verified === true,
+      providerSubjects: providerSubjectsOf(decoded.firebase?.identities),
     };
   } catch {
     return null;

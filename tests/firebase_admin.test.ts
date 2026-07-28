@@ -47,6 +47,65 @@ describe('server/firebase_admin', () => {
       uid: 'uid-1',
       email: 'player@example.com',
       emailVerified: true,
+      providerSubjects: {},
+    });
+  });
+
+  // The whole transparent-migration path depends on these: an existing player's
+  // account is found by their DISCORD snowflake / APPLE sub (what discord_links and
+  // apple_auth_links store), never by the Firebase uid, which those tables have never
+  // seen. Dropping the claim here would silently hand every returning linked player a
+  // brand new empty account instead of their characters.
+  it('verifyFirebaseIdToken carries the provider subject ids off the firebase.identities claim', async () => {
+    verifyIdToken.mockResolvedValue({
+      uid: 'uid-2',
+      email: null,
+      email_verified: false,
+      firebase: {
+        sign_in_provider: 'oidc.discord',
+        identities: {
+          'oidc.discord': ['198765432109876543'],
+          'apple.com': ['001234.abcdef.0100'],
+        },
+      },
+    });
+    const { verifyFirebaseIdToken } = await import('../server/firebase_admin');
+    await expect(verifyFirebaseIdToken('a.valid.token')).resolves.toEqual({
+      uid: 'uid-2',
+      email: null,
+      emailVerified: false,
+      providerSubjects: {
+        'oidc.discord': ['198765432109876543'],
+        'apple.com': ['001234.abcdef.0100'],
+      },
+    });
+  });
+
+  it('verifyFirebaseIdToken keeps only string subject ids and drops empty providers', async () => {
+    verifyIdToken.mockResolvedValue({
+      uid: 'uid-3',
+      email: 'a@example.com',
+      email_verified: true,
+      firebase: {
+        sign_in_provider: 'google.com',
+        // The claim is typed `any` per provider: a bare string, a mixed array, and a
+        // provider carrying nothing usable all have to normalize without throwing.
+        identities: {
+          'google.com': '107812345678901234567',
+          email: ['a@example.com', 42, null],
+          'oidc.discord': [],
+        },
+      },
+    });
+    const { verifyFirebaseIdToken } = await import('../server/firebase_admin');
+    await expect(verifyFirebaseIdToken('a.valid.token')).resolves.toEqual({
+      uid: 'uid-3',
+      email: 'a@example.com',
+      emailVerified: true,
+      providerSubjects: {
+        'google.com': ['107812345678901234567'],
+        email: ['a@example.com'],
+      },
     });
   });
 

@@ -110,6 +110,7 @@ export const API_CONTENT_TYPE: Readonly<Record<string, ContentTypeClass>> = {
   '/api/wallet/link': PROBLEM_JSON,
   '/api/wallet': PROBLEM_JSON,
   '/api/auth/discord/start': PROBLEM_JSON,
+  '/api/auth/firebase': PROBLEM_JSON,
   '/api/auth/apple': PROBLEM_JSON,
   '/api/auth/apple/login/new': PROBLEM_JSON,
   '/api/auth/apple/login/link': PROBLEM_JSON,
