@@ -41,9 +41,18 @@ export const DISCORD_PROVIDER_ID = 'oidc.discord';
 
 let app: ReturnType<typeof initializeApp> | null = null;
 
-function firebaseApp() {
+/** The one initialized Firebase app, shared with the Firestore transport
+ *  (firestore_sync.ts) so a second initializeApp never happens. */
+export function firebaseApp() {
   if (!app) app = initializeApp(FIREBASE_CONFIG);
   return app;
+}
+
+/** The signed-in player's Firebase uid, or null when this session has no Firebase
+ *  identity (a legacy password login, which never opens a Firebase session
+ *  client-side). Preference sync is keyed on it. */
+export function currentFirebaseUid(): string | null {
+  return getAuth(firebaseApp()).currentUser?.uid ?? null;
 }
 
 /** True when a rejected sign-in was the player dismissing the popup rather than a

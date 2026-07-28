@@ -8524,11 +8524,17 @@ function wireStartScreens(): void {
       event.preventDefault();
       googleLoginBtn.setAttribute('disabled', 'true');
       void (async () => {
-        const { signInWithGoogle, isSignInCancelled, isFirebaseSdkError } = await import(
-          './net/firebase_client'
-        );
+        const { signInWithGoogle, isSignInCancelled, isFirebaseSdkError, currentFirebaseUid } =
+          await import('./net/firebase_client');
         try {
           await api.firebaseLogin(await signInWithGoogle());
+          // Cross-device preference sync (docs/superpowers/specs/
+          // 2026-07-27-firestore-scope-design.md): preferences only, never game
+          // state, and best-effort, so it cannot delay or fail entering the world.
+          const uid = currentFirebaseUid();
+          if (uid) {
+            void import('./net/firestore_sync').then(({ syncPrefsForUid }) => syncPrefsForUid(uid));
+          }
           await completeOnlineAuth();
         } catch (error) {
           if (isSignInCancelled(error)) return;
