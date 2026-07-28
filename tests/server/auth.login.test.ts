@@ -401,6 +401,9 @@ describe('login: success', () => {
       moderationStatusForAccount: async () => modStatus(),
       touchLogin: async () => {},
       saveToken: async () => {},
+      // An email with no firebase_uid is exactly the shape that triggers the
+      // background Firebase provisioning below; faked so this case stays hermetic.
+      provisionFirebaseShadow: async () => {},
     });
     const res = await login({ username: USERNAME, password: CORRECT_PASSWORD });
     expect(res.status).toBe(200);
@@ -509,5 +512,109 @@ describe('login guards (through the onion)', () => {
     // Proceeded past Turnstile through the full happy path to a token.
     expect(res.status).toBe(200);
     expect((res.body as { token: string }).token).toMatch(TOKEN_RE);
+  });
+});
+
+// ---------------------------------------------------------------------------
+// 12. Background Firebase provisioning (the password half of the Firebase
+// migration). A successful legacy login silently mirrors the just-verified
+// password into Firebase, once, and never lets that side effect affect the
+// login's outcome.
+// ---------------------------------------------------------------------------
+
+describe('login: background Firebase provisioning', () => {
+  it('provisions a Firebase user when the account has an email and no firebase_uid yet', async () => {
+    const provisionFirebaseShadow = vi.fn(async () => {});
+    setAuthDbForTests({
+      findAccount: async () => account({ email: 'hero@example.com', firebase_uid: null }),
+      moderationStatusForAccount: async () => modStatus(),
+      touchLogin: async () => {},
+      saveToken: async () => {},
+      provisionFirebaseShadow,
+    });
+    const res = await login({ username: USERNAME, password: CORRECT_PASSWORD });
+    expect(res.status).toBe(200);
+    expect(provisionFirebaseShadow).toHaveBeenCalledWith('hero@example.com', CORRECT_PASSWORD, 1);
+  });
+
+  it('skips provisioning for an account with no email on file', async () => {
+    const provisionFirebaseShadow = vi.fn(async () => {});
+    setAuthDbForTests({
+      findAccount: async () => account({ email: null, firebase_uid: null }),
+      moderationStatusForAccount: async () => modStatus(),
+      touchLogin: async () => {},
+      saveToken: async () => {},
+      provisionFirebaseShadow,
+    });
+    const res = await login({ username: USERNAME, password: CORRECT_PASSWORD });
+    expect(res.status).toBe(200);
+    expect(provisionFirebaseShadow).not.toHaveBeenCalled();
+  });
+
+  it('skips provisioning for an account that already has a firebase_uid', async () => {
+    const provisionFirebaseShadow = vi.fn(async () => {});
+    setAuthDbForTests({
+      findAccount: async () =>
+        account({ email: 'hero@example.com', firebase_uid: 'already-migrated' }),
+      moderationStatusForAccount: async () => modStatus(),
+      touchLogin: async () => {},
+      saveToken: async () => {},
+      provisionFirebaseShadow,
+    });
+    const res = await login({ username: USERNAME, password: CORRECT_PASSWORD });
+    expect(res.status).toBe(200);
+    expect(provisionFirebaseShadow).not.toHaveBeenCalled();
+  });
+
+  // The load-bearing one: Firebase is a brand new external dependency on the
+  // oldest, most critical path in the product. It must not be able to take
+  // password login down.
+  it('still logs the player in when Firebase provisioning rejects', async () => {
+    setAuthDbForTests({
+      findAccount: async () => account({ email: 'hero@example.com', firebase_uid: null }),
+      moderationStatusForAccount: async () => modStatus(),
+      touchLogin: async () => {},
+      saveToken: async () => {},
+      provisionFirebaseShadow: async () => {
+        throw new Error('Firebase is down');
+      },
+    });
+    const res = await login({ username: USERNAME, password: CORRECT_PASSWORD });
+    expect(res.status).toBe(200);
+    expect((res.body as { token: string }).token).toMatch(TOKEN_RE);
+  });
+
+  // The password the shadow user gets must be the one the player actually typed
+  // and the handler actually verified, never a stale or re-read value.
+  it('mirrors the exact verified password, not the request body read twice', async () => {
+    const provisionFirebaseShadow = vi.fn(async () => {});
+    setAuthDbForTests({
+      findAccount: async () => account({ email: 'hero@example.com', firebase_uid: null }),
+      moderationStatusForAccount: async () => modStatus(),
+      touchLogin: async () => {},
+      saveToken: async () => {},
+      provisionFirebaseShadow,
+    });
+    await login({ username: USERNAME, password: CORRECT_PASSWORD });
+    const [, passwordArg] = provisionFirebaseShadow.mock.calls[0] as unknown as [
+      string,
+      string,
+      number,
+    ];
+    expect(passwordArg).toBe(CORRECT_PASSWORD);
+  });
+
+  it('does not provision on a failed password attempt', async () => {
+    const provisionFirebaseShadow = vi.fn(async () => {});
+    setAuthDbForTests({
+      findAccount: async () => account({ email: 'hero@example.com', firebase_uid: null }),
+      moderationStatusForAccount: async () => modStatus(),
+      touchLogin: async () => {},
+      saveToken: async () => {},
+      provisionFirebaseShadow,
+    });
+    const res = await login({ username: USERNAME, password: 'wrong-pw' });
+    expect(res.status).toBe(401);
+    expect(provisionFirebaseShadow).not.toHaveBeenCalled();
   });
 });

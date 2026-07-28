@@ -50,6 +50,7 @@ import {
   findAccount,
   isAdminAccount,
   moderationStatusForAccount,
+  provisionFirebaseShadow,
   type RequestMetadata,
   saveToken,
   setAccountEmail,
@@ -161,6 +162,7 @@ const REAL_AUTH_DB = {
   saveToken,
   moderationStatusForAccount,
   isAdminAccount,
+  provisionFirebaseShadow,
   touchLogin,
   setAccountEmail,
   verifyLoginTwoFactor,
@@ -335,7 +337,10 @@ async function loginHandler(ctx: Ctx): Promise<void> {
     return;
   }
   const account = username ? await authDb.findAccount(username) : null;
-  if (!account || !(await verifyPassword(String(body.password ?? ''), account.password_hash))) {
+  // Bound once so the Firebase shadow-provisioning step below mirrors the EXACT
+  // string verifyPassword accepted, never a second independent read of the body.
+  const password = String(body.password ?? '');
+  if (!account || !(await verifyPassword(password, account.password_hash))) {
     if (username) recordAuthFailure(username);
     json(ctx.res, 401, { error: INVALID_CREDENTIALS, code: 'auth.invalid_credentials' });
     return;
@@ -373,6 +378,15 @@ async function loginHandler(ctx: Ctx): Promise<void> {
     }
   }
   clearAuthFailures(username); // correct password: forgive earlier typos
+  // Firebase migration (the password half): mirror the password we just verified
+  // into a Firebase identity, once per account. Fire-and-forget by design, so a
+  // slow or down Firebase costs this login nothing; the failure is logged, not
+  // surfaced, because the player's login has already succeeded either way.
+  if (account.email?.trim() && !account.firebase_uid) {
+    void authDb
+      .provisionFirebaseShadow(account.email, password, account.id)
+      .catch((err) => logger.error({ err }, 'firebase shadow provisioning failed'));
+  }
   await authDb.touchLogin(account.id, rt.requestMetadata(ctx.req));
   const token = newToken();
   await authDb.saveToken(token, account.id);

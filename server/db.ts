@@ -1488,6 +1488,29 @@ export async function setFirebaseUid(
   await pool.query('UPDATE accounts SET firebase_uid = $1 WHERE id = $2', [firebaseUid, accountId]);
 }
 
+/**
+ * Best-effort background migration of a legacy password account: mirrors the
+ * just-verified password into a Firebase user, then links the resulting uid. The
+ * caller has ALREADY verified the password against the scrypt hash; this never
+ * verifies anything itself, so it must only ever be reached on a successful login.
+ *
+ * Callers MUST treat it as fire-and-forget-safe (catch and ignore any rejection): a
+ * Firebase outage must never block or slow a legacy login. Bundled as one function
+ * so auth_routes.ts calls one thing and the whole side effect fakes as one unit.
+ *
+ * The firebase_admin import is dynamic so the many existing suites that import
+ * db.ts never have to mock the firebase-admin package just to load this module.
+ */
+export async function provisionFirebaseShadow(
+  email: string,
+  password: string,
+  accountId: number,
+): Promise<void> {
+  const { createFirebaseUserWithPassword } = await import('./firebase_admin');
+  const firebaseUid = await createFirebaseUserWithPassword(email, password);
+  await setFirebaseUid(pool, accountId, firebaseUid);
+}
+
 // Account + scope for a live token. Mirrors accountForToken but also returns the
 // token's scope so read routes can accept 'read'|'full' while mutating routes
 // (via bearerActiveAccount) reject anything that is not 'full'. Old tokens
