@@ -5059,7 +5059,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     '浅瀬に群がる水陸両生の沼地の住人。騒がしく、縄張り意識の強い群れをなします。',
   'guide.family.burrower.name': '穴掘り',
   'guide.family.golem.name': 'ゴーレム',
-  'guide.family.golem.desc': '石と琥珀で造られた動く構造体。動きは遅いが力は絶大で、縛り付けられた場所を守り続ける。',
+  'guide.family.golem.desc':
+    '石と琥珀で造られた動く構造体。動きは遅いが力は絶大で、縛り付けられた場所を守り続ける。',
   'guide.family.burrower.desc':
     '泥にまみれた採掘者たち。鉱山や巣穴にはびこり、自らの鉱石を必死に守ります。',
   'guide.family.humanoid.name': 'ヒューマノイド',
@@ -7027,7 +7028,8 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
     'モデレーターがあなたのキャラクターのいずれかに改名を要求しています。',
   'apiError.email.invalid': '有効なメールアドレスを入力してください。',
   'apiError.email.unchanged': 'すでに現在のメールアドレスです。',
-  'apiError.firebase_auth.invalid_token': 'このサインインを確認できませんでした。もう一度サインインしてください。',
+  'apiError.firebase_auth.invalid_token':
+    'このサインインを確認できませんでした。もう一度サインインしてください。',
   'apiError.two_factor.code_invalid': 'そのコードは無効です。もう一度お試しください。',
   'apiError.two_factor.setup_required': 'まず二段階認証の設定を開始してください。',
   'apiError.two_factor.already_enabled': '二段階認証は既に有効です。',

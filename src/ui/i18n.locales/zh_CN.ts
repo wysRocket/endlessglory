@@ -4845,7 +4845,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.family.mudfin.desc': '两栖的沼泽居民，成群涌入浅滩，吵闹而极具地盘意识。',
   'guide.family.burrower.name': '穴居者',
   'guide.family.golem.name': '魔像',
-  'guide.family.golem.desc': '由石头和琥珀构成的活体造物，行动迟缓却力大无穷，守护着它们被束缚之地。',
+  'guide.family.golem.desc':
+    '由石头和琥珀构成的活体造物，行动迟缓却力大无穷，守护着它们被束缚之地。',
   'guide.family.burrower.desc': '沾满泥污的掘地者，在矿洞与地穴中繁衍，凶狠地守护着自己的矿石。',
   'guide.family.humanoid.name': '人型生物',
   'guide.family.humanoid.desc': '盗匪、邪教徒以及其他误入歧途之辈。他们以战术作战，而非只靠拳脚。',

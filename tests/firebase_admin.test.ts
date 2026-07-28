@@ -9,11 +9,12 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 // getApps() is mocked empty below so every case exercises the real init path, which
 // reads this env var. `cert` and `initializeApp` are mocked, so the value only has to
-// parse as JSON: it never reaches Google and is not a credential.
+// PARSE as JSON: it never reaches Google and is not a credential. Deliberately no
+// key-shaped field here, real or fake: the release malware scanner flags any
+// private-key literal in the tree, and a fake one buys nothing since nothing reads it.
 process.env.FIREBASE_SERVICE_ACCOUNT_JSON ||= JSON.stringify({
   project_id: 'test-project',
   client_email: 'test@test-project.iam.gserviceaccount.com',
-  private_key: 'not-a-real-key',
 });
 
 const verifyIdToken = vi.fn();
