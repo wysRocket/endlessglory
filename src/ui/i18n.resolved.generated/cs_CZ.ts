@@ -686,7 +686,8 @@ export const cs_CZ: EnTranslations = {
         "classic": "Klasická zlatá",
         "midnight": "Půlnoc",
         "parchment": "Pergamen",
-        "highContrast": "Vysoký kontrast"
+        "highContrast": "Vysoký kontrast",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Akcent",

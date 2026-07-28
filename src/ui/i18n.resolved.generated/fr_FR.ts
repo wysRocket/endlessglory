@@ -686,7 +686,8 @@ export const fr_FR: EnTranslations = {
         "classic": "Or classique",
         "midnight": "Minuit",
         "parchment": "Parchemin",
-        "highContrast": "Contraste élevé"
+        "highContrast": "Contraste élevé",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Accent",

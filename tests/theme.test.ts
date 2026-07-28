@@ -156,3 +156,26 @@ describe('theme pure core', () => {
     expect(parseTheme({ preset: 'bogus' }).custom).toEqual({});
   });
 });
+
+// The options window renders one segmented button per PRESET_ORDER entry, labelled
+// with t('hudChrome.theme.presets.<id>'). t() THROWS on an untracked key, and the
+// label lookup builds its key by template (cast to TranslationKey), which defeats the
+// compile-time check that would otherwise catch a missing one. So a preset added
+// without its catalog entry does not fail the build: it throws at runtime, inside
+// renderInterface, leaving the whole Options > Interface panel blank. That is exactly
+// how 'emberwood' shipped. This pins every preset to a real, non-empty label.
+describe('theme preset labels', () => {
+  it('gives every PRESET_ORDER entry a translatable label', async () => {
+    const { t } = await import('../src/ui/i18n');
+    for (const id of PRESET_ORDER) {
+      const label = t(`hudChrome.theme.presets.${id}` as never);
+      expect(label, id).toBeTruthy();
+      // A missing key that fell back to echoing the key itself is not a label.
+      expect(label, id).not.toContain('hudChrome.theme.presets');
+    }
+  });
+
+  it('covers every declared preset, so the label set cannot drift from the palette set', () => {
+    expect([...PRESET_ORDER].sort()).toEqual(Object.keys(THEME_PRESETS).sort());
+  });
+});

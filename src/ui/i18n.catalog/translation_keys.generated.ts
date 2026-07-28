@@ -5959,6 +5959,7 @@ export type TranslationKeyFlat =
   | 'hudChrome.theme.knob.textMuted'
   | 'hudChrome.theme.preset'
   | 'hudChrome.theme.presets.classic'
+  | 'hudChrome.theme.presets.emberwood'
   | 'hudChrome.theme.presets.highContrast'
   | 'hudChrome.theme.presets.midnight'
   | 'hudChrome.theme.presets.parchment'

@@ -757,6 +757,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': '午夜',
   'hudChrome.theme.presets.parchment': '羊皮紙',
   'hudChrome.theme.presets.highContrast': '高對比',
+  'hudChrome.theme.presets.emberwood': '餘燼林',
   'hudChrome.theme.knob.accent': '強調色',
   'hudChrome.theme.knob.border': '邊框',
   'hudChrome.theme.knob.panel': '框架',

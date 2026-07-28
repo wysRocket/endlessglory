@@ -780,6 +780,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': 'Полночь',
   'hudChrome.theme.presets.parchment': 'Пергамент',
   'hudChrome.theme.presets.highContrast': 'Высокий контраст',
+  'hudChrome.theme.presets.emberwood': 'Эмбервуд',
   'hudChrome.theme.knob.accent': 'Акцент',
   'hudChrome.theme.knob.border': 'Рамка',
   'hudChrome.theme.knob.panel': 'Панель',

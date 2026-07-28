@@ -686,7 +686,8 @@ export const vi_VN: EnTranslations = {
         "classic": "Vàng Cổ Điển",
         "midnight": "Nửa Đêm",
         "parchment": "Giấy Da",
-        "highContrast": "Tương Phản Cao"
+        "highContrast": "Tương Phản Cao",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Màu Nhấn",

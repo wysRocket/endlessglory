@@ -15,7 +15,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "es_ES": [
     "apiError.firebase_auth.invalid_token",
@@ -23,7 +24,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "fr_FR": [
     "apiError.firebase_auth.invalid_token",
@@ -31,7 +33,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "fr_CA": [
     "apiError.firebase_auth.invalid_token",
@@ -39,7 +42,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "en_CA": [],
   "it_IT": [
@@ -48,7 +52,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "de_DE": [
     "apiError.firebase_auth.invalid_token",
@@ -56,7 +61,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "zh_CN": [],
   "zh_TW": [],
@@ -68,7 +74,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "ru_RU": [],
   "cs_CZ": [
@@ -77,7 +84,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "nl_NL": [
     "apiError.firebase_auth.invalid_token",
@@ -85,7 +93,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "pl_PL": [
     "apiError.firebase_auth.invalid_token",
@@ -93,7 +102,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "id_ID": [
     "apiError.firebase_auth.invalid_token",
@@ -101,7 +111,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "tr_TR": [
     "apiError.firebase_auth.invalid_token",
@@ -109,7 +120,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "sv_SE": [
     "apiError.firebase_auth.invalid_token",
@@ -117,7 +129,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "vi_VN": [
     "apiError.firebase_auth.invalid_token",
@@ -125,7 +138,8 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ],
   "da_DK": [
     "apiError.firebase_auth.invalid_token",
@@ -133,6 +147,7 @@ export const pending: Record<string, readonly string[]> = {
     "guide.family.golem.desc",
     "guide.family.golem.name",
     "hudChrome.auth.googleError",
-    "hudChrome.auth.googleLoginCta"
+    "hudChrome.auth.googleLoginCta",
+    "hudChrome.theme.presets.emberwood"
   ]
 };

@@ -686,7 +686,8 @@ export const nl_NL: EnTranslations = {
         "classic": "Klassiek Goud",
         "midnight": "Middernacht",
         "parchment": "Perkament",
-        "highContrast": "Hoog Contrast"
+        "highContrast": "Hoog Contrast",
+        "emberwood": "Emberwood"
       },
       "knob": {
         "accent": "Accent",

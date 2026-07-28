@@ -780,6 +780,7 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': 'ミッドナイト',
   'hudChrome.theme.presets.parchment': '羊皮紙',
   'hudChrome.theme.presets.highContrast': 'ハイコントラスト',
+  'hudChrome.theme.presets.emberwood': 'エンバーウッド',
   'hudChrome.theme.knob.accent': 'アクセント',
   'hudChrome.theme.knob.border': '枠線',
   'hudChrome.theme.knob.panel': 'フレーム',

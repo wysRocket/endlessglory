@@ -686,7 +686,8 @@ export const ja_JP: EnTranslations = {
         "classic": "クラシックゴールド",
         "midnight": "ミッドナイト",
         "parchment": "羊皮紙",
-        "highContrast": "ハイコントラスト"
+        "highContrast": "ハイコントラスト",
+        "emberwood": "エンバーウッド"
       },
       "knob": {
         "accent": "アクセント",

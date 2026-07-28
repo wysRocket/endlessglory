@@ -272,6 +272,7 @@ export const hudChromeStrings = {
       midnight: 'Midnight',
       parchment: 'Parchment',
       highContrast: 'High Contrast',
+      emberwood: 'Emberwood',
     },
     knob: {
       accent: 'Accent',

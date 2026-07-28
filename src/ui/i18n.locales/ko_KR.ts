@@ -778,6 +778,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.theme.presets.midnight': '미드나이트',
   'hudChrome.theme.presets.parchment': '양피지',
   'hudChrome.theme.presets.highContrast': '고대비',
+  'hudChrome.theme.presets.emberwood': '엠버우드',
   'hudChrome.theme.knob.accent': '강조색',
   'hudChrome.theme.knob.border': '테두리',
   'hudChrome.theme.knob.panel': '프레임',
