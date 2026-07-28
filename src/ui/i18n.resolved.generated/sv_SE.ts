@@ -2526,6 +2526,9 @@ export const sv_SE: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Ogiltig indata."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

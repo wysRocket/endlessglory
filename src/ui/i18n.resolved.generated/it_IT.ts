@@ -2526,6 +2526,9 @@ export const it_IT: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Dati non validi."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

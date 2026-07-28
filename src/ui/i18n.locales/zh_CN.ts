@@ -6680,6 +6680,7 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': '管理员要求你的一个角色进行改名。',
   'apiError.email.invalid': '请输入有效的邮箱地址。',
   'apiError.email.unchanged': '这已经是你的邮箱地址了。',
+  'apiError.firebase_auth.invalid_token': '无法验证此次登录。请重新登录。',
   'apiError.two_factor.code_invalid': '验证码无效，请重试。',
   'apiError.two_factor.setup_required': '请先开始双重验证设置。',
   'apiError.two_factor.already_enabled': '双重验证已启用。',

@@ -2526,6 +2526,9 @@ export const nl_NL: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Ongeldige invoer."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

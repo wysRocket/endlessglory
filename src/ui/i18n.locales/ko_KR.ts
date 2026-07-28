@@ -7006,6 +7006,7 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': '운영자가 당신의 캐릭터 중 하나의 이름 변경을 요구했습니다.',
   'apiError.email.invalid': '유효한 이메일 주소를 입력하세요.',
   'apiError.email.unchanged': '이미 사용 중인 이메일 주소입니다.',
+  'apiError.firebase_auth.invalid_token': '이 로그인을 확인할 수 없습니다. 다시 로그인해 주세요.',
   'apiError.two_factor.code_invalid': '코드가 올바르지 않습니다. 다시 시도하세요.',
   'apiError.two_factor.setup_required': '먼저 2단계 인증 설정을 시작하세요.',
   'apiError.two_factor.already_enabled': '2단계 인증이 이미 활성화되어 있습니다.',

@@ -2526,6 +2526,9 @@ export const fr_FR: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Saisie invalide."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

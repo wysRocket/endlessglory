@@ -2526,6 +2526,9 @@ export const pl_PL: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Nieprawidłowe dane."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

@@ -186,4 +186,10 @@ export const apiErrorStrings = {
   welcome: {
     invalid_input: 'Invalid input.',
   },
+  // firebase_auth: the Firebase ID token exchange (server/firebase_auth.ts). The
+  // reason is deliberately not disclosed (expired, malformed, or wrong project all
+  // read the same to the player); the detail stays in the server log.
+  firebase_auth: {
+    invalid_token: 'That sign-in could not be verified. Please sign in again.',
+  },
 };

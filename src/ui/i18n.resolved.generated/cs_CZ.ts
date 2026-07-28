@@ -2526,6 +2526,9 @@ export const cs_CZ: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Neplatný vstup."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

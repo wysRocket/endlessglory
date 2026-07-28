@@ -2526,6 +2526,9 @@ export const ru_RU: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Неверные входные данные."
+    },
+    "firebase_auth": {
+      "invalid_token": "Не удалось подтвердить этот вход. Войдите снова."
     }
   },
   "guide": {

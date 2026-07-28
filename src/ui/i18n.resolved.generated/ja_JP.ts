@@ -2526,6 +2526,9 @@ export const ja_JP: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "入力が無効です。"
+    },
+    "firebase_auth": {
+      "invalid_token": "このサインインを確認できませんでした。もう一度サインインしてください。"
     }
   },
   "guide": {

@@ -10,32 +10,38 @@
 
 export const pending: Record<string, readonly string[]> = {
   "es": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "es_ES": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "fr_FR": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "fr_CA": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "en_CA": [],
   "it_IT": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "de_DE": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
@@ -45,47 +51,56 @@ export const pending: Record<string, readonly string[]> = {
   "ko_KR": [],
   "ja_JP": [],
   "pt_BR": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "ru_RU": [],
   "cs_CZ": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "nl_NL": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "pl_PL": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "id_ID": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "tr_TR": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "sv_SE": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "vi_VN": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"
   ],
   "da_DK": [
+    "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name"

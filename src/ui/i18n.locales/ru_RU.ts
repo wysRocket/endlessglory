@@ -7141,6 +7141,7 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': 'Модератор требует переименовать одного из ваших персонажей.',
   'apiError.email.invalid': 'Введите корректный адрес эл. почты.',
   'apiError.email.unchanged': 'Это уже ваш текущий адрес email.',
+  'apiError.firebase_auth.invalid_token': 'Не удалось подтвердить этот вход. Войдите снова.',
   'apiError.two_factor.code_invalid': 'Этот код недействителен, попробуйте ещё раз.',
   'apiError.two_factor.setup_required': 'Сначала начните настройку двухфакторной аутентификации.',
   'apiError.two_factor.already_enabled': 'Двухфакторная аутентификация уже включена.',

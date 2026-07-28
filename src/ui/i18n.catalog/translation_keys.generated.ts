@@ -113,6 +113,7 @@ export type TranslationKeyFlat =
   | 'apiError.discord.unknown_swag'
   | 'apiError.email.invalid'
   | 'apiError.email.unchanged'
+  | 'apiError.firebase_auth.invalid_token'
   | 'apiError.internal.error'
   | 'apiError.json.malformed'
   | 'apiError.moderation.banned'

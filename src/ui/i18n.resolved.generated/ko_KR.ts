@@ -2526,6 +2526,9 @@ export const ko_KR: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "입력이 올바르지 않습니다."
+    },
+    "firebase_auth": {
+      "invalid_token": "이 로그인을 확인할 수 없습니다. 다시 로그인해 주세요."
     }
   },
   "guide": {

@@ -193,6 +193,9 @@ export const ERROR_CODES = deepFreeze({
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
   'welcome.invalid_input': { params: [] },
+  // firebase_auth: the Firebase ID token failed verification (expired, malformed,
+  // wrong project). 401.
+  'firebase_auth.invalid_token': { params: [] },
 } as const);
 
 /** A stable error code: one of the keys of ERROR_CODES. */

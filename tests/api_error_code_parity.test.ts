@@ -80,6 +80,7 @@ const KNOWN_CODES = [
   'discord.unknown_swag',
   'email.invalid',
   'email.unchanged',
+  'firebase_auth.invalid_token',
   'internal.error',
   'json.malformed',
   'moderation.banned',

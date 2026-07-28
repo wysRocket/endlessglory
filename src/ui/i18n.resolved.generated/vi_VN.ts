@@ -2526,6 +2526,9 @@ export const vi_VN: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Dữ liệu nhập không hợp lệ."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

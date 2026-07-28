@@ -2526,6 +2526,9 @@ export const zh_CN: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "输入无效。"
+    },
+    "firebase_auth": {
+      "invalid_token": "无法验证此次登录。请重新登录。"
     }
   },
   "guide": {

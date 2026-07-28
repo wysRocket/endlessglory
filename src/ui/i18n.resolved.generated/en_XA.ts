@@ -2526,6 +2526,9 @@ export const en_XA: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "[Íñʋáļíð íñþúţ.]"
+    },
+    "firebase_auth": {
+      "invalid_token": "[Ţĥáţ šíĝñ-íñ çóúļð ñóţ ƀé ʋéŕíƒíéð. Þļéášé šíĝñ íñ áĝáíñ.]"
     }
   },
   "guide": {

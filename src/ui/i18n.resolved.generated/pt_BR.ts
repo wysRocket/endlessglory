@@ -2526,6 +2526,9 @@ export const pt_BR: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Entrada inválida."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

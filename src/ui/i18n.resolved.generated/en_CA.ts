@@ -2526,6 +2526,9 @@ export const en_CA: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Invalid input."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {

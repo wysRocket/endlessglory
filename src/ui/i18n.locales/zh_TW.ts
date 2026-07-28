@@ -6681,6 +6681,7 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'apiError.moderation.force_rename': '管理員要求你的其中一個角色必須改名。',
   'apiError.email.invalid': '請輸入有效的電子郵件地址。',
   'apiError.email.unchanged': '這已經是你目前的電子郵件地址了。',
+  'apiError.firebase_auth.invalid_token': '無法驗證這次登入。請重新登入。',
   'apiError.two_factor.code_invalid': '這組代碼無效，請再試一次。',
   'apiError.two_factor.setup_required': '請先開始雙重驗證設定。',
   'apiError.two_factor.already_enabled': '雙重驗證已啟用。',

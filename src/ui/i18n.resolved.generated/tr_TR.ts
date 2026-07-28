@@ -2526,6 +2526,9 @@ export const tr_TR: EnTranslations = {
     },
     "welcome": {
       "invalid_input": "Geçersiz girdi."
+    },
+    "firebase_auth": {
+      "invalid_token": "That sign-in could not be verified. Please sign in again."
     }
   },
   "guide": {
