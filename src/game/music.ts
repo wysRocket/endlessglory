@@ -588,7 +588,13 @@ function composeTownHighwatch(): Theme {
     [28, 64, 3],
   ];
   pushPhrase(ev, 0, motto, 0.22, 'reed');
-  pushPhrase(ev, 0, motto.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]), 0.12, 'oboe');
+  pushPhrase(
+    ev,
+    0,
+    motto.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
+    0.12,
+    'oboe',
+  );
   // B section: G major lift  -  the view from the wall at sunset
   const lift: Phrase = [
     [0, 76, 1],
@@ -660,7 +666,14 @@ function composeVale(): Theme {
     // walking bass: root on 1, fifth or third on 3, approach into next bar
     pushNote(ev, b0, c.root - 24, 1.2, 0.32, 'bass');
     pushNote(ev, b0 + 2, c.root - 17, 1.0, 0.22, 'bass');
-    pushNote(ev, b0 + 3.5, (chords[(bar + 1) % chords.length] as ChordDef).root - 26, 0.4, 0.15, 'bass');
+    pushNote(
+      ev,
+      b0 + 3.5,
+      (chords[(bar + 1) % chords.length] as ChordDef).root - 26,
+      0.4,
+      0.15,
+      'bass',
+    );
     // violin pizzicato trio: root, fifth, octave plucked on the downbeat
     pushVoicing(ev, b0, [t[0], t[2], t[0] + 12], 0.3, late ? 0.18 : 0.14, 'stacc');
     if (bar % 2 === 1) pushVoicing(ev, b0 + 2, [t[1] + 12, t[2] + 12], 0.3, 0.11, 'stacc');
@@ -723,7 +736,13 @@ function composeVale(): Theme {
   pushPhrase(ev, 36, chorale, 0.18, 'strings');
   // reprise with a soft dulcimer descant
   pushPhrase(ev, 52, motive, 0.2, 'stacc');
-  pushPhrase(ev, 54, motive.slice(2).map(([b, m, d]) => [b - 2, m + 12, d] as Phrase[number]), 0.07, 'dulcimer');
+  pushPhrase(
+    ev,
+    54,
+    motive.slice(2).map(([b, m, d]) => [b - 2, m + 12, d] as Phrase[number]),
+    0.07,
+    'dulcimer',
+  );
 
   ev.sort((a, b) => a.beat - b.beat);
   return { bpm: 84, bars: 16, events: ev };
@@ -824,7 +843,32 @@ function composeMarsh(): Theme {
     Dm = { root: 50, minor: true };
   const Bb = { root: 58 },
     Gm = { root: 55, minor: true };
-  const chords: ChordDef[] = [Em, F, Em, Dm, Em, F, Gm, Em, Dm, Em, F, Em, Bb, F, Dm, Em, Em, F, Gm, Em, Dm, F, Em, Em];
+  const chords: ChordDef[] = [
+    Em,
+    F,
+    Em,
+    Dm,
+    Em,
+    F,
+    Gm,
+    Em,
+    Dm,
+    Em,
+    F,
+    Em,
+    Bb,
+    F,
+    Dm,
+    Em,
+    Em,
+    F,
+    Gm,
+    Em,
+    Dm,
+    F,
+    Em,
+    Em,
+  ];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
@@ -880,7 +924,13 @@ function composeMarsh(): Theme {
     'oboe',
   );
   // reprise: the first dirge alone again, fading
-  pushPhrase(ev, 72, dirge.map(([b, m, d]) => [b, m, d * 0.9] as Phrase[number]), 0.16, 'reed');
+  pushPhrase(
+    ev,
+    72,
+    dirge.map(([b, m, d]) => [b, m, d * 0.9] as Phrase[number]),
+    0.16,
+    'reed',
+  );
 
   ev.sort((a, b) => a.beat - b.beat);
   return { bpm: 72, bars: 24, events: ev };
@@ -1163,7 +1213,24 @@ function composeDungeonHollowCrypt(): Theme {
     C$m = { root: 49, minor: true },
     E = { root: 52 };
   const F$ = { root: 54 };
-  const chords: ChordDef[] = [G$m, G$m, C$m, G$m, E, F$, G$m, G$m, C$m, G$m, F$, E, G$m, C$m, F$, G$m];
+  const chords: ChordDef[] = [
+    G$m,
+    G$m,
+    C$m,
+    G$m,
+    E,
+    F$,
+    G$m,
+    G$m,
+    C$m,
+    G$m,
+    F$,
+    E,
+    G$m,
+    C$m,
+    F$,
+    G$m,
+  ];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
@@ -1250,7 +1317,24 @@ function composeDungeonSunkenBastion(): Theme {
   const D = { root: 50 },
     E = { root: 52 },
     A = { root: 57 };
-  const chords: ChordDef[] = [F$m, C$m, F$m, C$m, D, A, F$m, C$m, F$m, C$m, D, E, F$m, C$m, F$m, F$m];
+  const chords: ChordDef[] = [
+    F$m,
+    C$m,
+    F$m,
+    C$m,
+    D,
+    A,
+    F$m,
+    C$m,
+    F$m,
+    C$m,
+    D,
+    E,
+    F$m,
+    C$m,
+    F$m,
+    F$m,
+  ];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
@@ -1451,15 +1535,15 @@ function composeDungeonGravewyrmSanctum(): Theme {
 // only the layer named 'combat' ever plays in game.
 // ---------------------------------------------------------------------------
 
-const COMBAT_CELL = [0, 0, 3, 0, 7, 0, 3, 5];
+const _COMBAT_CELL = [0, 0, 3, 0, 7, 0, 3, 5];
 
-function pushCombatCell(out: NoteEvent[], b0: number, base: number, vel: number): void {
-  for (const [i, s] of COMBAT_CELL.entries()) {
+function _pushCombatCell(out: NoteEvent[], b0: number, base: number, vel: number): void {
+  for (const [i, s] of _COMBAT_CELL.entries()) {
     pushNote(out, b0 + i * 0.5, base + s, 0.4, vel, 'stacc');
   }
 }
 
-function pushCombatTimpani(out: NoteEvent[], b0: number, scale = 1): void {
+function _pushCombatTimpani(out: NoteEvent[], b0: number, scale = 1): void {
   pushNote(out, b0, 38, 1, 0.55 * scale, 'timpani');
   pushNote(out, b0 + 2, 38, 1, 0.4 * scale, 'timpani');
   pushNote(out, b0 + 3.5, 38, 0.5, 0.3 * scale, 'timpani');
@@ -2634,7 +2718,7 @@ export class MusicDirector {
         const when = layer.anchor + (layer.loopCount * loopBeats + evt.beat) * spb;
         if (when > horizon) break;
         if (when >= ctx.currentTime - 0.03) {
-          this.synth!.playNote(evt, when, spb, layer);
+          this.synth?.playNote(evt, when, spb, layer);
         }
         layer.nextIdx++;
         if (layer.nextIdx >= layer.theme.events.length) {
