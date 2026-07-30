@@ -123,3 +123,4 @@ dist-bot/
 # Leaked SFX-studio security-test scratch symlink (must never be committed/deployed;
 # it points at an absolute path that breaks vite copyDir on the build container).
 public/models/sfx-studio-security-*.glb
+.env*

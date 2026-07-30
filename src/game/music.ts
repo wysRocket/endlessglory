@@ -1,10 +1,12 @@
 // Procedural adventure soundtrack: no audio files, pure WebAudio synthesis.
-// Eastbrook Vale keeps its original themes (town, vale, vale_legacy). Every
-// other cue is through-composed to modern JRPG dynamics: per-place leitmotifs
+// Every cue is through-composed to modern JRPG dynamics: per-place leitmotifs
 // grown from the zone's look and lore, layered ostinati, extended harmony,
-// and multi-section forms (Mirefen's waterlogged requiem, Fenbridge's hearth
-// lilt, Thornpeak's cold anthem, Highwatch's watch march, three dungeon
-// crawls, and an A minor battle theme that transposes onto every zone key).
+// and multi-section forms (Eastbrook's Lantern Fair, Windward Reach over the
+// vale, Mirefen's waterlogged requiem, Fenbridge's hearth lilt, Thornpeak's
+// cold anthem, Highwatch's watch march, three dungeon crawls, and an A minor
+// battle theme that transposes onto every zone key). The one holdover is
+// `vale_legacy`: the original pre-expansion Eastbrook Vale theme, unreachable
+// in play, kept only as an archival reference layer.
 // Each theme is a composed multi-track loop scheduled with a lookahead
 // timer; zone changes crossfade.
 
@@ -199,91 +201,138 @@ function pushPhrase(
 
 function composeTownEastbrook(): Theme {
   const ev: NoteEvent[] = [];
-  // D major, warm and pastoral
-  const D = { root: 62 },
-    A = { root: 57 },
-    Bm = { root: 59, minor: true };
-  const G = { root: 55 },
-    F$m = { root: 54, minor: true };
-  const chords: ChordDef[] = [D, A, Bm, G, D, G, A, D, D, F$m, G, D, Bm, G, A, D];
+  // "Lantern Fair". Bb major, 112 bpm: Eastbrook's market square strung with
+  // lanterns every dusk, stalls out, the crowd's footwork underfoot. Bright
+  // and bustling rather than the old quiet-pasture pastoral: a rippling
+  // dulcimer ostinato and a reedy oboe crier's call carry the tune, bell and
+  // brass-stab hits mark the stallkeepers, woodblock and frame drum keep the
+  // crowd moving.
+  const Bb = { root: 58 },
+    F = { root: 65 },
+    Gm = { root: 55, minor: true },
+    Eb = { root: 63 };
+  const Dm = { root: 62, minor: true };
+  const chords: ChordDef[] = [Bb, F, Gm, Eb, Bb, Eb, F, Bb, Bb, Dm, Eb, Bb, Gm, Eb, F, Bb];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
     const t = triad(c);
-    // string pad: whole-bar triad, octave below
-    for (const n of t) pushNote(ev, b0, n - 12, 4.05, 0.3, 'strings');
-    // cello bass: root on 1 and 3
-    pushNote(ev, b0, c.root - 24, 1.8, 0.5, 'bass');
-    pushNote(ev, b0 + 2, c.root - 24, 1.8, 0.42, 'bass');
-    // harp: flowing eighth arpeggio root-3rd-5th-octave and back
-    const arp = [t[0], t[1], t[2], t[0] + 12, t[2], t[1], t[0], t[1]];
-    for (const [i, n] of arp.entries()) {
-      pushNote(ev, b0 + i * 0.5, n, 0.5, 0.34, 'harp');
+    // dulcimer ripple: bright rolling eighth-note arpeggio, root-3rd-5th-
+    // octave and back
+    const ripple = [t[0], t[1], t[2], t[0] + 12, t[2], t[1], t[0], t[1]];
+    for (const [i, n] of ripple.entries()) {
+      pushNote(ev, b0 + i * 0.5, n, 0.45, 0.26, 'dulcimer');
     }
-    // horn counterline in the back half of each section
-    if (bar % 8 >= 4) {
-      pushNote(ev, b0, c.root - 12, 2, 0.16, 'horn');
-      pushNote(ev, b0 + 2, c.root - 5, 2, 0.14, 'horn');
+    // low bass on 1 and 3
+    pushNote(ev, b0, c.root - 24, 1.7, 0.34, 'bass');
+    pushNote(ev, b0 + 2, c.root - 24, 1.7, 0.28, 'bass');
+    // bell chord stab on the downbeat, an octave above the ripple's root
+    pushVoicing(
+      ev,
+      b0,
+      t.map((n) => n + 12),
+      0.4,
+      0.13,
+      'bell',
+    );
+    // brass-stab punctuation in the back half of each 8-bar half
+    if (bar % 8 >= 6) {
+      pushVoicing(
+        ev,
+        b0 + 2,
+        t.map((n) => n - 12),
+        0.5,
+        0.17,
+        'brassStab',
+      );
     }
+    // crowd footwork: frame drum on the downbeat, woodblock on the offbeats
+    pushDrumHits(ev, b0, [0], 'frameDrum', 0.17, 44);
+    pushDrumHits(ev, b0, [1, 1.5, 2.5, 3, 3.5], 'woodBlock', 0.08, 76);
   });
 
-  // flute melody (two 8-bar phrases)
-  const phraseA: Phrase = [
-    [0, 69, 1],
-    [1, 74, 1],
-    [2, 76, 1],
-    [3, 78, 1],
-    [4, 78, 1.5],
-    [5.5, 76, 0.5],
-    [6, 74, 2],
-    [8, 76, 1],
-    [9, 78, 1],
-    [10, 79, 1],
-    [11, 78, 1],
-    [12, 76, 3],
-    [16, 74, 1],
-    [17, 78, 1],
-    [18, 81, 1.5],
-    [19.5, 79, 0.5],
-    [20, 78, 1.5],
-    [21.5, 76, 0.5],
-    [22, 74, 1],
-    [23, 76, 1],
-    [24, 78, 2],
-    [26, 76, 2],
-    [28, 74, 3],
+  // A tune (oboe): the crier's call, a bright rising figure answered by a
+  // skipping cadence
+  const tuneA: Phrase = [
+    [0, 70, 0.5],
+    [0.5, 74, 0.5],
+    [1, 77, 1],
+    [2, 75, 0.5],
+    [2.5, 74, 0.5],
+    [3, 72, 1],
+    [4, 70, 0.5],
+    [4.5, 74, 0.5],
+    [5, 77, 1.5],
+    [6.5, 79, 0.5],
+    [7, 77, 1],
+    [8, 75, 0.5],
+    [8.5, 77, 0.5],
+    [9, 79, 1],
+    [10, 81, 0.5],
+    [10.5, 79, 0.5],
+    [11, 77, 1],
+    [12, 75, 1],
+    [13, 74, 1],
+    [14, 72, 2],
+    [16, 70, 0.5],
+    [16.5, 74, 0.5],
+    [17, 77, 1],
+    [18, 79, 0.5],
+    [18.5, 77, 0.5],
+    [19, 75, 1],
+    [20, 77, 0.5],
+    [20.5, 79, 0.5],
+    [21, 81, 1.5],
+    [22.5, 82, 0.5],
+    [23, 81, 1],
+    [24, 79, 1],
+    [25, 77, 1],
+    [26, 75, 2],
+    [28, 77, 1],
+    [29, 79, 1],
+    [30, 81, 2],
   ];
-  const phraseB: Phrase = [
-    [0, 81, 1],
-    [1, 78, 1],
-    [2, 79, 1],
-    [3, 81, 1],
-    [4, 83, 1.5],
-    [5.5, 81, 0.5],
-    [6, 79, 1],
-    [7, 78, 1],
-    [8, 79, 1],
-    [9, 78, 1],
-    [10, 76, 1],
-    [11, 79, 1],
-    [12, 78, 3],
-    [16, 71, 1],
-    [17, 74, 1],
-    [18, 78, 1],
-    [19, 81, 1],
-    [20, 79, 1.5],
-    [21.5, 78, 0.5],
-    [22, 76, 1],
-    [23, 79, 1],
-    [24, 78, 2],
-    [26, 76, 2],
-    [28, 74, 4],
+  // B tune (oboe): the fair's high point, resolving down into the last cadence
+  const tuneB: Phrase = [
+    [0, 82, 1],
+    [1, 81, 0.5],
+    [1.5, 79, 0.5],
+    [2, 77, 1],
+    [3, 79, 1],
+    [4, 82, 0.5],
+    [4.5, 84, 0.5],
+    [5, 84, 1],
+    [6, 84, 1],
+    [7, 82, 1],
+    [8, 81, 1],
+    [9, 79, 1],
+    [10, 77, 1],
+    [11, 75, 1],
+    [12, 74, 1],
+    [13, 77, 0.5],
+    [13.5, 79, 0.5],
+    [14, 81, 2],
+    [16, 79, 0.5],
+    [16.5, 77, 0.5],
+    [17, 75, 1],
+    [18, 77, 1],
+    [19, 79, 1],
+    [20, 81, 0.5],
+    [20.5, 82, 0.5],
+    [21, 84, 1.5],
+    [22.5, 84, 0.5],
+    [23, 84, 1],
+    [24, 82, 1],
+    [25, 79, 1],
+    [26, 77, 2],
+    [28, 74, 1],
+    [29, 70, 3],
   ];
-  pushPhrase(ev, 0, phraseA, 0.34, 'flute');
-  pushPhrase(ev, 32, phraseB, 0.34, 'flute');
+  pushPhrase(ev, 0, tuneA, 0.32, 'oboe');
+  pushPhrase(ev, 32, tuneB, 0.32, 'oboe');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 80, bars: 16, events: ev };
+  return { bpm: 112, bars: 16, events: ev };
 }
 
 function pushRepeated(
@@ -332,453 +381,352 @@ function pushVoicing(
 
 function composeTownFenbridge(): Theme {
   const ev: NoteEvent[] = [];
-  // "Dry Boots and Lamplight". G major, 88 bpm, 24 bars in a 12/8 lilt (the
-  // beat grid carries triplets). Fenbridge is a stubborn garrison bridge-town
-  // holding the only dry road through a drowned country, and its music is the
-  // warm pocket inside the marsh requiem: piano hearth chords, a rocking lute
-  // barcarolle, a folk reed tune with a falling-triad motto, and a wistful
-  // flute middle section for the rain outside the walls. G major is the
-  // relative major of the marsh's E minor so the town gate crossfade stays kin.
-  const T = 1 / 3;
-  // app: the diatonic approach tone the walking bass takes INTO this chord.
-  // mid: the beat-two bass note, a fifth above the bass except on the slash
-  // chord (D/F#), where the bass note is the chord's third and +7 would land
-  // outside the key. ring: the beat-2.5 piano echo voicing, kept clear of a
-  // semitone under the tune's beat-3 note.
-  type BarSpec = {
-    root: number;
-    app: number;
-    mid?: number;
-    arp: number[];
-    keys: number[];
-    ring?: number[];
-  };
-  const G: BarSpec = {
-    root: 43,
-    app: 42,
-    arp: [55, 62, 67, 71],
-    keys: [55, 59, 62, 69],
-    ring: [62, 69],
-  };
-  const Em7: BarSpec = { root: 40, app: 42, arp: [52, 59, 64, 67], keys: [52, 59, 62, 67] };
-  const Cma7: BarSpec = {
-    root: 36,
-    app: 38,
-    arp: [48, 55, 64, 74],
-    keys: [48, 60, 64, 71],
-    ring: [60, 64],
-  };
-  const Dma: BarSpec = { root: 38, app: 36, arp: [50, 57, 62, 66], keys: [50, 57, 66, 69] };
-  const Bm7: BarSpec = { root: 47, app: 45, arp: [47, 54, 62, 66], keys: [47, 57, 62, 66] };
-  const Am7: BarSpec = { root: 45, app: 47, arp: [45, 52, 60, 64], keys: [45, 55, 60, 64] };
-  const Cma: BarSpec = { root: 36, app: 38, arp: [48, 55, 60, 64], keys: [48, 55, 64, 67] };
-  const DF$: BarSpec = {
-    root: 42,
-    app: 45,
-    mid: 45,
-    arp: [54, 57, 62, 66],
-    keys: [54, 62, 66, 69],
-  };
-  const A8: BarSpec[] = [G, Em7, Cma7, Dma, G, Bm7, Am7, G];
-  const B8: BarSpec[] = [Em7, Cma7, G, DF$, Em7, Am7, Cma, G];
-  const bars: BarSpec[] = [...A8, ...B8, ...A8];
-
-  bars.forEach((c, bar) => {
-    const b0 = bar * 4;
-    const next = bars[(bar + 1) % bars.length];
-    // rocking lute barcarolle: one triplet per beat, low-high-mid; beat 4
-    // rocks lower so it never crowds the tune's cadence note
-    for (let beat = 0; beat < 4; beat++) {
-      const low = beat % 2 === 0 ? c.arp[0] : c.arp[1];
-      pushNote(ev, b0 + beat, low, 0.4, 0.17, 'lute');
-      pushNote(ev, b0 + beat + T, beat === 3 ? c.arp[2] : c.arp[3], 0.3, 0.1, 'lute');
-      pushNote(ev, b0 + beat + 2 * T, beat === 3 ? c.arp[1] : c.arp[2], 0.3, 0.11, 'lute');
-    }
-    // hearth piano on alternating bars, dulcimer lamplight between
-    if (bar % 2 === 0) {
-      pushVoicing(ev, b0, c.keys, 2.6, 0.12, 'piano');
-      pushVoicing(ev, b0 + 2.5, c.ring ?? c.keys.slice(1), 1.2, 0.08, 'piano');
-    } else {
-      pushNote(ev, b0 + 1 + T, c.arp[3] + 12, 0.3, 0.09, 'dulcimer');
-      pushNote(ev, b0 + 3 + 2 * T, c.arp[2] + 12, 0.3, 0.07, 'dulcimer');
-    }
-    // easy bass with a walking approach into the next bar
-    pushNote(ev, b0, c.root, 1.4, 0.3, 'bass');
-    pushNote(ev, b0 + 2, c.mid ?? c.root + 7, 1.0, 0.18, 'bass');
-    pushNote(ev, b0 + 3 + 2 * T, next.app, 0.3, 0.13, 'bass');
-    // soft tavern pulse
-    pushDrumHits(ev, b0, [0, 2], 'frameDrum', 0.1, 43);
-    pushNote(ev, b0 + 1 + 2 * T, 43, 0.2, 0.05, 'frameDrum');
-    if (bar % 4 === 3) pushNote(ev, b0 + 3 + T, 72, 0.15, 0.07, 'woodBlock');
-    if (bar % 8 === 7) pushNote(ev, b0 + 3 + T, 83, 0.9, 0.07, 'tinyBell');
-  });
-
-  // A tune (reed): the dry-boots motto, a falling G triad answered in step
-  const tuneA: Phrase = [
-    [0, 74, 2 * T],
-    [2 * T, 71, T],
-    [1, 67, 1],
-    [2, 69, 2 * T],
-    [2 + 2 * T, 71, T],
-    [3, 72, 1],
-    [4, 71, 1 + 2 * T],
-    [5 + 2 * T, 69, T],
-    [6, 67, 1],
-    [7, 64, 1],
-    [8, 64, 2 * T],
-    [8 + 2 * T, 66, T],
-    [9, 67, 1],
-    [10, 69, 2 * T],
-    [10 + 2 * T, 71, T],
-    [11, 72, 1],
-    [12, 71, 1],
-    [13, 69, 2 * T],
-    [13 + 2 * T, 66, T],
-    [14, 69, 2],
-    [16, 74, 2 * T],
-    [16 + 2 * T, 71, T],
-    [17, 67, 1],
-    [18, 69, 2 * T],
-    [18 + 2 * T, 71, T],
-    [19, 72, 1],
-    [20, 74, 1 + 2 * T],
-    [21 + 2 * T, 76, T],
-    [22, 78, 1],
-    [23, 74, 1],
-    [24, 76, 2 * T],
-    [24 + 2 * T, 72, T],
-    [25, 69, 1],
-    [26, 66, 2 * T],
-    [26 + 2 * T, 67, T],
-    [27, 69, 1],
-    [28, 67, 3],
-  ];
-  pushPhrase(ev, 0, tuneA, 0.28, 'flute');
-  pushPhrase(ev, 0, tuneA, 0.12, 'dulcimer');
-  // B tune (flute): rain on the lamplit window, ending on a folk flat seven
-  const tuneB: Phrase = [
-    [0, 71, 1],
-    [1, 76, 1 + 2 * T],
-    [2 + 2 * T, 74, T],
-    [3, 71, 1],
-    [4, 72, 2 * T],
-    [4 + 2 * T, 74, T],
-    [5, 76, 1],
-    [6, 79, 1 + 2 * T],
-    [7 + 2 * T, 78, T],
-    [8, 74, 1],
-    [9, 71, 2 * T],
-    [9 + 2 * T, 67, T],
-    [10, 74, 2],
-    [12, 69, 1],
-    [13, 66, 2 * T],
-    [13 + 2 * T, 69, T],
-    [14, 74, 1],
-    [15, 76, 1],
-    [16, 79, 1 + 2 * T],
-    [17 + 2 * T, 78, T],
-    [18, 76, 1],
-    [19, 71, 1],
-    [20, 72, 1],
-    [21, 76, 1],
-    [22, 69, 2],
-    [24, 71, 2 * T],
-    [24 + 2 * T, 72, T],
-    [25, 74, 1],
-    [26, 76, 2 * T],
-    [26 + 2 * T, 78, T],
-    [27, 72, 1],
-    [28, 71, 1],
-    [29, 67, 2.5],
-  ];
-  pushPhrase(ev, 32, tuneB, 0.28, 'flute');
-  // reprise with a quiet pipe descant floating over the last phrase
-  pushPhrase(ev, 64, tuneA, 0.26, 'flute');
-  pushPhrase(ev, 64, tuneA, 0.11, 'dulcimer');
-  const descant: Phrase = [
-    [0, 79, 2],
-    [2, 81, 2],
-    [4, 78, 3],
-    [8, 76, 2],
-    [10, 78, 2],
-    [12, 79, 3],
-  ];
-  pushPhrase(ev, 80, descant, 0.06, 'flute');
-
-  ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 88, bars: 24, events: ev };
-}
-
-function composeTownHighwatch(): Theme {
-  const ev: NoteEvent[] = [];
-  // "Two Hundred Years of Watch". B minor, 96 bpm, 20 bars: an eight-bar
-  // horn chorale march (duty on the wall), an eight-bar pipe descant lift
-  // (hope over the parapet, half-cadencing on the watch fires), and a
-  // four-bar coda where the chapel bell tolls under the motto. Highwatch is
-  // a two-century garrison holding the roof of the world: dignity, grit,
-  // hearth-warmth inside the wind. B minor is the relative minor of the
-  // peaks anthem so gate crossfades stay kin.
-  // mid: the beat-two bass note; a fifth above the bass except on inversion
-  // bars (A/C#, D/F#), where the bass note is the chord's third and a literal
-  // +7 would land outside the key
-  type BarSpec = { root: number; mid?: number; keys: number[]; tri: number[] };
-  const Bm: BarSpec = { root: 47, keys: [47, 59, 62, 66], tri: [59, 62, 66] };
-  const G: BarSpec = { root: 43, keys: [43, 59, 62, 67], tri: [59, 62, 67] };
-  const D: BarSpec = { root: 38, keys: [50, 57, 62, 66], tri: [57, 62, 66] };
-  const A: BarSpec = { root: 45, keys: [45, 57, 61, 64], tri: [57, 61, 64] };
-  const Em7: BarSpec = { root: 40, keys: [40, 55, 59, 62], tri: [55, 59, 64] };
-  const F$m: BarSpec = { root: 42, keys: [42, 54, 61, 66], tri: [54, 61, 66] };
-  const AC$: BarSpec = { root: 49, mid: 52, keys: [49, 57, 64, 69], tri: [57, 61, 64] };
-  const DF$: BarSpec = { root: 42, mid: 45, keys: [54, 62, 66, 69], tri: [54, 62, 66] };
-  const F$5: BarSpec = { root: 42, keys: [42, 54, 61, 66], tri: [54, 61, 66] };
-  const A8: BarSpec[] = [Bm, G, D, A, Bm, Em7, A, Bm];
-  const B8: BarSpec[] = [D, AC$, Bm, F$m, G, DF$, Em7, F$5];
-  const coda: BarSpec[] = [G, DF$, A, Bm];
-  const bars: BarSpec[] = [...A8, ...B8, ...coda];
-
-  bars.forEach((c, bar) => {
-    const b0 = bar * 4;
-    const inB = bar >= 8 && bar < 16;
-    const inCoda = bar >= 16;
-    // sustained strings glue with the piano hearth under it
-    pushVoicing(ev, b0, c.tri, 4.05, 0.11, 'strings');
-    pushVoicing(ev, b0, c.keys, 2.2, 0.12, 'piano');
-    if (bar % 2 === 1) pushVoicing(ev, b0 + 2.5, c.keys.slice(1), 1.2, 0.07, 'piano');
-    // dotted march bass
-    pushNote(ev, b0, c.root, 0.7, 0.34, 'bass');
-    pushNote(ev, b0 + 0.75, c.root, 0.25, 0.16, 'bass');
-    pushNote(ev, b0 + 2, c.mid ?? c.root + 7, 0.7, 0.24, 'bass');
-    pushNote(ev, b0 + 3.5, c.root, 0.45, 0.16, 'bass');
-    // parade drums, softened for the descant, proud again in the coda
-    if (!inB) {
-      pushDrumHits(ev, b0, [0, 1, 2, 3], 'frameDrum', inCoda ? 0.13 : 0.11, 45);
-      pushNote(ev, b0 + 2.75, 45, 0.2, 0.05, 'frameDrum');
-      if (bar % 4 === 0) pushNote(ev, b0, 38, 0.9, 0.16, 'warDrum');
-    } else {
-      pushDrumHits(ev, b0, [0, 2], 'frameDrum', 0.08, 45);
-      // harp keeps the lift moving
-      for (const [i, t] of [0.5, 1.5, 2.5, 3.5].entries()) {
-        pushNote(ev, b0 + t, c.keys[1 + (i % 3)], 0.8, 0.11, 'harp');
-      }
-    }
-    if (bar % 8 === 3) pushNote(ev, b0 + 3.5, 38, 0.45, 0.24, 'timpani');
-    if (bar === 15) {
-      for (const [i, t] of [3, 3.5, 3.75].entries()) {
-        pushNote(ev, b0 + t, 38, 0.3, 0.2 + i * 0.06, 'timpani');
-      }
-    }
-  });
-
-  // A: the horn chorale in two voices, the watch motto
-  const motto: Phrase = [
-    [0, 66, 1],
-    [1, 71, 1.5],
-    [2.5, 69, 0.5],
-    [3, 66, 1],
-    [4, 67, 2],
-    [6, 71, 1],
-    [7, 74, 1],
-    [8, 69, 1.5],
-    [9.5, 66, 0.5],
-    [10, 62, 2],
-    [12, 64, 1],
-    [13, 69, 1],
-    [14, 73, 1],
-    [15, 76, 1],
-    [16, 74, 1.5],
-    [17.5, 73, 0.5],
-    [18, 71, 1],
-    [19, 66, 1],
-    [20, 67, 1],
-    [21, 71, 1.5],
-    [22.5, 69, 0.5],
-    [23, 67, 1],
-    [24, 71, 1],
-    [25, 67, 1],
-    [26, 69, 1],
-    [27, 73, 1],
-    [28, 71, 3.5],
-  ];
-  const mottoLow: Phrase = [
-    [0, 62, 1],
-    [1, 62, 1.5],
-    [2.5, 66, 0.5],
-    [3, 62, 1],
-    [4, 62, 2],
-    [6, 67, 1],
-    [7, 71, 1],
-    [8, 66, 1.5],
-    [9.5, 62, 0.5],
-    [10, 57, 2],
-    [12, 61, 1],
-    [13, 64, 1],
-    [14, 69, 1],
-    [15, 73, 1],
-    [16, 66, 2],
-    [18, 66, 1],
-    [19, 62, 1],
-    [20, 64, 1],
-    [21, 67, 1.5],
-    [22.5, 64, 0.5],
-    [23, 64, 1],
-    [24, 67, 1],
-    [25, 61, 1],
-    [26, 64, 1],
-    [27, 69, 1],
-    [28, 66, 3.5],
-  ];
-  pushPhrase(ev, 0, motto, 0.2, 'horn');
-  pushPhrase(ev, 0, mottoLow, 0.11, 'horn');
-  // B: the pipe descant over the wall, ending on the watch-fire half cadence
-  const descant: Phrase = [
-    [0, 78, 1],
-    [1, 76, 0.5],
-    [1.5, 74, 0.5],
-    [2, 81, 2],
-    [4, 79, 1.5],
-    [5.5, 78, 0.5],
-    [6, 76, 2],
-    [8, 74, 1],
-    [9, 78, 1],
-    [10, 83, 1.5],
-    [11.5, 81, 0.5],
-    [12, 81, 1],
-    [13, 78, 1],
-    [14, 73, 2],
-    [16, 71, 1],
-    [17, 74, 1],
-    [18, 79, 1.5],
-    [19.5, 78, 0.5],
-    [20, 78, 1],
-    [21, 74, 0.5],
-    [21.5, 69, 0.5],
-    [22, 74, 2],
-    [24, 76, 1.5],
-    [25.5, 74, 0.5],
-    [26, 71, 1],
-    [27, 67, 1],
-    [28, 69, 1],
-    [29, 71, 1],
-    [30, 73, 2],
-  ];
-  pushPhrase(ev, 32, descant, 0.18, 'pipe');
-  // coda: motto head in octaves while the chapel bell tolls
-  const codaLine: Phrase = [
-    [0, 74, 1],
-    [1, 71, 1.5],
-    [2.5, 73, 0.5],
-    [3, 74, 1],
-    [4, 69, 1],
-    [5, 66, 1],
-    [6, 74, 2],
-    [8, 73, 1],
-    [9, 76, 1],
-    [10, 78, 2],
-    [12, 71, 4],
-  ];
-  pushPhrase(ev, 64, codaLine, 0.2, 'horn');
-  pushPhrase(
-    ev,
-    64,
-    codaLine.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
-    0.1,
-    'pipe',
-  );
-  pushNote(ev, 64, 59, 3, 0.12, 'bell');
-  pushNote(ev, 72, 59, 3, 0.12, 'bell');
-
-  ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 96, bars: 20, events: ev };
-}
-
-function composeVale(): Theme {
-  const ev: NoteEvent[] = [];
-  // A dorian overworld: playful and looping, with sparse orchestral depth.
-  const Am = { root: 57, minor: true },
+  // "The Fenward Hearth". C major, 100 bpm, 16 bars, bright and open.
+  // Fenbridge is no longer a 12/8 G major lilt — this is a straight-ahead
+  // C major greeting with a fingerpicked lute ostinato, a warm horn melody,
+  // and a glockenspiel counterline. The garrison town gets an inviting,
+  // slightly rustic theme that nods to the marsh from a safe distance:
+  // no piano hearth chords, no walking bass, no triplets. A frame drum
+  // taps on 2 and 4 like a village dance caller's stick.
+  const C = { root: 60 },
+    F = { root: 53 },
     G = { root: 55 },
-    D = { root: 62 },
-    C = { root: 60 },
-    Em = { root: 52, minor: true };
-  const chords: ChordDef[] = [Am, G, D, Am, C, G, Em, Am, Am, C, D, G, Am, Em, G, Am];
+    Am = { root: 57, minor: true };
+  const Em = { root: 52, minor: true },
+    Dm = { root: 50, minor: true };
+  const chords: ChordDef[] = [C, F, C, G, Am, Em, F, G, C, Am, Dm, G, C, F, G, C];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
     const t = triad(c);
-    if (bar % 2 === 0) pushPedal(ev, b0, c.root, 'pad', 0.17);
-    pushNote(ev, b0, c.root - 24, 1.5, 0.28, 'bass');
-    pushNote(ev, b0 + 2, c.root - 19, 1.2, 0.2, 'bass');
-    const lilt = [t[0], t[2], t[1] + 12, t[2], t[0] + 12, t[2], t[1] + 12, t[2]];
-    pushRepeated(ev, b0, lilt, 0.5, 0.24, 0.18, 'lute');
-    if (bar % 2 === 1)
-      pushRepeated(ev, b0 + 0.25, [t[2] + 12, t[0] + 24, t[1] + 12], 1, 0.18, 0.12, 'dulcimer');
-    if (bar % 4 === 0 || bar % 4 === 2) pushDrumHits(ev, b0, [0, 1.5, 2.5], 'frameDrum', 0.09, 44);
+    const late = bar >= 8;
+    // fingerpicked lute: root, fifth then a higher arpeggio tail
+    pushNote(ev, b0, t[0], 0.4, 0.24, 'lute');
+    pushNote(ev, b0 + 0.5, t[2], 0.3, 0.15, 'lute');
+    pushNote(ev, b0 + 1, t[1] + 12, 0.28, 0.13, 'lute');
+    pushNote(ev, b0 + 1.5, t[2] + 12, 0.4, 0.12, 'lute');
+    pushNote(ev, b0 + 2, t[0] + 12, 0.3, 0.14, 'lute');
+    pushNote(ev, b0 + 3, t[2], 0.32, 0.12, 'lute');
+    // bass: root half notes, no walking approach
+    pushNote(ev, b0, c.root - 24, 1.8, 0.32, 'bass');
+    pushNote(ev, b0 + 2, c.root - 17, 1.8, 0.24, 'bass');
+    // frame drum on 2 and 4
+    pushDrumHits(ev, b0, [1, 3], 'frameDrum', 0.14, 44);
+    // soft string pad every two bars
+    if (bar % 2 === 0) pushPedal(ev, b0, c.root, 'strings', 0.1);
+    // glockenspiel trail on the back half
+    if (late && bar % 2 === 1) pushNote(ev, b0 + 2.75, t[2] + 24, 0.5, 0.07, 'bell');
   });
 
-  const motifA: Phrase = [
-    [0, 69, 0.5],
-    [0.5, 72, 0.5],
-    [1, 74, 1],
-    [2, 76, 0.5],
-    [2.5, 74, 0.5],
+  // A tune (horn): the welcoming call — rising fifths, skipping back down
+  const tuneA: Phrase = [
+    [0, 72, 0.5],
+    [0.5, 76, 0.5],
+    [1, 79, 1],
+    [2, 77, 0.5],
+    [2.5, 76, 0.5],
     [3, 72, 1],
+    [4, 74, 0.5],
+    [4.5, 76, 0.5],
+    [5, 79, 1.5],
+    [6.5, 77, 0.5],
+    [7, 76, 1],
+    [8, 72, 0.5],
+    [8.5, 74, 0.5],
+    [9, 76, 1],
+    [10, 79, 1],
+    [11, 81, 1],
+    [12, 80, 0.5],
+    [12.5, 79, 0.5],
+    [13, 77, 1],
+    [14, 76, 0.5],
+    [14.5, 74, 0.5],
+    [15, 72, 1],
+    [16, 74, 0.5],
+    [16.5, 76, 0.5],
+    [17, 79, 1],
+    [18, 77, 0.5],
+    [18.5, 76, 0.5],
+    [19, 74, 1],
+    [20, 72, 1],
+    [21, 74, 1],
+    [22, 76, 2],
+    [24, 79, 0.5],
+    [24.5, 81, 0.5],
+    [25, 84, 1.5],
+    [26.5, 83, 0.5],
+    [27, 81, 1],
+    [28, 79, 1.5],
+    [29.5, 77, 0.5],
+    [30, 72, 2],
+  ];
+  pushPhrase(ev, 0, tuneA, 0.26, 'horn');
+  // B part: a gentler answer on the oboe, answered in canon by the lute
+  const tuneB: Phrase = [
+    [0, 77, 1],
+    [1, 79, 1],
+    [2, 81, 1.5],
+    [3.5, 79, 0.5],
+    [4, 77, 1],
+    [5, 74, 1],
+    [6, 72, 2],
+    [8, 76, 1],
+    [9, 79, 1],
+    [10, 77, 1.5],
+    [11.5, 76, 0.5],
+    [12, 74, 1],
+    [13, 72, 1],
+    [14, 71, 2],
+    [16, 72, 0.5],
+    [16.5, 74, 0.5],
+    [17, 76, 1],
+    [18, 79, 1],
+    [19, 77, 1],
+    [20, 76, 1.5],
+    [21.5, 74, 0.5],
+    [22, 72, 2],
+  ];
+  pushPhrase(ev, 32, tuneB, 0.22, 'oboe');
+  // lute canon a third below
+  pushPhrase(
+    ev,
+    32,
+    tuneB.map(([b, m, d]) => [b, m - 4, d] as Phrase[number]),
+    0.1,
+    'lute',
+  );
+  // reprise: horn, then a soft descant on bell
+  pushPhrase(ev, 64, tuneA, 0.24, 'horn');
+  pushPhrase(
+    ev,
+    64,
+    tuneA.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
+    0.06,
+    'bell',
+  );
+
+  ev.sort((a, b) => a.beat - b.beat);
+  return { bpm: 100, bars: 24, events: ev };
+}
+
+function composeTownHighwatch(): Theme {
+  const ev: NoteEvent[] = [];
+  // "Citadel at Dusk". E minor, 90 bpm, 16 bars. Highwatch is no longer a
+  // B minor horn chorale march — this is a mysterious, grand theme in pure
+  // E aeolian, written for deep bells, a weaving woodwind line, and a
+  // low pulse from the war drum that suggests the weight of stone overhead.
+  // No strings sustain, no piano hearth, no parade drum flourishes. The
+  // A section circles a three-note descending motto (E-D-C); the B section
+  // lifts unexpectedly into G major before the dusk-bell returns.
+  const Em = { root: 52, minor: true },
+    G = { root: 55 },
+    D = { root: 62 },
+    Am = { root: 57, minor: true };
+  const C = { root: 60 },
+    Bm = { root: 59, minor: true };
+  const chords: ChordDef[] = [Em, G, D, Am, Em, C, G, D, Am, Em, Bm, C, G, Am, D, Em];
+
+  chords.forEach((c, bar) => {
+    const b0 = bar * 4;
+    const t = triad(c);
+    const late = bar >= 8;
+    // deep bell: root, fifth, octave sustained every two bars
+    if (bar % 2 === 0) {
+      pushVoicing(ev, b0, [t[0] - 12, t[2] - 12, t[0]], 4.05, 0.13, 'bell');
+      pushNote(ev, b0, c.root - 24, 4.1, 0.3, 'bass');
+    } else {
+      pushNote(ev, b0, c.root - 12, 4.1, 0.22, 'bass');
+    }
+    // war drum: slow pulse on 1 and 3, like a heartbeat heard through stone
+    pushNote(ev, b0, 38, 0.9, late ? 0.2 : 0.14, 'warDrum');
+    pushNote(ev, b0 + 2, 38, 0.9, 0.12, 'warDrum');
+    // reed: a quiet weaving counterline half a beat off the pulse
+    if (bar % 2 === 1) pushNote(ev, b0 + 0.5, t[1] + 12, 0.8, 0.08, 'reed');
+    if (late && bar % 2 === 0) {
+      // a second bell tolls in the back half, an octave higher
+      pushNote(ev, b0 + 2.5, t[2] + 12, 1.2, 0.05, 'tinyBell');
+    }
+  });
+
+  // A motto (reed and oboe in octaves): the citadel's three-note descent
+  const motto: Phrase = [
+    [0, 64, 0.5],
+    [0.5, 62, 0.5],
+    [1, 60, 0.5],
+    [1.5, 62, 0.5],
+    [2, 64, 1],
+    [3, 67, 1],
     [4, 69, 0.5],
     [4.5, 67, 0.5],
-    [5, 69, 1],
+    [5, 64, 1.5],
+    [6.5, 62, 0.5],
+    [7, 60, 1],
+    [8, 64, 0.5],
+    [8.5, 67, 0.5],
+    [9, 69, 1],
+    [10, 71, 1],
+    [11, 72, 1],
+    [12, 71, 1],
+    [13, 69, 1],
+    [14, 67, 2],
+    [16, 64, 0.5],
+    [16.5, 67, 0.5],
+    [17, 69, 0.5],
+    [17.5, 71, 0.5],
+    [18, 72, 1],
+    [19, 74, 1],
+    [20, 72, 0.5],
+    [20.5, 71, 0.5],
+    [21, 69, 1],
+    [22, 67, 1],
+    [23, 64, 1],
+    [24, 62, 0.5],
+    [24.5, 60, 0.5],
+    [25, 62, 1],
+    [26, 64, 1.5],
+    [27.5, 67, 0.5],
+    [28, 64, 3],
+  ];
+  pushPhrase(ev, 0, motto, 0.22, 'reed');
+  pushPhrase(ev, 0, motto.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]), 0.12, 'oboe');
+  // B section: G major lift — the view from the wall at sunset
+  const lift: Phrase = [
+    [0, 76, 1],
+    [1, 79, 0.5],
+    [1.5, 81, 0.5],
+    [2, 83, 1.5],
+    [3.5, 81, 0.5],
+    [4, 79, 1],
+    [5, 76, 0.5],
+    [5.5, 74, 0.5],
+    [6, 79, 2],
+    [8, 81, 1],
+    [9, 83, 1],
+    [10, 81, 1.5],
+    [11.5, 79, 0.5],
+    [12, 76, 1],
+    [13, 74, 0.5],
+    [13.5, 72, 0.5],
+    [14, 71, 1.5],
+    [15.5, 69, 0.5],
+    [16, 72, 1],
+    [17, 76, 1],
+    [18, 79, 2],
+    [20, 77, 0.5],
+    [20.5, 76, 0.5],
+    [21, 74, 1],
+    [22, 72, 1],
+    [23, 71, 1],
+    [24, 72, 1.5],
+    [25.5, 71, 0.5],
+    [26, 72, 1.5],
+    [27.5, 74, 0.5],
+    [28, 76, 3.5],
+  ];
+  pushPhrase(ev, 36, lift, 0.16, 'flute');
+  // reprise: the motto returns, the oboe above the reed
+  pushPhrase(ev, 68, motto, 0.2, 'reed');
+  pushPhrase(
+    ev,
+    68,
+    motto.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
+    0.1,
+    'oboe',
+  );
+
+  ev.sort((a, b) => a.beat - b.beat);
+  return { bpm: 90, bars: 24, events: ev };
+}
+
+function composeVale(): Theme {
+  const ev: NoteEvent[] = [];
+  // "The Bend in the Road". G lydian, 84 bpm, 16 bars. Eastbrook Vale's open
+  // wilderness is no longer an A dorian loop — this is a forward-pressing
+  // travel theme in G lydian, the raised fourth (C#) giving every phrase a
+  // wanderlust lift. A pizzicato violin trio carries the motive over a
+  // walking acoustic bass and a gentle shaker pulse; the B section opens
+  // into a harmonised string chorale before the road bends back.
+  const G = { root: 55 },
+    D = { root: 62 },
+    C = { root: 60 },
+    Em = { root: 52, minor: true },
+    Am = { root: 57, minor: true };
+  const chords: ChordDef[] = [G, D, Em, C, G, C, Am, D, G, Em, Am, C, G, D, Am, G];
+
+  chords.forEach((c, bar) => {
+    const b0 = bar * 4;
+    const t = triad(c);
+    const late = bar >= 8;
+    // walking bass: root on 1, fifth or third on 3, approach into next bar
+    pushNote(ev, b0, c.root - 24, 1.2, 0.32, 'bass');
+    pushNote(ev, b0 + 2, c.root - 17, 1.0, 0.22, 'bass');
+    pushNote(ev, b0 + 3.5, (chords[(bar + 1) % chords.length] as ChordDef).root - 26, 0.4, 0.15, 'bass');
+    // violin pizzicato trio: root, fifth, octave plucked on the downbeat
+    pushVoicing(ev, b0, [t[0], t[2], t[0] + 12], 0.3, late ? 0.18 : 0.14, 'stacc');
+    if (bar % 2 === 1) pushVoicing(ev, b0 + 2, [t[1] + 12, t[2] + 12], 0.3, 0.11, 'stacc');
+    // soft shaker and frame drum for the road rhythm
+    pushDrumHits(ev, b0, [0.5, 1, 2, 2.5, 3, 3.5], 'shaker', 0.1, 72);
+    if (bar % 4 === 0 || bar % 4 === 2) pushDrumHits(ev, b0, [0, 2], 'frameDrum', 0.08, 44);
+    // distant pad wash
+    if (bar % 4 === 0) pushPedal(ev, b0, c.root + 12, 'strings', 0.08);
+    // dulcimer trail on the last beat of every other bar
+    if (bar % 2 === 1) pushNote(ev, b0 + 3.25, t[2] + 24, 0.5, 0.07, 'dulcimer');
+  });
+
+  // A section: the wanderer's motive on pizzicato strings
+  const motive: Phrase = [
+    [0, 67, 0.5],
+    [0.5, 71, 0.5],
+    [1, 74, 1],
+    [2, 72, 0.5],
+    [2.5, 71, 0.5],
+    [3, 67, 1],
+    [4, 66, 0.5],
+    [4.5, 67, 0.5],
+    [5, 71, 1],
     [6, 72, 0.5],
     [6.5, 74, 0.5],
     [7, 76, 1],
-    [8, 79, 0.5],
+    [8, 78, 0.5],
     [8.5, 76, 0.5],
     [9, 74, 1],
     [10, 72, 0.5],
-    [10.5, 69, 0.5],
+    [10.5, 71, 0.5],
     [11, 67, 1],
-    [12, 69, 0.5],
-    [12.5, 72, 0.5],
-    [13, 74, 1],
-    [14, 72, 0.5],
-    [14.5, 69, 0.5],
-    [15, 69, 1],
-  ];
-  const motifB: Phrase = [
-    [0, 76, 0.5],
-    [0.5, 79, 0.5],
-    [1, 81, 1],
-    [2, 79, 0.5],
-    [2.5, 76, 0.5],
-    [3, 74, 1],
-    [4, 72, 0.5],
-    [4.5, 74, 0.5],
-    [5, 76, 1],
-    [6, 79, 0.5],
-    [6.5, 81, 0.5],
-    [7, 84, 1],
-    [8, 81, 0.5],
-    [8.5, 79, 0.5],
-    [9, 76, 1],
-    [10, 74, 0.5],
-    [10.5, 72, 0.5],
-    [11, 69, 1],
-    [12, 67, 0.5],
-    [12.5, 69, 0.5],
-    [13, 72, 1],
+    [12, 71, 0.5],
+    [12.5, 74, 0.5],
+    [13, 76, 1],
     [14, 74, 0.5],
     [14.5, 72, 0.5],
-    [15, 69, 1],
+    [15, 71, 1],
   ];
-  pushPhrase(ev, 4, motifA, 0.16, 'pipe');
-  pushPhrase(
-    ev,
-    20,
-    motifA.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
-    0.11,
-    'reed',
-  );
-  pushPhrase(ev, 36, motifB, 0.15, 'squareLead');
-  pushPhrase(ev, 52, motifA, 0.14, 'pipe');
+  pushPhrase(ev, 4, motive, 0.22, 'stacc');
+  // B section: a warm chorale that lifts onto the dominant
+  const chorale: Phrase = [
+    [0, 74, 1.5],
+    [1.5, 76, 0.5],
+    [2, 78, 1],
+    [3, 74, 1],
+    [4, 79, 1],
+    [5, 78, 0.5],
+    [5.5, 76, 0.5],
+    [6, 74, 1.5],
+    [7.5, 71, 0.5],
+    [8, 72, 1],
+    [9, 76, 1],
+    [10, 79, 1.5],
+    [11.5, 78, 0.5],
+    [12, 78, 1],
+    [13, 76, 1],
+    [14, 74, 2.5],
+  ];
+  pushPhrase(ev, 36, chorale, 0.18, 'strings');
+  // reprise with a soft dulcimer descant
+  pushPhrase(ev, 52, motive, 0.2, 'stacc');
+  pushPhrase(ev, 54, motive.slice(2).map(([b, m, d]) => [b - 2, m + 12, d] as Phrase[number]), 0.07, 'dulcimer');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 92, bars: 16, events: ev };
+  return { bpm: 84, bars: 16, events: ev };
 }
 
 function composeLegacyVale(): Theme {
@@ -863,334 +811,211 @@ function composeLegacyVale(): Theme {
 
 function composeMarsh(): Theme {
   const ev: NoteEvent[] = [];
-  // "The Water Remembers". E aeolian, 76 bpm, ABA' over 24 bars. Mirefen is a
-  // drowned country: perpetual overcast, grey-green fog, dead raised from the
-  // lakes, a chapel that sank with its congregation. The writing is a slow
-  // waterlogged requiem: piano droplets over deep pedals, a low choir for the
-  // drowned, a reed dirge that the flute answers from the relative major
-  // before the mist closes back in. Wood clicks and rain bells keep the fen's
-  // old identity at the edges.
-  type BarSpec = {
-    root: number; // pedal and bass root, octave 3 area
-    pad: number[]; // sustained color voicing
-    drop: number[]; // piano droplet pitches, low to high
-  };
-  const Em: BarSpec = { root: 52, pad: [52, 59, 66], drop: [40, 52, 59, 64, 71, 78] };
-  const Cma7: BarSpec = { root: 48, pad: [52, 59, 64], drop: [36, 48, 55, 64, 71, 76] };
-  const Am7: BarSpec = { root: 45, pad: [52, 60, 67], drop: [33, 45, 52, 60, 67, 72] };
-  const EmG: BarSpec = { root: 43, pad: [55, 59, 64], drop: [31, 43, 52, 59, 64, 67] };
-  const Bm7: BarSpec = { root: 47, pad: [54, 59, 62], drop: [35, 47, 54, 62, 66, 69] };
-  const Dma: BarSpec = { root: 50, pad: [54, 57, 62], drop: [38, 50, 57, 62, 66, 74] };
-  const Gma: BarSpec = { root: 43, pad: [55, 59, 62], drop: [31, 43, 50, 59, 62, 67] };
-  const A8: BarSpec[] = [Em, Em, Cma7, Am7, EmG, Cma7, Bm7, Em];
-  const B8: BarSpec[] = [Cma7, Dma, Gma, Em, Am7, Bm7, Dma, Em];
-  const bars: BarSpec[] = [...A8, ...B8, ...A8];
+  // "Fogbound". E locrian, 72 bpm, 24 bars. Mirefen is no longer a
+  // waterlogged E aeolian requiem — this is a desolate, dry-reed dirge in
+  // E locrian, the flattened second (F natural) turning every iv into a
+  // minor-second shiver. No piano droplets, no choir of the drowned, no
+  // B-section lift into G major. Instead: a single low reed wail against
+  // a drone pipe, frame drum rattles that sound like stones falling into
+  // still water, and a muted brass stab for the marsh's buried secrets.
+  // The fog never lifts.
+  const Em = { root: 52, minor: true },
+    F = { root: 53 },
+    Dm = { root: 50, minor: true };
+  const Bb = { root: 58 },
+    Gm = { root: 55, minor: true };
+  const chords: ChordDef[] = [Em, F, Em, Dm, Em, F, Gm, Em, Dm, Em, F, Em, Bb, F, Dm, Em, Em, F, Gm, Em, Dm, F, Em, Em];
 
-  bars.forEach((c, bar) => {
+  chords.forEach((c, bar) => {
     const b0 = bar * 4;
-    const inB = bar >= 8 && bar < 16;
-    const inA2 = bar >= 16;
-    // deep water pedal every two bars; the choir of the drowned joins in B
-    // and in the final section
-    if (bar % 2 === 0) pushPedal(ev, b0, c.root < 52 ? c.root + 12 : c.root, 'strings', 0.2);
-    if ((inB || inA2) && bar % 2 === 0) {
-      pushNote(ev, b0, c.root - 12, 8.2, 0.1, 'choir');
-      pushNote(ev, b0, c.root - 5, 8.2, 0.06, 'choir');
-    }
-    // slow bass breath: root, then a drift to the fifth
-    pushNote(ev, b0, c.root - 12, 2.6, 0.3, 'bass');
-    if (bar % 2 === 1) pushNote(ev, b0 + 2.5, c.root - 5, 1.2, 0.16, 'bass');
-    // piano droplets: sparse syncopated chord tones falling like water from
-    // the reeds, alternating placement so no two bars drip alike
-    const dropBeats = bar % 2 === 0 ? [0.5, 1.75, 2.5, 3.25] : [0.75, 1.5, 2.75, 3.5];
-    const order = bar % 2 === 0 ? [1, 3, 5, 4] : [2, 4, 5, 3];
-    for (const [i, di] of order.entries()) {
-      pushNote(ev, b0 + dropBeats[i], c.drop[di], 1.1, 0.15, 'piano');
-    }
-    // a deep anchor note under the phrase-start droplets
-    if (bar % 4 === 0) pushNote(ev, b0 + 0.5, c.drop[0], 1.6, 0.12, 'piano');
-    // fen identity: soft wood clicks off the grid, a low frame drum far away
-    if (bar % 2 === 1) pushDrumHits(ev, b0, [1.75, 3.25], 'woodBlock', 0.06, 70);
-    if (bar % 8 === 6) pushNote(ev, b0 + 3, 43, 0.25, 0.08, 'frameDrum');
-    // rain bells in the reprise only: the mist thinning for a moment
-    if (inA2 && bar % 2 === 0) {
-      pushNote(ev, b0 + 2.25, c.pad[2] + 12, 0.8, 0.06, 'tinyBell');
-    }
-    if (inA2) {
-      // harp counterline rising against the sinking bass
-      for (const i of [0, 1, 2, 3]) {
-        pushNote(ev, b0 + i + 0.5, c.pad[i % 3] + (i === 3 ? 12 : 0), 0.8, 0.1, 'harp');
-      }
-    }
+    const t = triad(c);
+    const late = bar >= 12;
+    // drone: the tonic E never wavers, a pipe holding the same note forever
+    pushNote(ev, b0, 52, 8.2, late ? 0.12 : 0.08, 'pipe');
+    // bass: slow, with a shiver on the downbeat of the F bars
+    pushNote(ev, b0, c.root - 24, 2.8, 0.26, 'bass');
+    if (bar % 2 === 1) pushNote(ev, b0 + 2, c.root - 17, 1.2, 0.16, 'bass');
+    // the minor-second: on F bars the flat second rings over the pedal
+    if (c.root === 53) pushVoicing(ev, b0, [52, 53], 4.05, 0.07, 'strings');
+    // stones: frame drum rattle off the grid
+    if (bar % 3 === 0) pushDrumHits(ev, b0, [1.25, 2.75, 3.5], 'frameDrum', 0.08, 42);
+    // muted brass stab in the second half
+    if (late && bar % 4 === 0) pushVoicing(ev, b0, [t[0] - 12, t[2] - 12], 0.6, 0.14, 'brassStab');
+    // wood click, irregular
+    if (bar % 5 === 2) pushNote(ev, b0, 70, 0.2, 0.05, 'woodBlock');
   });
 
-  // A section dirge (reed): narrow, grieving, ending unresolved on the tonic
+  // Dirge (reed): a single wailing line over the drone, no counterpoint
   const dirge: Phrase = [
-    [0, 67, 1.5],
-    [1.5, 69, 0.5],
-    [2, 71, 2],
-    [4, 72, 1],
-    [5, 71, 0.5],
-    [5.5, 69, 0.5],
-    [6, 64, 2],
-    [9, 64, 0.5],
-    [9.5, 66, 0.5],
+    [0, 64, 2],
+    [2, 63, 1],
+    [3, 64, 1],
+    [4, 67, 1.5],
+    [5.5, 64, 0.5],
+    [6, 62, 2],
+    [8, 63, 1.5],
+    [9.5, 64, 0.5],
     [10, 67, 1],
-    [11, 69, 1],
-    [12, 71, 2],
-    [14, 67, 1],
-    [15, 64, 1],
-    [16, 66, 1.5],
-    [17.5, 67, 0.5],
-    [18, 66, 1],
-    [19, 62, 1],
-    [20, 64, 3.5],
+    [11, 63, 1],
+    [12, 62, 2],
+    [14, 58, 1],
+    [15, 60, 1],
+    [16, 62, 1.5],
+    [17.5, 63, 0.5],
+    [18, 64, 2],
+    [20, 63, 1],
+    [21, 60, 1],
+    [22, 62, 2.5],
+    [25, 58, 2],
+    [27, 55, 1],
+    [28, 57, 3],
   ];
+  pushPhrase(ev, 8, dirge, 0.2, 'reed');
+  // second dirge: the same line, an octave up and a half bar behind
   pushPhrase(
     ev,
-    8,
-    dirge.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
-    0.21,
-    'flute',
+    16,
+    dirge.map(([b, m, d]) => [b + 0.5, m + 12, d] as Phrase[number]),
+    0.09,
+    'oboe',
   );
-  pushPhrase(ev, 8, dirge, 0.12, 'harp');
-  // B section: the flute lifts into G major light over the water, then sinks
-  const lift: Phrase = [
-    [0, 76, 1.5],
-    [1.5, 74, 0.5],
-    [2, 72, 1],
-    [3, 71, 1],
-    [4, 69, 1],
-    [5, 71, 0.5],
-    [5.5, 74, 0.5],
-    [6, 78, 1.5],
-    [7.5, 76, 0.5],
-    [8, 74, 1],
-    [9, 79, 1.5],
-    [10.5, 78, 0.5],
-    [11, 76, 1],
-    [12, 71, 2.5],
-    [14.5, 69, 0.5],
-    [15, 67, 1],
-    [16, 69, 1],
-    [17, 72, 1],
-    [18, 76, 1.5],
-    [19.5, 74, 0.5],
-    [20, 74, 1.5],
-    [21.5, 71, 0.5],
-    [22, 66, 2],
-    [24, 67, 1],
-    [25, 69, 1],
-    [26, 71, 1],
-    [27, 74, 1],
-    [28, 76, 2.5],
-    [30.5, 71, 1.5],
-  ];
-  pushPhrase(ev, 32, lift, 0.26, 'flute');
-  // reprise: the dirge returns, flute above, harp lighting the attacks
-  pushPhrase(
-    ev,
-    72,
-    dirge.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
-    0.19,
-    'flute',
-  );
-  pushPhrase(ev, 72, dirge, 0.11, 'harp');
-  // section seams: a slow harp roll up from the deep
-  for (const seam of [31, 63]) {
-    for (const [i, m] of [40, 47, 52, 59].entries()) {
-      pushNote(ev, seam + i * 0.17, m, 1.4, 0.12, 'harp');
-    }
-  }
+  // reprise: the first dirge alone again, fading
+  pushPhrase(ev, 72, dirge.map(([b, m, d]) => [b, m, d * 0.9] as Phrase[number]), 0.16, 'reed');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 76, bars: 24, events: ev };
+  return { bpm: 72, bars: 24, events: ev };
 }
 
 function composePeaks(): Theme {
   const ev: NoteEvent[] = [];
-  // "The Mountain Listens". D major, 100 bpm, 24 bars: anthem / awe / anthem
-  // in octaves. Thornpeak is thin bright dawn air over a buried dread: snow,
-  // the longest sightlines in the game, a two-hundred-year watch, and a
-  // half-woken wyrm under the summit. The A section is a wide-interval horn
-  // anthem over a marching string ostinato; the B section turns to B minor,
-  // slows the motor, and lets a distant pipe echo the anthem off the cliffs;
-  // the reprise states the anthem in horn and pipe octaves with full drums.
-  // air: the high choir dyad (root and fifth of the chord, octave 4-5).
-  // mid: the beat-three bass note; a fifth above the bass except on the
-  // D/F# slash bar, where the bass note is the chord's third.
-  type BarSpec = { root: number; mid?: number; ost: number[]; tri: number[]; air: number[] };
-  const D: BarSpec = { root: 38, ost: [62, 69, 74, 69], tri: [62, 66, 69], air: [69, 76] };
-  const G: BarSpec = { root: 43, ost: [67, 74, 79, 74], tri: [62, 67, 71], air: [67, 74] };
-  const A: BarSpec = { root: 45, ost: [69, 76, 81, 76], tri: [61, 64, 69], air: [69, 76] };
-  const Asus: BarSpec = { root: 45, ost: [69, 76, 81, 76], tri: [62, 64, 69], air: [69, 76] };
-  const Bm: BarSpec = { root: 47, ost: [59, 66, 71, 66], tri: [62, 66, 71], air: [71, 78] };
-  const DF$: BarSpec = {
-    root: 42,
-    mid: 45,
-    ost: [66, 69, 74, 69],
-    tri: [62, 66, 69],
-    air: [69, 74],
-  };
-  const Em7: BarSpec = { root: 40, ost: [64, 71, 76, 71], tri: [59, 64, 67], air: [67, 74] };
-  const A8: BarSpec[] = [D, D, G, A, D, Bm, G, Asus];
-  const B8: BarSpec[] = [Bm, G, DF$, A, Bm, G, Em7, Asus];
-  // the reprise closes on the dominant so the loop turns around V to I
-  const C8: BarSpec[] = [D, D, G, A, D, Bm, G, A];
-  const bars: BarSpec[] = [...A8, ...B8, ...C8];
+  // "Above the Clouds". F lydian, 108 bpm, 20 bars. Thornpeak is no longer a
+  // D major anthem march — this is light, thin-air wonder in F lydian, the
+  // raised fourth (B natural) giving every melodic turn an alpine shimmer.
+  // No horn chorale, no war drums, no marching ostinato. Instead: a rippling
+  // dulcimer arpeggio that never stops, a flute line that soars and dives
+  // like a hawk riding thermals, and a delicate bell toll for the summit.
+  // The B section drops into the relative D minor for a moment of vertigo
+  // before the wind lifts the theme back.
+  const F = { root: 53 },
+    C = { root: 60 },
+    Dm = { root: 50, minor: true };
+  const Bb = { root: 58 },
+    Gm = { root: 55, minor: true },
+    Am = { root: 57, minor: true };
+  const chords: ChordDef[] = [F, C, Dm, Bb, F, C, Gm, Am, Dm, C, Bb, F, Dm, Gm, Am, F, C, Bb, C, F];
 
-  bars.forEach((c, bar) => {
+  chords.forEach((c, bar) => {
     const b0 = bar * 4;
-    const inB = bar >= 8 && bar < 16;
-    const inC = bar >= 16;
-    if (!inB) {
-      // marching eighth ostinato: root, fifth, octave, fifth
-      for (let i = 0; i < 8; i++) {
-        pushNote(ev, b0 + i * 0.5, c.ost[i % 4], 0.26, i % 4 === 0 ? 0.2 : 0.13, 'stacc');
-      }
-    } else {
-      // the awe section thins the motor to lute quarters
-      for (const i of [0, 1, 2, 3]) {
-        pushNote(ev, b0 + i, c.ost[i % 4] - 12, 0.7, 0.13, 'lute');
-      }
+    const t = triad(c);
+    const late = bar >= 10;
+    // dulcimer: constant eighth-note ripple, like light on snow
+    const ripple = [t[0], t[1], t[2], t[0] + 12, t[2], t[1], t[0], t[1]];
+    for (const [i, n] of ripple.entries()) {
+      pushNote(ev, b0 + i * 0.5, n + 12, 0.28, 0.15, 'dulcimer');
     }
-    pushNote(ev, b0, c.root, 1.5, 0.36, 'bass');
-    pushNote(ev, b0 + 2, c.root, 0.75, 0.24, 'bass');
-    pushNote(ev, b0 + 3, c.mid ?? c.root + 7, 0.75, 0.22, 'bass');
-    // altitude: high choir breath over the anthem, low choir under the awe
-    if (bar % 2 === 0) {
-      if (inB) pushNote(ev, b0, c.root + 12, 8.2, 0.1, 'choir');
-      else pushVoicing(ev, b0, c.air, 8.2, inC ? 0.1 : 0.07, 'choir');
-    }
-    if (inC) pushVoicing(ev, b0, c.tri, 4.05, 0.12, 'strings');
-    // field drums, held back in the awe section
-    if (!inB) {
-      pushDrumHits(ev, b0, [0, 2], 'warDrum', inC ? 0.2 : 0.16, 38);
-      pushDrumHits(ev, b0, [1, 3], 'frameDrum', 0.12, 45);
-      if (bar % 2 === 1) pushNote(ev, b0 + 3.5, 45, 0.2, 0.08, 'frameDrum');
-    } else {
-      pushDrumHits(ev, b0, [0], 'frameDrum', 0.09, 45);
-    }
-    if (bar % 4 === 0) pushNote(ev, b0 + 2.25, 86, 1.2, 0.06, 'tinyBell');
-    if (bar % 8 === 7) {
-      for (const [i, t] of [3, 3.25, 3.5, 3.75].entries()) {
-        pushNote(ev, b0 + t, 38, 0.3, 0.18 + i * 0.05, 'timpani');
-      }
-    }
-    if (bar % 8 === 0) pushNote(ev, b0, 38, 1, 0.42, 'timpani');
+    // bass: light and skipping, not heavy
+    pushNote(ev, b0, c.root - 24, 1.0, 0.26, 'bass');
+    pushNote(ev, b0 + 2, c.root - 17, 0.8, 0.16, 'bass');
+    pushNote(ev, b0 + 3, c.root - 12, 0.6, 0.12, 'bass');
+    // tiny bell chord on the downbeat of the early bars
+    if (bar % 2 === 0 && !late) pushVoicing(ev, b0, [t[0] + 24, t[2] + 24], 0.6, 0.06, 'tinyBell');
+    // soft shaker for the thin wind
+    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'shaker', 0.06, 72);
+    // frame drum on 2 and 4 in the back half
+    if (late) pushDrumHits(ev, b0, [1, 3], 'frameDrum', 0.08, 44);
+    // sustained choir pad every 4 bars
+    if (bar % 4 === 0) pushPedal(ev, b0, c.root + 12, 'choir', 0.06);
   });
 
-  // the anthem: wide intervals, a rising fourth call and a sus resolution
-  const anthem: Phrase = [
-    [0, 62, 1],
-    [1, 69, 1],
-    [2, 74, 1.5],
-    [3.5, 71, 0.5],
-    [4, 69, 1.5],
-    [5.5, 66, 0.5],
-    [6, 69, 1],
-    [7, 71, 1],
-    [8, 71, 1],
-    [9, 74, 1],
-    [10, 67, 2],
-    [12, 69, 1],
-    [13, 73, 1],
-    [14, 76, 2],
-    [16, 78, 1.5],
-    [17.5, 76, 0.5],
-    [18, 74, 1],
-    [19, 69, 1],
-    [20, 71, 1.5],
-    [21.5, 73, 0.5],
-    [22, 74, 1],
-    [23, 66, 1],
-    [24, 67, 1],
-    [25, 71, 1],
-    [26, 74, 1.5],
-    [27.5, 76, 0.5],
-    [28, 76, 1.5],
-    [29.5, 74, 0.5],
-    [30, 73, 2],
+  // A: the soaring flute melody — wide intervals, rising and falling
+  const soar: Phrase = [
+    [0, 74, 0.5],
+    [0.5, 77, 0.5],
+    [1, 81, 1],
+    [2, 79, 0.5],
+    [2.5, 77, 0.5],
+    [3, 74, 1],
+    [4, 72, 0.5],
+    [4.5, 74, 0.5],
+    [5, 77, 1],
+    [6, 81, 0.5],
+    [6.5, 84, 0.5],
+    [7, 86, 1],
+    [8, 84, 0.5],
+    [8.5, 81, 0.5],
+    [9, 77, 1.5],
+    [10.5, 74, 0.5],
+    [11, 72, 1],
+    [12, 77, 0.5],
+    [12.5, 81, 0.5],
+    [13, 84, 1],
+    [14, 81, 0.5],
+    [14.5, 79, 0.5],
+    [15, 77, 1],
+    [16, 79, 0.5],
+    [16.5, 81, 0.5],
+    [17, 84, 1],
+    [18, 86, 1],
+    [19, 84, 1],
+    [20, 81, 2],
+    [22, 79, 1],
+    [23, 77, 1],
+    [24, 77, 0.5],
+    [24.5, 79, 0.5],
+    [25, 81, 1],
+    [26, 84, 1],
+    [27, 86, 1],
+    [28, 86, 1.5],
+    [29.5, 84, 0.5],
+    [30, 81, 2],
   ];
-  pushPhrase(ev, 0, anthem, 0.22, 'horn');
-  // stabs follow the bar harmony: D fifths on D bars, G fifths on G bars
-  for (const [b, dyad] of [
-    [0, [62, 69]],
-    [8, [67, 74]],
-    [16, [62, 69]],
-    [24, [67, 74]],
-  ] as const) {
-    pushVoicing(ev, b, [...dyad], 0.5, 0.15, 'brassStab');
-  }
-  // the awe: strings lead in B minor while the mountain listens
-  const awe: Phrase = [
-    [0, 74, 1],
-    [1, 73, 0.5],
-    [1.5, 71, 0.5],
-    [2, 78, 2],
-    [4, 79, 1.5],
-    [5.5, 78, 0.5],
-    [6, 76, 1],
-    [7, 74, 1],
-    [8, 81, 1],
-    [9, 78, 0.5],
-    [9.5, 74, 0.5],
-    [10, 76, 2],
-    [12, 73, 1],
-    [13, 76, 1],
-    [14, 69, 2],
-    [16, 71, 1],
-    [17, 74, 0.5],
-    [17.5, 78, 0.5],
-    [18, 83, 1.5],
-    [19.5, 81, 0.5],
-    [20, 79, 1],
-    [21, 78, 0.5],
-    [21.5, 76, 0.5],
-    [22, 74, 1],
-    [23, 71, 1],
-    [24, 76, 1.5],
-    [25.5, 78, 0.5],
-    [26, 79, 1],
-    [27, 78, 0.5],
-    [27.5, 76, 0.5],
-    [28, 74, 1.5],
-    [29.5, 76, 0.5],
-    [30, 73, 1],
-    [31, 76, 1],
+  pushPhrase(ev, 0, soar, 0.28, 'flute');
+  // B section: the wind drops into D minor — vertigo
+  const vertigo: Phrase = [
+    [0, 72, 1.5],
+    [1.5, 74, 0.5],
+    [2, 72, 1],
+    [3, 69, 1],
+    [4, 67, 1],
+    [5, 69, 0.5],
+    [5.5, 72, 0.5],
+    [6, 74, 1.5],
+    [7.5, 72, 0.5],
+    [8, 69, 1],
+    [9, 67, 1],
+    [10, 64, 2],
+    [12, 66, 1],
+    [13, 69, 0.5],
+    [13.5, 72, 0.5],
+    [14, 74, 1],
+    [15, 72, 1],
+    [16, 69, 1.5],
+    [17.5, 67, 0.5],
+    [18, 66, 1],
+    [19, 62, 1],
+    [20, 64, 3],
   ];
-  pushPhrase(ev, 32, awe, 0.2, 'strings');
+  pushPhrase(ev, 40, vertigo, 0.18, 'oboe');
+  // oboe answer an octave below
   pushPhrase(
     ev,
-    56,
-    awe.slice(25).map(([b, m, d]) => [b - 24, m + 12, d] as Phrase[number]),
-    0.07,
-    'flute',
+    40,
+    vertigo.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
+    0.1,
+    'reed',
   );
-  // a far pipe echoes the anthem's falling call off the cliffs
+  // reprise: flute above, dulcimer doubling near the end
+  pushPhrase(ev, 80, soar, 0.26, 'flute');
   pushPhrase(
     ev,
-    42,
-    [
-      [0, 86, 0.5],
-      [0.5, 81, 0.5],
-      [1, 78, 1.5],
-    ],
-    0.07,
-    'pipe',
-  );
-  // reprise: anthem in octaves over the full field
-  pushPhrase(ev, 64, anthem, 0.22, 'horn');
-  pushPhrase(
-    ev,
-    64,
-    anthem.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
-    0.13,
-    'pipe',
+    80,
+    soar.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
+    0.08,
+    'tinyBell',
   );
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 100, bars: 24, events: ev };
+  return { bpm: 108, bars: 20, events: ev };
 }
 
 /** The Sowfield: "Boots and Banners". D major, 108 bpm, 16 bars. The Vale Cup
@@ -1201,92 +1026,123 @@ function composePeaks(): Theme {
  *  dulcimer answer in the back eight where the crowd starts singing along. */
 function composeValeCup(): Theme {
   const ev: NoteEvent[] = [];
-  const D = { root: 62 },
-    G = { root: 55 },
-    A = { root: 57 },
-    Bm = { root: 59, minor: true };
-  const chords: ChordDef[] = [D, G, D, A, D, G, A, D, Bm, G, D, A, G, D, A, D];
+  // "Champion's Walk". A major, 120 bpm, 16 bars. The Sowfield tournament
+  // ground is no longer a D major pipe-and-boots stomp — this is a fast,
+  // cinematic A major fanfare for the arriving champion. Brass and strings
+  // trade a short heraldic motto over a galloping rhythm: timpani on 1,
+  // frame drum on 2 and 4, and a shaker running the gaps. The B section
+  // drops into F# minor before the fanfare returns for the final lap.
+  const A = { root: 57 },
+    D = { root: 62 },
+    E = { root: 64 },
+    F$m = { root: 54, minor: true };
+  const Bm = { root: 59, minor: true },
+    C$m = { root: 49, minor: true };
+  const chords: ChordDef[] = [A, D, A, E, F$m, D, A, E, F$m, C$m, D, A, A, D, E, A];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
     const t = triad(c);
-    // oom-pah: bass root on 1 and 3, lute chord stabs on 2, 2.5, 4, 4.5
-    pushNote(ev, b0, c.root - 24, 0.9, 0.55, 'bass');
-    pushNote(ev, b0 + 2, c.root - 17, 0.9, 0.46, 'bass');
-    for (const off of [1, 1.5, 3, 3.5]) {
-      for (const n of t) pushNote(ev, b0 + off, n, 0.4, 0.2, 'lute');
-    }
-    // boots on the boards: frame drum 1 and 3, wood block offbeats, shaker run
-    pushDrumHits(ev, b0, [0, 2], 'frameDrum', 0.5, 40);
-    pushDrumHits(ev, b0, [1, 3], 'woodBlock', 0.3, 60);
-    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'shaker', 0.16, 70);
-    // the stands hum along in the back eight
-    if (bar >= 8) {
-      for (const n of t) pushNote(ev, b0, n - 12, 4.05, 0.16, 'strings');
-      pushNote(ev, b0 + 2, t[2] - 5, 2, 0.12, 'horn');
-    }
+    const late = bar >= 8;
+    // galloping bass: root, fifth, root, octave — a horse's canter
+    pushNote(ev, b0, c.root - 24, 0.5, 0.42, 'bass');
+    pushNote(ev, b0 + 1, c.root - 17, 0.4, 0.28, 'bass');
+    pushNote(ev, b0 + 2, c.root - 24, 0.4, 0.34, 'bass');
+    pushNote(ev, b0 + 3, c.root - 12, 0.5, 0.22, 'bass');
+    // drums: timpani beats, frame drum backbeat
+    pushNote(ev, b0, 38, 0.8, 0.38, 'timpani');
+    pushDrumHits(ev, b0, [1.5, 3.5], 'frameDrum', 0.16, 45);
+    // shaker connecting the beats
+    pushDrumHits(ev, b0, [0.5, 1, 2, 2.5, 3], 'shaker', 0.1, 72);
+    // brass chord stab on the downbeat of heavy bars
+    if (bar % 2 === 0) pushVoicing(ev, b0, [t[0], t[2], t[0] + 12], 0.5, 0.2, 'brassStab');
+    // strings sustain over the phrase
+    if (bar % 4 === 0) pushPedal(ev, b0, c.root, 'strings', 0.14);
+    // second half: cymbal swell on 4
+    if (late && bar % 2 === 1) pushNote(ev, b0 + 3, 70, 0.3, 0.1, 'cymSwell');
   });
 
-  // pipe tune: an eight-bar kick-about phrase, then answered up the octave
-  const phraseA: Phrase = [
-    [0, 74, 0.5],
+  // Fanfare (brass): rising triad, the champion's call
+  const fanfare: Phrase = [
+    [0, 69, 0.25],
+    [0.25, 73, 0.25],
     [0.5, 76, 0.5],
-    [1, 78, 1],
-    [2, 74, 1],
-    [3, 69, 1],
-    [4, 71, 0.5],
-    [4.5, 74, 0.5],
-    [5, 79, 1.5],
-    [6.5, 78, 0.5],
-    [7, 74, 1],
-    [8, 74, 0.5],
-    [8.5, 76, 0.5],
-    [9, 78, 1],
-    [10, 81, 1],
-    [11, 78, 1],
-    [12, 76, 0.5],
-    [12.5, 74, 0.5],
-    [13, 76, 1.5],
-    [14.5, 73, 0.5],
-    [15, 74, 1],
-    [16, 78, 0.5],
-    [16.5, 79, 0.5],
-    [17, 81, 1],
-    [18, 78, 1],
-    [19, 74, 1],
+    [1, 73, 0.25],
+    [1.25, 76, 0.25],
+    [1.5, 80, 1],
+    [2.5, 78, 0.25],
+    [2.75, 76, 0.25],
+    [3, 73, 0.5],
+    [3.5, 69, 0.5],
+    [4, 73, 0.25],
+    [4.25, 76, 0.25],
+    [4.5, 81, 1],
+    [5.5, 80, 0.25],
+    [5.75, 78, 0.25],
+    [6, 76, 1],
+    [7, 73, 0.5],
+    [7.5, 76, 0.5],
+    [8, 80, 0.25],
+    [8.25, 81, 0.25],
+    [8.5, 83, 1],
+    [9.5, 81, 0.25],
+    [9.75, 80, 0.25],
+    [10, 78, 1],
+    [11, 76, 0.5],
+    [11.5, 73, 0.5],
+    [12, 73, 0.25],
+    [12.25, 76, 0.25],
+    [12.5, 80, 1],
+    [13.5, 81, 0.5],
+    [14, 85, 1.5],
+    [15.5, 83, 0.5],
+    [16, 81, 1.5],
+    [17.5, 80, 0.5],
+    [18, 78, 2],
     [20, 76, 0.5],
     [20.5, 78, 0.5],
-    [21, 79, 1.5],
-    [22.5, 78, 0.5],
+    [21, 80, 1],
+    [22, 78, 1],
     [23, 76, 1],
-    [24, 74, 0.5],
-    [24.5, 73, 0.5],
-    [25, 74, 1],
+    [24, 73, 2],
     [26, 76, 1],
-    [27, 78, 1],
-    [28, 74, 2.5],
-    [31, 69, 1],
+    [27, 80, 1],
+    [28, 81, 2],
+    [30, 85, 2],
+    [32, 83, 0.5],
+    [32.5, 81, 0.5],
+    [33, 80, 0.5],
+    [33.5, 78, 0.5],
+    [34, 76, 2],
+    [36, 73, 1],
+    [37, 76, 1],
+    [38, 80, 2],
+    [40, 81, 2],
+    [42, 80, 1],
+    [43, 78, 1],
+    [44, 76, 3],
   ];
-  pushPhrase(ev, 0, phraseA, 0.4, 'pipe');
-  // the dulcimer picks the tune up an octave over the humming stands
+  pushPhrase(ev, 0, fanfare, 0.32, 'horn');
+  // strings answer a third below
   pushPhrase(
     ev,
-    32,
-    phraseA.map(([b, m, d]) => [b, m + 12, d] as [number, number, number]),
-    0.3,
-    'dulcimer',
+    0,
+    fanfare.map(([b, m, d]) => [b, m - 4, d] as Phrase[number]),
+    0.16,
+    'strings',
   );
-  // and the pipe rides along in harmony a third below
+  // reprise: the fanfare returns with a tinyBell descant
+  pushPhrase(ev, 64, fanfare, 0.3, 'horn');
   pushPhrase(
     ev,
-    32,
-    phraseA.map(([b, m, d]) => [b, m - 3, d] as [number, number, number]),
-    0.22,
-    'pipe',
+    64,
+    fanfare.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
+    0.08,
+    'tinyBell',
   );
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 108, bars: 16, events: ev };
+  return { bpm: 120, bars: 16, events: ev };
 }
 
 /** Hollow Crypt: "Sleep, Neighbors". D minor over a phrygian creep, 100 bpm.
@@ -1296,133 +1152,84 @@ function composeValeCup(): Theme {
  *  raised out of their own graves. Intimate dread, not yet apocalypse. */
 function composeDungeonHollowCrypt(): Theme {
   const ev: NoteEvent[] = [];
-  type BarSpec = { bass: number; pad: number[]; creep: [number, number][] };
-  const creepD: [number, number][] = [
-    [0, 50],
-    [0.5, 51],
-    [1, 50],
-    [2, 50],
-    [2.5, 51],
-    [3, 53],
-  ];
-  const creepEb: [number, number][] = [
-    [0, 51],
-    [0.5, 53],
-    [1, 51],
-    [2, 51],
-    [2.5, 50],
-    [3, 51],
-  ];
-  const Dm: BarSpec = { bass: 38, pad: [50, 53, 57], creep: creepD };
-  const Eb: BarSpec = { bass: 39, pad: [51, 55, 58], creep: creepEb };
-  const Bb: BarSpec = {
-    bass: 34,
-    pad: [50, 53, 58],
-    creep: [
-      [0, 50],
-      [0.5, 53],
-      [1, 50],
-      [2, 50],
-      [2.5, 53],
-      [3, 55],
-    ],
-  };
-  const Gm: BarSpec = {
-    bass: 43,
-    pad: [50, 55, 58],
-    creep: [
-      [0, 50],
-      [0.5, 53],
-      [1, 50],
-      [2, 50],
-      [2.5, 55],
-      [3, 53],
-    ],
-  };
-  const A5: BarSpec = {
-    bass: 45,
-    pad: [45, 52, 57],
-    creep: [
-      [0, 49],
-      [0.5, 50],
-      [1, 49],
-      [2, 49],
-      [2.5, 50],
-      [3, 52],
-    ],
-  };
-  const bars: BarSpec[] = [Dm, Eb, Dm, Bb, Gm, A5, Eb, Dm, Dm, Bb, Gm, Dm, Eb, Dm, A5, Dm];
+  // "Barrow of the Forgotten". G# minor, 94 bpm, 16 bars. The violated
+  // graveyard is no longer a D phrygian funeral crawl — this is G# minor,
+  // a key that feels wrong under the fingers. Low oboe and reed trade a
+  // narrow, rocking two-note lament (G#-F#) over a static pedal. No bell,
+  // no hymn, no piano grief. Instead: a subterranean pad, a single war drum
+  // that doesn't keep time (irregular hits on 1 and then 2.75), and dulcimer
+  // glints that sound like disturbed bone catching torchlight. The B section
+  // tries to lift to C# minor but is pulled back down.
+  const G$m = { root: 56, minor: true },
+    C$m = { root: 49, minor: true },
+    E = { root: 52 };
+  const F$ = { root: 54 },
+    B = { root: 59 };
+  const chords: ChordDef[] = [G$m, G$m, C$m, G$m, E, F$, G$m, G$m, C$m, G$m, F$, E, G$m, C$m, F$, G$m];
 
-  bars.forEach((c, bar) => {
+  chords.forEach((c, bar) => {
     const b0 = bar * 4;
+    const t = triad(c);
     const late = bar >= 8;
-    // the grave pedal never moves: D beneath whatever walks above it
-    if (bar % 2 === 0) pushPedal(ev, b0, 62, 'choir', 0.14);
-    pushVoicing(ev, b0, c.pad, 4.05, 0.09, 'pad');
-    pushNote(ev, b0, c.bass, 2.2, 0.3, 'bass');
-    pushNote(ev, b0 + 2.75, c.bass, 0.5, 0.16, 'bass');
-    // phrygian creep, half-step shadows around the tonic
-    for (const [t, m] of c.creep) {
-      pushNote(ev, b0 + t, m, 0.4, t === 0 ? 0.18 : 0.12, 'stacc');
-    }
-    // a slow heart under the floor, louder the deeper the crawl goes
-    pushNote(ev, b0, 38, 0.9, late ? 0.19 : 0.13, 'warDrum');
-    pushNote(ev, b0 + 0.75, 38, 0.7, late ? 0.13 : 0.09, 'warDrum');
-    // bone skitter
-    if (bar % 4 === 2) pushDrumHits(ev, b0, [1.25, 1.5], 'woodBlock', 0.07, 70);
-    if (bar % 4 === 0) pushNote(ev, b0 + 3.25, 70, 0.2, 0.06, 'woodBlock');
-    // wrongness: a minor-second string shimmer behind the middle phrases
-    if (bar >= 4 && bar < 8) pushVoicing(ev, b0, [57, 58], 4.05, 0.055, 'strings');
-    if (bar >= 12) pushVoicing(ev, b0, [69, 70], 4.05, 0.05, 'strings');
+    // the pedal never moves: G# beneath everything
+    pushPedal(ev, b0, 56, 'strings', 0.1);
+    // bass slow and heavy
+    pushNote(ev, b0, c.root - 24, 3.5, 0.3, 'bass');
+    // the shudder: a minor-second bowing on the strings
+    if (c.minor) pushVoicing(ev, b0, [c.root + 12, c.root + 13], 4.05, 0.06, 'strings');
+    // irregular war drum: not a steady pulse
+    pushNote(ev, b0, 38, 0.8, late ? 0.28 : 0.16, 'warDrum');
+    if (bar % 3 === 0) pushNote(ev, b0 + 2.75, 38, 0.6, 0.12, 'warDrum');
+    // bone glint: dulcimer pick at the very edge of hearing
+    if (bar % 2 === 1) pushNote(ev, b0 + 3.25, t[2] + 24, 0.4, 0.05, 'dulcimer');
+    // oboe shadow: a single held tone, winding up or down
+    if (late) pushNote(ev, b0 + 1, t[1] + 12, 2.5, 0.09, 'oboe');
   });
 
-  // the bell and the hymn that breaks off mid-line
-  for (const b of [0, 16, 32, 48]) pushNote(ev, b, 62, 3.5, 0.13, 'bell');
-  const hymn: Phrase = [
-    [0, 62, 1],
-    [1, 65, 1],
-    [2, 64, 1.5],
-    [4, 62, 1],
-    [5, 60, 1],
-    [6, 58, 1.5],
-  ];
-  pushPhrase(ev, 8, hymn, 0.1, 'reed');
-  // the lament: a piano grieving by name in the second half
+  // Lament (oboe): the narrow two-note rock G#-F#, expanding as it loops
   const lament: Phrase = [
-    [0, 69, 1.5],
-    [1.5, 67, 0.5],
-    [2, 65, 1],
-    [3, 64, 1],
-    [4, 65, 1],
-    [5, 62, 1],
-    [6, 74, 1.5],
-    [7.5, 72, 0.5],
-    [8, 70, 1.5],
-    [9.5, 69, 0.5],
-    [10, 67, 2],
-    [12, 65, 1],
-    [13, 64, 0.5],
-    [13.5, 65, 0.5],
-    [14, 69, 2],
-    [16, 67, 1],
-    [17, 70, 1],
-    [18, 75, 1.5],
-    [19.5, 74, 0.5],
-    [20, 74, 1],
-    [21, 69, 1],
-    [22, 65, 2],
-    [24, 64, 1.5],
-    [25.5, 65, 0.5],
-    [26, 64, 1],
-    [27, 62, 1],
-    [28, 62, 3.5],
+    [0, 68, 1],
+    [1, 66, 1.5],
+    [2.5, 64, 0.5],
+    [3, 66, 1],
+    [4, 66, 1],
+    [5, 64, 1],
+    [6, 68, 2],
+    [8, 66, 1],
+    [9, 64, 1.5],
+    [10.5, 63, 0.5],
+    [11, 64, 1],
+    [12, 63, 1],
+    [13, 61, 0.5],
+    [13.5, 59, 0.5],
+    [14, 68, 2.5],
+    [16.5, 66, 0.5],
+    [17, 68, 1],
+    [18, 66, 0.5],
+    [18.5, 64, 0.5],
+    [19, 63, 1],
+    [20, 64, 2],
+    [22, 66, 1],
+    [23, 68, 1],
+    [24, 66, 1.5],
+    [25.5, 64, 0.5],
+    [26, 63, 2],
+    [28, 61, 3.5],
   ];
-  pushPhrase(ev, 32, lament, 0.17, 'piano');
-  pushNote(ev, 28, 86, 1.4, 0.05, 'tinyBell');
-  pushNote(ev, 60, 86, 1.4, 0.05, 'tinyBell');
+  pushPhrase(ev, 4, lament, 0.22, 'oboe');
+  // reed answers an octave below in the second half
+  pushPhrase(
+    ev,
+    36,
+    lament.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
+    0.12,
+    'reed',
+  );
+  // reprise: oboe alone
+  pushPhrase(ev, 68, lament, 0.2, 'oboe');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 100, bars: 16, events: ev };
+  return { bpm: 94, bars: 16, events: ev };
 }
 
 /** Sunken Bastion: "The Drowning Dark". E minor passacaglia, 116 bpm.
@@ -1433,95 +1240,96 @@ function composeDungeonHollowCrypt(): Theme {
  *  Olen's fanfare surfaces twice, rusted but noble. */
 function composeDungeonSunkenBastion(): Theme {
   const ev: NoteEvent[] = [];
-  for (let bar = 0; bar < 16; bar++) {
+  // "The Sunken Bell". F# minor, 104 bpm, 16 bars. The drowned keep is no
+  // longer an E minor passacaglia with a ground bass — this is a
+  // slow-rise two-chord cycle (F#m - C#m) that breathes like water moving
+  // through a flooded hall. A single deep bell tolls at the start of each
+  // 4-bar group. Harp arpeggios rise and fall like stirring currents. The
+  // oboe carries a lonely, arching melody. No choir, no drums, no fanfare.
+  // The floor dropped out; only the quiet remains.
+  const F$m = { root: 54, minor: true },
+    C$m = { root: 49, minor: true };
+  const D = { root: 50 },
+    E = { root: 52 },
+    A = { root: 57 };
+  const chords: ChordDef[] = [F$m, C$m, F$m, C$m, D, A, F$m, C$m, F$m, C$m, D, E, F$m, C$m, F$m, F$m];
+
+  chords.forEach((c, bar) => {
     const b0 = bar * 4;
-    const even = bar % 2 === 1; // second bar of each ground cycle
-    // the ground: E . D | C . B, honor sinking a step at a time
-    if (!even) {
-      pushNote(ev, b0, 40, 1.4, 0.34, 'bass');
-      pushNote(ev, b0 + 2, 40, 0.9, 0.22, 'bass');
-      pushNote(ev, b0 + 3, 38, 0.9, 0.26, 'bass');
-    } else {
-      pushNote(ev, b0, 36, 1.4, 0.34, 'bass');
-      pushNote(ev, b0 + 2, 35, 0.9, 0.24, 'bass');
-      pushNote(ev, b0 + 3, 35, 0.9, 0.2, 'bass');
+    const t = triad(c);
+    const phrase = bar % 4;
+    // deep bell: tolls once per phrase
+    if (phrase === 0) pushNote(ev, b0, t[0] - 24, 4.5, 0.18, 'bell');
+    // bass: a slow half-note exchange
+    pushNote(ev, b0, c.root - 24, 2.5, 0.32, 'bass');
+    pushNote(ev, b0 + 2, c.root - 17, 2.0, 0.2, 'bass');
+    // harp: arpeggio flowing upward from the bass root
+    const water = [c.root - 12, t[0], t[1], t[2], t[0] + 12, t[1] + 12, t[2] + 12, t[0] + 24];
+    for (const [i, n] of water.entries()) {
+      pushNote(ev, b0 + i * 0.5, n, 0.6, 0.14, 'harp');
     }
-    if (bar % 2 === 0) pushPedal(ev, b0, 52, 'pad', 0.15);
-    // water: harp sixteenths climbing inside each bar
-    const flow = even ? [48, 55, 64, 71, 47, 54, 59, 66] : [52, 59, 64, 71, 59, 64, 71, 76];
-    for (let i = 0; i < 16; i++) {
-      pushNote(
-        ev,
-        b0 + i * 0.25,
-        flow[(i < 8 ? 0 : 4) + (i % 4)],
-        0.3,
-        i % 4 === 0 ? 0.12 : 0.08,
-        'harp',
-      );
-    }
-    // tide three: the drowned stand up
-    if (bar >= 8) {
-      if (even) {
-        pushNote(ev, b0, 36, 2, 0.12, 'choir');
-        pushNote(ev, b0 + 2, 35, 2.1, 0.12, 'choir');
-        pushNote(ev, b0, 52, 2, 0.08, 'choir');
-        pushNote(ev, b0 + 2, 54, 2.1, 0.08, 'choir');
-      } else {
-        pushNote(ev, b0, 40, 4.1, 0.12, 'choir');
-        pushNote(ev, b0, 52, 4.1, 0.08, 'choir');
-      }
-      pushDrumHits(ev, b0, [0, 2.5], 'warDrum', 0.17, 38);
-      pushDrumHits(ev, b0, [1, 3], 'frameDrum', 0.1, 45);
-    }
-    // tide four: the water rises up the walls
-    if (bar >= 12) {
-      const run = even ? [48, 50, 52, 55, 57, 59, 60, 64] : [52, 54, 55, 57, 59, 60, 62, 64];
-      for (const [i, m] of run.entries()) {
-        pushNote(ev, b0 + i * 0.25, m + (bar >= 14 ? 12 : 0), 0.2, 0.15, 'stacc');
-      }
-    }
-    if (bar < 4 && bar % 2 === 0) pushNote(ev, b0 + 3.25, 88, 1.2, 0.05, 'tinyBell');
-  }
-  // the dirge, then its echo an octave up as the pressure builds
-  const dirge: Phrase = [
-    [0, 71, 1.5],
-    [1.5, 69, 0.5],
-    [2, 67, 1],
-    [3, 66, 1],
-    [4, 69, 1],
-    [5, 67, 0.5],
-    [5.5, 64, 0.5],
-    [6, 66, 1],
-    [7, 59, 1],
-    [8, 64, 1],
-    [9, 67, 1],
-    [10, 71, 1.5],
-    [11.5, 72, 0.5],
-    [12, 72, 1],
-    [13, 71, 0.5],
-    [13.5, 67, 0.5],
-    [14, 66, 2],
+    // pad: strings holding the chord's heart
+    if (phrase % 2 === 0) pushPedal(ev, b0, c.root, 'strings', 0.1);
+    // tiny bell: a submerged chime at the end of each phrase
+    if (phrase === 3) pushNote(ev, b0 + 3.5, t[2] + 24, 0.8, 0.04, 'tinyBell');
+  });
+
+  // The melody (oboe): a lonely arch over the two-chord tide
+  const arch: Phrase = [
+    [0, 73, 1],
+    [1, 71, 1],
+    [2, 69, 1.5],
+    [3.5, 71, 0.5],
+    [4, 73, 1],
+    [5, 76, 0.5],
+    [5.5, 78, 0.5],
+    [6, 76, 1.5],
+    [7.5, 73, 0.5],
+    [8, 71, 1.5],
+    [9.5, 69, 0.5],
+    [10, 66, 2],
+    [12, 68, 1],
+    [13, 71, 1],
+    [14, 73, 2.5],
+    [16.5, 71, 1.5],
+    [18, 69, 1],
+    [19, 66, 1],
+    [20, 64, 2],
+    [22, 66, 1],
+    [23, 68, 1],
+    [24, 69, 1],
+    [25, 73, 1],
+    [26, 71, 2],
+    [28, 69, 1.5],
+    [29.5, 68, 0.5],
+    [30, 66, 2.5],
+    [32.5, 64, 0.5],
+    [33, 66, 1],
+    [34, 69, 1.5],
+    [35.5, 71, 0.5],
+    [36, 73, 1.5],
+    [37.5, 76, 0.5],
+    [38, 73, 2.5],
+    [40.5, 71, 1.5],
+    [42, 69, 1],
+    [43, 66, 1],
+    [44, 64, 3],
   ];
-  pushPhrase(ev, 16, dirge, 0.15, 'reed');
+  pushPhrase(ev, 4, arch, 0.24, 'oboe');
+  // strings answer at half volume an octave down
   pushPhrase(
     ev,
-    32,
-    dirge.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
-    0.14,
-    'pipe',
+    4,
+    arch.map(([b, m, d]) => [b, m - 12, d] as Phrase[number]),
+    0.1,
+    'strings',
   );
-  // Olen's fanfare: a knight's call through rusted plate
-  for (const b of [36, 52]) {
-    pushVoicing(ev, b, [52, 59], 0.5, 0.2, 'brassStab');
-    pushVoicing(ev, b + 0.75, [52, 59], 0.25, 0.14, 'brassStab');
-    pushVoicing(ev, b + 1, [55, 62], 1, 0.18, 'brassStab');
-  }
-  for (const [i, t] of [2.5, 3, 3.25, 3.5, 3.75].entries()) {
-    pushNote(ev, 60 + t, 38, 0.3, 0.18 + i * 0.04, 'timpani');
-  }
+  // reprise: oboe alone, one last bell toll
+  pushPhrase(ev, 68, arch, 0.22, 'oboe');
+  pushNote(ev, 64, 30, 4.5, 0.14, 'bell');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 116, bars: 16, events: ev };
+  return { bpm: 104, bars: 16, events: ev };
 }
 
 /** Gravewyrm Sanctum: "It Breathes Below". B phrygian, 126 bpm. The final
@@ -1531,131 +1339,106 @@ function composeDungeonSunkenBastion(): Theme {
  *  low square lead as the party nears the dais. */
 function composeDungeonGravewyrmSanctum(): Theme {
   const ev: NoteEvent[] = [];
-  type BarSpec = { root: number; drone: number; chant: number[]; cell: number[] };
-  const B5: BarSpec = { root: 35, drone: 35, chant: [59, 60, 59, 57], cell: [0, 1, 3, 1] };
-  const Cma: BarSpec = { root: 36, drone: 36, chant: [60, 62, 60, 59], cell: [0, 2, 4, 2] };
-  const Em: BarSpec = { root: 40, drone: 40, chant: [64, 66, 64, 62], cell: [0, 2, 3, 2] };
-  const D5: BarSpec = { root: 38, drone: 38, chant: [62, 64, 62, 60], cell: [0, 2, 4, 2] };
-  const Gma: BarSpec = { root: 43, drone: 43, chant: [67, 69, 67, 66], cell: [0, 2, 4, 2] };
-  const bars: BarSpec[] = [B5, Cma, B5, Cma, Em, Cma, D5, B5, B5, Cma, Gma, Em, Cma, D5, Cma, B5];
+  // "Serpent Coils". F lydian augmented, 88 bpm, 16 bars. The wyrm's
+  // chamber is no longer a B phrygian ritual heartbeat — this is a
+  // slithering, whole-tone-inflected crawl in F with a raised fourth (B)
+  // and a raised fifth (C#) that never quite resolves. The rhythm is
+  // irregular: low strings slither in staggered entries, wood blocks
+  // click like chitin, and a serpentine line on the square lead winds
+  // through the texture. No war drum heartbeat, no chant, no choir.
+  // The ground is never steady under your feet.
+  const F = { root: 53 },
+    Dm = { root: 50, minor: true },
+    Gm = { root: 55, minor: true };
+  const Bb = { root: 58 },
+    C = { root: 60 },
+    Eb = { root: 51 };
+  const chords: ChordDef[] = [F, Dm, Bb, C, F, Dm, Gm, C, F, Bb, Eb, C, Dm, Gm, C, F];
 
-  bars.forEach((c, bar) => {
+  chords.forEach((c, bar) => {
     const b0 = bar * 4;
-    // the heartbeat: paired thumps, lub-dub, twice a bar
-    pushNote(ev, b0, 38, 0.9, 0.29, 'warDrum');
-    pushNote(ev, b0 + 0.375, 38, 0.7, 0.19, 'warDrum');
-    pushNote(ev, b0 + 2, 38, 0.9, 0.25, 'warDrum');
-    pushNote(ev, b0 + 2.375, 38, 0.7, 0.17, 'warDrum');
-    // drone and bass
-    pushNote(ev, b0, c.drone, 4.1, 0.16, 'choir');
-    pushNote(ev, b0, c.drone + 7, 4.1, 0.1, 'choir');
-    pushNote(ev, b0, c.root + 12, 0.9, 0.4, 'bass');
-    pushNote(ev, b0 + 1.5, c.root + 12, 0.45, 0.22, 'bass');
-    pushNote(ev, b0 + 2.5, c.root + 19, 0.45, 0.2, 'bass');
-    pushNote(ev, b0 + 3.5, c.root + 12, 0.4, 0.18, 'bass');
-    // the chant, and the thing beneath chanting back
-    for (const [i, m] of c.chant.entries()) {
-      pushNote(ev, b0 + i, m, 0.9, 0.13, 'choir');
-    }
-    if (bar % 4 === 3) {
-      pushNote(ev, b0 + 2, c.chant[0] - 24, 1, 0.13, 'choir');
-      pushNote(ev, b0 + 3, c.chant[1] - 24, 1, 0.13, 'choir');
-    }
-    // phrygian risers
-    for (let i = 0; i < 16; i++) {
-      pushNote(
-        ev,
-        b0 + i * 0.25,
-        c.root + 24 + c.cell[i % 4],
-        0.18,
-        i % 4 === 0 ? 0.2 : 0.12,
-        'stacc',
-      );
-    }
-    // thresholds
-    pushVoicing(ev, b0, [c.root + 24, c.root + 31], 0.75, 0.24, 'brassStab');
-    if (bar % 4 === 3)
-      pushVoicing(ev, b0 + 2.5, [c.root + 24, c.root + 31], 0.4, 0.18, 'brassStab');
-    if (bar % 2 === 1) pushDrumHits(ev, b0, [1.25, 3.25], 'woodBlock', 0.08, 70);
-    if (bar % 8 === 0) pushNote(ev, b0, 38, 1, 0.45, 'timpani');
-    if (bar % 8 === 7) {
-      const fill = bar === 15 ? [2, 2.5, 3, 3.25, 3.5, 3.75] : [3, 3.25, 3.5, 3.75];
-      for (const [i, t] of fill.entries()) {
-        pushNote(ev, b0 + t, 38, 0.3, 0.18 + i * 0.05, 'timpani');
-      }
-    }
+    const t = triad(c);
+    const late = bar >= 8;
+    // slithering bass: root then a staggered chromatic approach
+    pushNote(ev, b0, c.root - 24, 1.5, 0.28, 'bass');
+    pushNote(ev, b0 + 1.5, c.root - 19, 0.6, 0.16, 'bass');
+    pushNote(ev, b0 + 2.75, c.root - 18, 0.6, 0.14, 'bass');
+    // wood blocks: irregular clicks like mandibles
+    pushDrumHits(ev, b0, [0.75, 2.25], 'woodBlock', 0.08, 68);
+    if (bar % 3 === 0) pushDrumHits(ev, b0, [3.25, 3.5], 'woodBlock', 0.06, 70);
+    // low pad: an uneasy drone with the raised fifth
+    if (bar % 2 === 0) pushNote(ev, b0, c.root + 10, 4.05, 0.07, 'pad');
+    // frame drum: one hit per bar, never on the same beat
+    const drumBeat = [0.5, 1.5, 2, 3.5][bar % 4];
+    pushNote(ev, b0 + drumBeat, 44, 0.4, late ? 0.12 : 0.08, 'frameDrum');
+    // reed: a sustained note that bends at the end of each 2-bar group
+    if (bar % 2 === 0) pushNote(ev, b0 + 2, t[1] + 12, 2.0, 0.07, 'reed');
   });
 
-  pushNote(ev, 0, 59, 3.5, 0.15, 'bell');
-  pushNote(ev, 32, 59, 3.5, 0.15, 'bell');
-  // the incantation
-  const incant: Phrase = [
-    [0, 64, 0.5],
-    [0.5, 67, 0.5],
-    [1, 66, 0.5],
-    [1.5, 64, 0.5],
-    [2, 67, 1],
-    [3, 69, 1],
-    [4, 67, 1.5],
-    [5.5, 64, 0.5],
-    [6, 72, 1],
-    [7, 71, 1],
-    [8, 69, 1],
-    [9, 66, 0.5],
-    [9.5, 62, 0.5],
-    [10, 74, 1.5],
-    [11.5, 72, 0.5],
-    [12, 72, 1],
-    [13, 71, 0.5],
-    [13.5, 69, 0.5],
-    [14, 71, 2],
-  ];
-  pushPhrase(ev, 16, incant, 0.14, 'reed');
-  // a distant wail on the phrygian second, sighing down onto the B root
-  pushPhrase(
-    ev,
-    32,
-    [
-      [0, 84, 2],
-      [2, 83, 2],
-    ],
-    0.06,
-    'pipe',
-  );
-  pushPhrase(
-    ev,
-    44,
-    [
-      [0, 79, 2],
-      [2, 78, 2],
-    ],
-    0.06,
-    'pipe',
-  );
-  // the serpent below, slithering in the low square
+  // The serpent line (squareLead): winding chromatic motion
   const serpent: Phrase = [
-    [0, 48, 1],
-    [1, 50, 0.5],
-    [1.5, 52, 0.5],
-    [2, 50, 1],
-    [3, 48, 1],
-    [4, 50, 1],
-    [5, 52, 0.5],
-    [5.5, 54, 0.5],
-    [6, 52, 1],
-    [7, 50, 1],
-    [8, 48, 0.75],
-    [8.75, 48, 0.25],
-    [9, 52, 1],
-    [10, 50, 0.5],
-    [10.5, 48, 0.5],
-    [11, 47, 1],
-    [12, 47, 2.5],
+    [0, 73, 1],
+    [1, 72, 0.5],
+    [1.5, 74, 0.5],
+    [2, 76, 1.5],
+    [3.5, 75, 0.5],
+    [4, 74, 1],
+    [5, 72, 0.5],
+    [5.5, 71, 0.5],
+    [6, 73, 1.5],
+    [7.5, 71, 0.5],
+    [8, 69, 1.5],
+    [9.5, 71, 0.5],
+    [10, 72, 1],
+    [11, 74, 1],
+    [12, 76, 1],
+    [13, 74, 0.5],
+    [13.5, 72, 0.5],
+    [14, 71, 2],
+    [16, 69, 1],
+    [17, 71, 1],
+    [18, 72, 1.5],
+    [19.5, 74, 0.5],
+    [20, 76, 1],
+    [21, 77, 0.5],
+    [21.5, 76, 0.5],
+    [22, 74, 1.5],
+    [23.5, 72, 0.5],
+    [24, 71, 1],
+    [25, 69, 1],
+    [26, 67, 2],
+    [28, 64, 2.5],
+    [30.5, 66, 0.5],
+    [31, 67, 1],
+    [32, 69, 1.5],
+    [33.5, 71, 0.5],
+    [34, 72, 1],
+    [35, 74, 0.5],
+    [35.5, 76, 0.5],
+    [36, 78, 1.5],
+    [37.5, 76, 0.5],
+    [38, 74, 2],
+    [40, 72, 1],
+    [41, 71, 1],
+    [42, 69, 2],
+    [44, 67, 3.5],
   ];
-  pushPhrase(ev, 48, serpent, 0.12, 'squareLead');
+  pushPhrase(ev, 4, serpent, 0.18, 'squareLead');
+  // oboe echo in the second half
+  pushPhrase(ev, 36, serpent, 0.12, 'oboe');
+  // half-time strings: a shimmer behind the serpent
+  pushPhrase(
+    ev,
+    4,
+    serpent.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]),
+    0.06,
+    'strings',
+  );
+  // reprise: the serpent returns alone
+  pushPhrase(ev, 68, serpent, 0.16, 'squareLead');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 126, bars: 16, events: ev };
+  return { bpm: 88, bars: 16, events: ev };
 }
 
 // ---------------------------------------------------------------------------
@@ -1693,126 +1476,115 @@ function pushCombatTimpani(out: NoteEvent[], b0: number, scale = 1): void {
  *  back into the pounding cell so chain pulls never hear a dead seam. */
 function composeCombat(): Theme {
   const ev: NoteEvent[] = [];
+  // "Iron Tide". C phrygian, 138 bpm, 16 bars. No longer a D-based orchestral
+  // cell pattern — this is a percussive, metal-adjacent combat theme in
+  // C phrygian (the flat second (Db) gives every phrase a savage edge).
+  // The engine is a constant sixteenth-note staccato string ride on the
+  // root-fifth-octave skeleton, timpani hitting every downbeat, and brass
+  // stabs that cut across the grid. No horn melody, no war drum heartbeat,
+  // no cymbal swells. The B section drops into the flat VI (Ab major) before
+  // the assault re-engages.
   const bassAt = (b0: number, root: number): void => {
-    pushNote(ev, b0, root, 0.6, 0.44, 'bass');
-    pushNote(ev, b0 + 2, root, 0.5, 0.32, 'bass');
-    pushNote(ev, b0 + 3.5, root, 0.4, 0.26, 'bass');
+    pushNote(ev, b0, root, 0.25, 0.5, 'bass');
+    pushNote(ev, b0 + 0.5, root, 0.25, 0.36, 'bass');
+    pushNote(ev, b0 + 1, root + 7, 0.25, 0.3, 'bass');
+    pushNote(ev, b0 + 1.5, root - 5, 0.25, 0.26, 'bass');
+    pushNote(ev, b0 + 2, root, 0.25, 0.36, 'bass');
+    pushNote(ev, b0 + 2.5, root, 0.25, 0.28, 'bass');
+    pushNote(ev, b0 + 3, root + 7, 0.25, 0.22, 'bass');
+    pushNote(ev, b0 + 3.5, root - 5, 0.25, 0.2, 'bass');
+  };
+  // staccato eighth-note ride: root, flat-two, root, five, root, flat-two, root, flat-seven
+  const RIDE = [0, 1, 0, 7, 0, 1, 0, 10];
+  const rideAt = (b0: number, base: number, vel: number): void => {
+    for (const [i, s] of RIDE.entries()) {
+      pushNote(ev, b0 + i * 0.5, base + s, 0.35, vel, 'stacc');
+    }
   };
 
-  // bars 1-4: the original, with the bass shadowing the timpani skeleton
+  // bars 1-4: establish the ride, timpani on every beat
   for (let bar = 0; bar < 4; bar++) {
     const b0 = bar * 4;
-    pushCombatTimpani(ev, b0);
-    pushCombatCell(ev, b0, 50, 0.26);
-    bassAt(b0, 38);
-    if (bar % 2 === 1) {
-      pushNote(ev, b0, 50, 1.6, 0.2, 'horn');
-      pushNote(ev, b0 + 0.02, 57, 1.6, 0.16, 'horn');
-    }
+    rideAt(b0, 60, 0.24);
+    bassAt(b0, 36);
+    pushNote(ev, b0, 38, 1, 0.5, 'timpani');
+    pushNote(ev, b0 + 1, 38, 0.6, 0.32, 'timpani');
+    pushNote(ev, b0 + 2, 38, 0.6, 0.36, 'timpani');
+    pushNote(ev, b0 + 3, 38, 0.6, 0.28, 'timpani');
+    // brass stab on bar 2 and 4
+    if (bar % 2 === 1) pushVoicing(ev, b0, [36, 43], 0.5, 0.24, 'brassStab');
+    // frame drum on offbeats
+    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'frameDrum', 0.14, 45);
   }
-  pushNote(ev, 14, 70, 2, 0.1, 'cymSwell');
 
-  // bars 5-8: octave agitato, war drums, and the rising-fourth war call
+  // bars 5-8: double the ride, add octave staccato above, war drum joins
   for (let bar = 4; bar < 8; bar++) {
     const b0 = bar * 4;
-    pushCombatTimpani(ev, b0);
-    if (bar < 7) {
-      pushCombatCell(ev, b0, 50, 0.26);
-      pushCombatCell(ev, b0, 62, 0.12);
-    } else {
-      // the last eighth of the terrace belongs to the run into the shock
-      for (const [i, st] of COMBAT_CELL.slice(0, 7).entries()) {
-        pushNote(ev, b0 + i * 0.5, 50 + st, 0.4, 0.26, 'stacc');
-        pushNote(ev, b0 + i * 0.5, 62 + st, 0.4, 0.12, 'stacc');
-      }
+    rideAt(b0, 60, 0.26);
+    rideAt(b0, 72, 0.14);
+    bassAt(b0, 36);
+    pushNote(ev, b0, 38, 1, 0.55, 'timpani');
+    pushNote(ev, b0 + 1, 38, 0.6, 0.36, 'timpani');
+    pushNote(ev, b0 + 2, 38, 0.6, 0.4, 'timpani');
+    pushNote(ev, b0 + 3, 38, 0.6, 0.32, 'timpani');
+    pushVoicing(ev, b0, [36, 43], 0.5, 0.28, 'brassStab');
+    pushNote(ev, b0 + 2, 38, 0.8, 0.22, 'warDrum');
+    pushNote(ev, b0 + 3.5, 38, 0.6, 0.18, 'warDrum');
+    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'frameDrum', 0.16, 45);
+    if (bar === 7) pushNote(ev, b0 + 3.75, 70, 0.3, 0.14, 'cymSwell');
+  }
+
+  // bars 9-12: modulate to the flat VI (Ab) — the dark respite
+  const bassAb = (b0: number): void => {
+    pushNote(ev, b0, 44, 0.25, 0.5, 'bass');
+    pushNote(ev, b0 + 0.5, 44, 0.25, 0.36, 'bass');
+    pushNote(ev, b0 + 1, 51, 0.25, 0.3, 'bass');
+    pushNote(ev, b0 + 1.5, 39, 0.25, 0.26, 'bass');
+    pushNote(ev, b0 + 2, 44, 0.25, 0.36, 'bass');
+    pushNote(ev, b0 + 2.5, 44, 0.25, 0.28, 'bass');
+    pushNote(ev, b0 + 3, 51, 0.25, 0.22, 'bass');
+    pushNote(ev, b0 + 3.5, 39, 0.25, 0.2, 'bass');
+  };
+  const RIDE_Ab = [0, 3, 0, 7, 0, 3, 0, 10];
+  const rideAbAt = (b0: number, base: number, vel: number): void => {
+    for (const [i, s] of RIDE_Ab.entries()) {
+      pushNote(ev, b0 + i * 0.5, base + s, 0.35, vel, 'stacc');
     }
-    bassAt(b0, 38);
-    pushNote(ev, b0, 38, 0.9, 0.2, 'warDrum');
-    pushNote(ev, b0 + 2.5, 38, 0.7, 0.16, 'warDrum');
-    if (bar % 2 === 0) {
-      pushNote(ev, b0, 50, 1.6, 0.18, 'horn');
-      pushNote(ev, b0 + 0.02, 57, 1.6, 0.14, 'horn');
-    } else {
-      pushNote(ev, b0, 50, 3.5, 0.12, 'horn');
-      pushNote(ev, b0, 57, 1, 0.2, 'horn');
-      pushNote(ev, b0 + 1, 62, 2.5, 0.22, 'horn');
-    }
-  }
-  // diminished ascent into the shock: D, F, A-flat, B-flat
-  for (const [i, m] of [50, 53, 56, 58].entries()) {
-    pushNote(ev, 31 + i * 0.25, m, 0.2, 0.2, 'stacc');
-  }
-
-  // bars 9-10: everything a half step up, low brass and a crash answer
-  for (const bar of [8, 9]) {
+  };
+  for (let bar = 8; bar < 12; bar++) {
     const b0 = bar * 4;
-    pushCombatTimpani(ev, b0);
-    pushCombatCell(ev, b0, 51, 0.26);
-    if (bar === 9) pushCombatCell(ev, b0, 63, 0.12);
-    bassAt(b0, 39);
-    pushNote(ev, b0, 38, 0.9, 0.2, 'warDrum');
-    pushNote(ev, b0 + 2.5, 38, 0.7, 0.16, 'warDrum');
-  }
-  pushVoicing(ev, 32, [39, 46], 0.75, 0.3, 'brassStab');
-  pushNote(ev, 32, 70, 0.12, 0.16, 'cymSwell');
-  pushNote(ev, 36, 51, 1.6, 0.18, 'horn');
-  pushNote(ev, 36.02, 58, 1.6, 0.14, 'horn');
-
-  // bar 11: home again, hitting harder
-  pushCombatTimpani(ev, 40);
-  pushCombatCell(ev, 40, 50, 0.26);
-  pushCombatCell(ev, 40, 62, 0.12);
-  bassAt(40, 38);
-  pushVoicing(ev, 40, [38, 45], 0.75, 0.28, 'brassStab');
-  pushNote(ev, 40, 38, 0.9, 0.22, 'warDrum');
-  pushNote(ev, 42.5, 38, 0.7, 0.16, 'warDrum');
-
-  // bar 12: the march home, half a bar of B-flat, half of C
-  pushNote(ev, 44, 38, 1, 0.5, 'timpani');
-  pushNote(ev, 46, 38, 1, 0.45, 'timpani');
-  for (const [i, s] of [0, 0, 3, 0].entries()) {
-    pushNote(ev, 44 + i * 0.5, 46 + s, 0.4, 0.26, 'stacc');
-    pushNote(ev, 46 + i * 0.5, 48 + s, 0.4, 0.26, 'stacc');
-  }
-  pushNote(ev, 44, 34, 0.9, 0.42, 'bass');
-  pushNote(ev, 46, 36, 0.9, 0.42, 'bass');
-  pushVoicing(ev, 44, [46, 53], 0.6, 0.26, 'brassStab');
-  pushVoicing(ev, 46, [48, 55], 0.6, 0.28, 'brassStab');
-  for (const [i, t] of [3, 3.25, 3.5, 3.75].entries()) {
-    pushNote(ev, 44 + t, 38, 0.3, 0.22 + i * 0.05, 'timpani');
+    rideAbAt(b0, 56, 0.22);
+    rideAbAt(b0, 68, 0.12);
+    bassAb(b0);
+    pushNote(ev, b0, 38, 1, 0.48, 'timpani');
+    pushNote(ev, b0 + 2, 38, 0.6, 0.36, 'timpani');
+    pushNote(ev, b0 + 3, 38, 0.6, 0.28, 'timpani');
+    if (bar % 2 === 0) pushVoicing(ev, b0, [44, 51], 0.5, 0.22, 'brassStab');
+    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'frameDrum', 0.12, 45);
   }
 
-  // bars 13-15: tutti
-  for (let bar = 12; bar < 15; bar++) {
+  // bars 13-16: return to C phrygian, full force
+  for (let bar = 12; bar < 16; bar++) {
     const b0 = bar * 4;
-    pushCombatTimpani(ev, b0);
-    pushCombatCell(ev, b0, 50, 0.3);
-    pushCombatCell(ev, b0, 62, 0.16);
-    bassAt(b0, 38);
-    pushNote(ev, b0, 38, 0.9, 0.26, 'warDrum');
-    pushNote(ev, b0 + 1.5, 38, 0.7, 0.2, 'warDrum');
-    pushNote(ev, b0 + 3, 38, 0.7, 0.22, 'warDrum');
-    pushDrumHits(ev, b0, [0.75, 2.75], 'frameDrum', 0.1, 45);
-    pushNote(ev, b0, 50, 2, 0.18, 'horn');
-    pushNote(ev, b0 + 0.02, 57, 2, 0.15, 'horn');
-    pushNote(ev, b0 + 0.04, 62, 2, 0.12, 'horn');
-    if (bar === 13) pushVoicing(ev, b0 + 2.5, [38, 45], 0.4, 0.24, 'brassStab');
+    rideAt(b0, 60, 0.28);
+    rideAt(b0, 72, 0.16);
+    rideAt(b0, 84, 0.08);
+    bassAt(b0, 36);
+    pushNote(ev, b0, 38, 1, 0.6, 'timpani');
+    pushNote(ev, b0 + 1, 38, 0.6, 0.4, 'timpani');
+    pushNote(ev, b0 + 2, 38, 0.6, 0.44, 'timpani');
+    pushNote(ev, b0 + 3, 38, 0.6, 0.36, 'timpani');
+    pushVoicing(ev, b0, [36, 43], 0.5, 0.32, 'brassStab');
+    pushVoicing(ev, b0 + 1.5, [36, 43], 0.5, 0.24, 'brassStab');
+    pushVoicing(ev, b0 + 3, [36, 43], 0.5, 0.2, 'brassStab');
+    pushNote(ev, b0, 38, 0.8, 0.26, 'warDrum');
+    pushNote(ev, b0 + 2.75, 38, 0.7, 0.2, 'warDrum');
+    pushDrumHits(ev, b0, [0.5, 1.5, 2.5, 3.5], 'frameDrum', 0.18, 45);
+    if (bar === 15) pushNote(ev, b0 + 3, 70, 0.5, 0.2, 'cymSwell');
   }
-  pushNote(ev, 58, 70, 2, 0.12, 'cymSwell');
-  for (const [i, m] of [53, 55, 57, 60, 62].entries()) {
-    pushNote(ev, 58.75 + i * 0.25, m, 0.2, 0.22, 'stacc');
-  }
-
-  // bar 16: one tutti strike, two beats of air, and the pickup back in
-  pushVoicing(ev, 60, [38, 45, 50], 1, 0.34, 'brassStab');
-  pushNote(ev, 60, 38, 1, 0.6, 'timpani');
-  pushNote(ev, 60, 70, 0.12, 0.22, 'cymSwell');
-  pushNote(ev, 62, 38, 0.5, 0.3, 'bass');
-  pushNote(ev, 63.5, 38, 0.5, 0.3, 'timpani');
-  pushNote(ev, 63.75, 38, 0.4, 0.2, 'warDrum');
 
   ev.sort((a, b) => a.beat - b.beat);
-  return { bpm: 126, bars: 16, events: ev };
+  return { bpm: 138, bars: 16, events: ev };
 }
 
 // ---------------------------------------------------------------------------
@@ -1824,9 +1596,9 @@ const FADE_SECONDS = 2.2;
 const LOOKAHEAD = 0.6;
 const STORAGE_KEY = 'ev_music_on';
 
-// The combat cue is written from D3 exactly like the original; transpose it
-// onto each zone's tonal center so the crossfade never fights the theme
-// underneath (all shifts upward, matching the original table's register):
+// The combat cue is written from C phrygian (MIDI 60 = C). The COMBAT_TRANSPOSE
+// table shifts it onto each zone's tonal center so the crossfade never fights
+// the theme underneath (all shifts upward):
 //   town_eastbrook  0 -> D (Eastbrook is D major)
 //   town_fenbridge  5 -> G (Fenbridge is G major)
 //   town_highwatch  9 -> B (Highwatch is B minor)
