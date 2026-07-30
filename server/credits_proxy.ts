@@ -671,7 +671,9 @@ export async function creditsStore(accountId: number): Promise<CreditsStoreResul
   if (!Array.isArray(data)) return { available: false, items: [] };
   const items: CreditsStoreItem[] = data
     .filter(
-      (i): i is {
+      (
+        i,
+      ): i is {
         itemId: string;
         name: string;
         kind: 'cosmetic' | 'skin' | 'item';

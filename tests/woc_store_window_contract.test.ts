@@ -5,10 +5,7 @@ const storeWindow = readFileSync(
   new URL('../src/ui/daily_rewards_window.ts', import.meta.url),
   'utf8',
 );
-const creditsWindow = readFileSync(
-  new URL('../src/ui/credits_window.ts', import.meta.url),
-  'utf8',
-);
+const creditsWindow = readFileSync(new URL('../src/ui/credits_window.ts', import.meta.url), 'utf8');
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
 const main = readFileSync(new URL('../src/main.ts', import.meta.url), 'utf8');
 const inspect = readFileSync(new URL('../src/ui/armory_inspect.ts', import.meta.url), 'utf8');
@@ -153,9 +150,7 @@ describe('WOC Store window contract', () => {
   });
 
   it('isolates stacked store paint and pauses decorative raster work during window drag', () => {
-    const containment = componentsCss.match(
-      /#daily-rewards-window,\s*#credits-window \{([^}]*)\}/,
-    );
+    const containment = componentsCss.match(/#daily-rewards-window,\s*#credits-window \{([^}]*)\}/);
     expect(containment).not.toBeNull();
     expect(containment?.[1]).toContain('contain: paint;');
     expect(containment?.[1]).toContain('isolation: isolate;');

@@ -1,4 +1,4 @@
-/* emberwood.tokens.css — Emberwood Chronicle semantic palette overrides.
+/* emberwood.tokens.css: Emberwood Chronicle semantic palette overrides.
    Loaded under @layer tokens, scoped to [data-visual-theme="emberwood"] so it
    only remaps tokens when the active visual theme is Emberwood. The classic
    tokens remain the default and the runtime theme system (src/ui/theme.ts)
@@ -68,7 +68,7 @@
     --scrollbar-thumb-hover: #c99a4a;
     --scrollbar-border: #c99a4a;
 
-    /* Quest / objective warm accent (was classic gold #ffd100 — keep the
+    /* Quest / objective warm accent (was classic gold #ffd100, keep the
        brass-embered tone so map + minimap POIs read as part of the world). */
     --color-map-quest-area-fill: rgba(209, 113, 58, 0.18);
     --color-map-quest-area-stroke: rgba(201, 154, 74, 0.5);

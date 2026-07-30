@@ -46,4 +46,4 @@ scene.addChild(node);
 const glb = await new NodeIO().writeBinary(doc);
 const out = path.resolve('public/models/emberwood/creatures/amber_heart_golem.glb');
 fs.writeFileSync(out, glb);
-console.log(`wrote ${out} (${(glb.length / 1024).toFixed(1)} KB) — billboard of concept art, plane ${W.toFixed(2)}x${H.toFixed(2)}`);
+console.log(`wrote ${out} (${(glb.length / 1024).toFixed(1)} KB), billboard of concept art, plane ${W.toFixed(2)}x${H.toFixed(2)}`);

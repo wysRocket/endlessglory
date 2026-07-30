@@ -24,8 +24,8 @@ vi.mock('../../server/credits_proxy', async (importActual) => {
 });
 
 import {
-  creditsPreAuthMutationRateLimited,
   configureCreditsRuntime,
+  creditsPreAuthMutationRateLimited,
   handleCreditsApi,
   resetCreditsDbForTests,
   routes,
@@ -240,11 +240,7 @@ describe('Credits spend entitlement mirroring', () => {
     });
     const res = new FakeRes();
 
-    await handleCreditsApi(
-      makeReq({ method: 'GET', url: '/api/credits/store' }),
-      res as never,
-      7,
-    );
+    await handleCreditsApi(makeReq({ method: 'GET', url: '/api/credits/store' }), res as never, 7);
 
     expect(responseJson(res)).toEqual({
       available: true,

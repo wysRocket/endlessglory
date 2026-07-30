@@ -1,4 +1,4 @@
-/* emberwood.hud.css — Emberwood Chronicle HUD chrome.
+/* emberwood.hud.css: Emberwood Chronicle HUD chrome.
    Loaded under @layer components, scoped to [data-visual-theme="emberwood"].
    The warm palette already comes from emberwood.tokens.css (--panel-bg, --border,
    --gold etc. are remapped there). This layer only ADDS crafted detail on top of
@@ -28,7 +28,7 @@
       0 2px 10px rgba(0, 0, 0, 0.45);
   }
 
-  /* Brass corner notches — drawn as ::before so geometry is untouched. */
+  /* Brass corner notches, drawn as ::before so geometry is untouched. */
   :root[data-visual-theme="emberwood"] .window::before,
   :root[data-visual-theme="emberwood"] .modal::before,
   :root[data-visual-theme="emberwood"] .tooltip::before {

@@ -145,7 +145,7 @@ def retheme_class(spec):
     trim_rgb = spec["trim"]
     # Recolor every material across all meshes. Each mesh may have 1-3 materials
     # (body, accessory, weapon). Cycle through the 3 palette slots so different
-    # sub-meshes pick up different accents — keeps the retheme visually rich.
+    # sub-meshes pick up different accents, keeps the retheme visually rich.
     palette_slots = [body_rgb, metal_rgb, trim_rgb]
     roughness = spec["roughness"]
     metalness = spec["metalness"]

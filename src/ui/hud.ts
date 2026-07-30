@@ -142,8 +142,6 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import type { CreditsRail, CreditsSnapshot } from './credits_window';
-import { CreditsWindow } from './credits_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
@@ -170,6 +168,8 @@ import {
 } from './craft_celebration_view';
 import { buildCraftingView } from './crafting_view';
 import { renderCraftingWindow, stationNameText } from './crafting_window';
+import type { CreditsRail, CreditsSnapshot } from './credits_window';
+import { CreditsWindow } from './credits_window';
 import { DailyRewardsWindow } from './daily_rewards_window';
 import {
   deedBroadcastLine,

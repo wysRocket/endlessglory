@@ -1,4 +1,4 @@
-// Procedurally generate the Emberwood "Amber-Heart Golem" — rebuilt to MATCH
+// Procedurally generate the Emberwood "Amber-Heart Golem", rebuilt to MATCH
 // the Gemini concept reference (see /tmp/sculpt-work/concepts/golem.png):
 //   * towering fused-basalt/obsidian body (organic displaced rock, not boxes)
 //   * chest plates with deliberate fractures revealing a roiling magma core
@@ -7,7 +7,7 @@
 //   * right arm gripping a massive gnarled axe (volcanic rock head + amber blade)
 //   * wide, grounded, defensive-aggressive stance
 //   * obsidian (near-black, wet sheen) + high-key golden-orange emissive glow
-// Articulated node hierarchy (no skinning) animated by node-transform clips —
+// Articulated node hierarchy (no skinning) animated by node-transform clips:
 // the engine's AnimationMixer drives per-node pivots (see gen_chicken_cow.mjs).
 //
 //   node scripts/gen_amber_golem.mjs
@@ -46,7 +46,7 @@ const matAmberBright = M('amberBright', [1.0, 0.72, 0.22], 0.25, 0.0, [1.0, 0.5,
 const matEye = M('eye', [1.0, 0.85, 0.4], 0.2, 0.0, [1.0, 0.6, 0.1], 2.5);
 
 // Real stone texture is applied to the rock/obsidian materials above (1x tiling
-// across the procedural masses — readable carved-stone grain instead of flat grey).
+// across the procedural masses, readable carved-stone grain instead of flat grey).
 
 // ---- geometry helpers ------------------------------------------------------
 function noise3(x, y, z) {
@@ -119,7 +119,7 @@ function ellipsoid(rx, ry, rz, seg = 14, ring = 10) {
   for (let i = 0; i < ring; i++) for (let j = 0; j < seg; j++) { const a = i * s + j, b = a + 1, c = a + s, d = c + 1; idx.push(a, c, b, b, c, d); }
   return geo(pos, nrm, idx);
 }
-// Crystal spike: stretched octahedron (bipyramid) — amber, emissive.
+// Crystal spike: stretched octahedron (bipyramid), amber, emissive.
 function crystal(len, rad) {
   const h = len / 2;
   const pos = [0, h, 0, 0, -h, 0, rad, 0, 0, -rad, 0, 0, 0, 0, rad, 0, 0, -rad];
@@ -219,7 +219,7 @@ function arm(name, side, forward, seed) {
   const hand = group(`${name}_hand`, [0, -0.8, 0]); el.addChild(hand);
   hand.addChild(part(`${name}_palm`, ellipsoid(0.22, 0.2, 0.16), matRock, [0, 0, 0]));
   hand.addChild(part(`${name}_vent`, ellipsoid(0.1, 0.1, 0.06), matAmberBright, [0, 0, 0.14])); // glowing palm vent
-  // five fingers (crystal-tooth claws) — flat-shaded faceted amber crystals
+  // five fingers (crystal-tooth claws): flat-shaded faceted amber crystals
   const fdirs = [[-0.13, 0.02], [-0.07, 0.05], [0, 0.06], [0.07, 0.05], [0.13, 0.02]];
   fdirs.forEach(([fx, fy], i) => {
     const fg = group(`${name}_f${i}`, [fx, fy, 0.18]); hand.addChild(fg);

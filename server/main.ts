@@ -70,8 +70,8 @@ import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from '.
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
 import {
-  creditsPreAuthMutationRateLimited,
   configureCreditsRuntime,
+  creditsPreAuthMutationRateLimited,
   handleCreditsApi,
   handleCreditsStripeWebhook,
 } from './credits';

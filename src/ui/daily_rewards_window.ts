@@ -412,8 +412,7 @@ export class DailyRewardsWindow {
   }
 
   private armorySectionHtml(section: ArmorySection): string {
-    const servicePrice =
-      section.rows.find((row) => row.costCredits !== null)?.costCredits ?? null;
+    const servicePrice = section.rows.find((row) => row.costCredits !== null)?.costCredits ?? null;
     const price =
       servicePrice === null
         ? `<span class="armory-section-price unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
@@ -527,11 +526,7 @@ export class DailyRewardsWindow {
       if (result.balance !== null) this.storeBalance = result.balance;
       await this.renderStore(null);
       const current = this.armoryRowById(row.skin.id);
-      if (
-        current &&
-        current.costCredits !== null &&
-        current.costCredits !== expectedCostCredits
-      ) {
+      if (current && current.costCredits !== null && current.costCredits !== expectedCostCredits) {
         this.requestArmoryPurchase(current);
       }
       return;
@@ -544,9 +539,7 @@ export class DailyRewardsWindow {
         if (body) this.paintStore(body);
       }
       const authoritativeCost =
-        result.costCredits !== null &&
-        Number.isFinite(result.costCredits) &&
-        result.costCredits > 0
+        result.costCredits !== null && Number.isFinite(result.costCredits) && result.costCredits > 0
           ? result.costCredits
           : row.costCredits;
       if (authoritativeCost !== null) {
