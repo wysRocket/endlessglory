@@ -4100,10 +4100,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': 'Вы лишены дара речи!',
   'hud.pet.noPetFood': 'У вас нет пищи, чтобы покормить питомца.',
   'hud.pet.petEatsFoodOnly': 'Ваш питомец ест только пищу.',
-  'mode.caCopyAria': 'Скопировать адрес контракта',
-  'mode.caLabel': 'Адрес контракта $WOC',
-  'mode.caNote':
-    'WOC - токен нашего сообщества. Он не нужен для игры. Присоединяйтесь к Discord, чтобы обсудить применение и экосистему WOC.',
   'mode.play': 'Играть',
   'mode.playAria': 'Играть в Endless Glory',
   'mode.serverAria': 'Выберите мир: В сети или Не в сети',

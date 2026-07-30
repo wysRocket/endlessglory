@@ -4170,10 +4170,7 @@ export const nl_NL: EnTranslations = {
     "playAria": "Speel Endless Glory",
     "serverLabel": "Kies je wereld",
     "serverAria": "Kies wereld: Online of Offline",
-    "serverOfflineSub": "Directe lokale wereld",
-    "caLabel": "$WOC Contractadres",
-    "caCopyAria": "Contractadres kopiëren",
-    "caNote": "WOC is onze communitytoken. Het is niet nodig om te spelen. Word lid van Discord om de WOC-toepassing en het vliegwiel te bespreken."
+    "serverOfflineSub": "Directe lokale wereld"
   },
   "auth": {
     "enterRealm": "Betreed de wereld",

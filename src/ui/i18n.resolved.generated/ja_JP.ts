@@ -4170,10 +4170,7 @@ export const ja_JP: EnTranslations = {
     "playAria": "Endless Gloryをプレイ",
     "serverLabel": "ワールドを選択",
     "serverAria": "ワールドを選択：オンラインまたはオフライン",
-    "serverOfflineSub": "即座にローカルの世界へ",
-    "caLabel": "$WOC コントラクトアドレス",
-    "caCopyAria": "コントラクトアドレスをコピー",
-    "caNote": "WOCはコミュニティトークンです。プレイには必要ありません。Discordに参加して、WOCのユーティリティとフライホイールについて語り合いましょう。"
+    "serverOfflineSub": "即座にローカルの世界へ"
   },
   "auth": {
     "enterRealm": "ワールドに入る",

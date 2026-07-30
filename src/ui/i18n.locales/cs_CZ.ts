@@ -1094,10 +1094,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'auth.username': 'Uživatelské jméno',
   'auth.usernameError': 'Zadej uživatelské jméno.',
   'auth.usernamePlaceholder': 'Zadej uživatelské jméno',
-  'mode.caCopyAria': 'Kopírovat adresu kontraktu',
-  'mode.caLabel': 'Adresa kontraktu $WOC',
-  'mode.caNote':
-    'WOC je komunitní token. Ke hraní není potřeba. Připoj se na Discord a diskutuj o využití a ekonomickém modelu WOC.',
   'mode.offlineAria': 'Hrát offline: spustit okamžitou lokální hru pro jednoho hráče',
   'mode.offlineDesc':
     'Okamžitý svět pro jednoho hráče v prohlížeči. Nic se neukládá: ideální pro rychlou bitku nebo testování.',

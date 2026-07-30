@@ -4170,10 +4170,7 @@ export const ru_RU: EnTranslations = {
     "playAria": "Играть в Endless Glory",
     "serverLabel": "Выберите свой мир",
     "serverAria": "Выберите мир: В сети или Не в сети",
-    "serverOfflineSub": "Мгновенный локальный мир",
-    "caLabel": "Адрес контракта $WOC",
-    "caCopyAria": "Скопировать адрес контракта",
-    "caNote": "WOC - токен нашего сообщества. Он не нужен для игры. Присоединяйтесь к Discord, чтобы обсудить применение и экосистему WOC."
+    "serverOfflineSub": "Мгновенный локальный мир"
   },
   "auth": {
     "enterRealm": "Войти в игровой мир",

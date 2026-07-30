@@ -328,10 +328,6 @@ export const en = {
     serverLabel: 'Choose your world',
     serverAria: 'Select world: Online or Offline',
     serverOfflineSub: 'Instant local world',
-    caLabel: '$WOC Contract Address',
-    caCopyAria: 'Copy contract address',
-    caNote:
-      'WOC is our community token. It is not needed to play. Join Discord to discuss the WOC utility and flywheel.',
   },
   auth: {
     enterRealm: 'Enter the World',

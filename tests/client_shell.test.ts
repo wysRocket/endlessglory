@@ -804,12 +804,16 @@ describe('client HTML shell', () => {
   });
 
   it('excludes wallet surfaces from native and Steam builds while allowing website desktop', () => {
-    expect(hudCss).toContain('body.native-app #nav-btn-download,');
+    // #nav-btn-download and #token-ca dropped out of this selector list: both
+    // elements were removed in the rebrand (the desktop download surface and the
+    // $WOC contract-address pill), so there is nothing left to suppress for them.
+    expect(hudCss).not.toContain('nav-btn-download');
+    expect(hudCss).not.toContain('token-ca');
     expect(hudCss).toContain(
       'body.native-app .cs-wallet,\n  body.native-app .cs-wallet-hidden-note,\n  body.native-app .account-wallet-card',
     );
     expect(hudCss).toContain('body.native-app #performance-tip,');
-    expect(hudCss).toContain('body.desktop-app #token-ca,\n  body.desktop-app .official-site-copy');
+    expect(hudCss).toContain('body.desktop-app .official-site-copy');
     expect(hudCss).not.toContain('body.desktop-app .cs-wallet');
     expect(html).toContain('<section class="account-card account-wallet-card">');
     expect(mainTs).toContain("document.body.classList.toggle('desktop-app', DESKTOP_APP);");

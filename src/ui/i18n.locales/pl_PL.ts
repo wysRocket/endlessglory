@@ -6219,10 +6219,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
     'Graj w poziomym trybie pełnoekranowym, aby uzyskać najlepsze wrażenia na urządzeniu mobilnym.',
   'mobilePreflight.rotateTitle': 'Obróć do poziomu',
   'mobilePreflight.title': 'Graj w poziomym trybie pełnoekranowym',
-  'mode.caCopyAria': 'Skopiuj adres kontraktu',
-  'mode.caLabel': 'Adres kontraktu $WOC',
-  'mode.caNote':
-    'WOC to nasz token społecznościowy. Nie jest potrzebny do gry. Dołącz do Discorda, aby porozmawiać o użyteczności WOC i jego napędzie.',
   'mode.offlineAria': 'Graj offline: rozpocznij natychmiastową lokalną sesję jednoosobową',
   'mode.offlineDesc':
     'Natychmiastowy świat jednoosobowy w twojej przeglądarce. Nic nie jest zapisywane: idealny na szybką potyczkę lub testy.',

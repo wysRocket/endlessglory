@@ -4898,10 +4898,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': 'Você está silenciado!',
   'hud.pet.noPetFood': 'Você não tem comida para alimentar seu mascote.',
   'hud.pet.petEatsFoodOnly': 'Seu mascote só pode comer comida.',
-  'mode.caCopyAria': 'Copiar endereço do contrato',
-  'mode.caLabel': 'Endereço do contrato $WOC',
-  'mode.caNote':
-    'WOC é o token da nossa comunidade. Não é necessário para jogar. Entre no Discord para discutir a utilidade e o flywheel do WOC.',
   'mode.play': 'Jogar',
   'mode.playAria': 'Jogar Endless Glory',
   'mode.serverAria': 'Escolher mundo: Online ou Offline',

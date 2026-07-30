@@ -6303,10 +6303,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
     'Mainkan dalam layar penuh posisi lanskap untuk pengalaman seluler terbaik.',
   'mobilePreflight.rotateTitle': 'Putar ke Lanskap',
   'mobilePreflight.title': 'Mainkan dalam Layar Penuh Lanskap',
-  'mode.caCopyAria': 'Salin alamat kontrak',
-  'mode.caLabel': 'Alamat Kontrak $WOC',
-  'mode.caNote':
-    'WOC adalah token komunitas kami. Token ini tidak diperlukan untuk bermain. Gabung Discord untuk membahas utilitas dan flywheel WOC.',
   'mode.offlineAria': 'Main Luring: mulai sesi pemain-tunggal lokal seketika',
   'mode.offlineDesc':
     'Dunia pemain-tunggal seketika di peramban kamu. Tidak ada yang disimpan: sempurna untuk pertarungan singkat atau pengujian.',

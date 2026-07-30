@@ -3909,10 +3909,6 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': '你已被沉默！',
   'hud.pet.noPetFood': '你没有可以喂给宠物的食物。',
   'hud.pet.petEatsFoodOnly': '你的宠物只能吃食物。',
-  'mode.caCopyAria': '复制合约地址',
-  'mode.caLabel': '$WOC 合约地址',
-  'mode.caNote':
-    'WOC 是我们的社区代币。游玩游戏并不需要它。加入 Discord 一起讨论 WOC 的用途与飞轮效应。',
   'mode.play': '开始游戏',
   'mode.playAria': '开始游玩 Endless Glory',
   'mode.serverAria': '选择世界：在线或离线',

@@ -4069,10 +4069,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': '沈黙状態です！',
   'hud.pet.noPetFood': 'ペットに与える食べ物がありません。',
   'hud.pet.petEatsFoodOnly': 'ペットは食べ物しか食べられません。',
-  'mode.caCopyAria': 'コントラクトアドレスをコピー',
-  'mode.caLabel': '$WOC コントラクトアドレス',
-  'mode.caNote':
-    'WOCはコミュニティトークンです。プレイには必要ありません。Discordに参加して、WOCのユーティリティとフライホイールについて語り合いましょう。',
   'mode.play': 'プレイ',
   'mode.playAria': 'Endless Gloryをプレイ',
   'mode.serverAria': 'ワールドを選択：オンラインまたはオフライン',

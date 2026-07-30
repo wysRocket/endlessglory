@@ -5311,10 +5311,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': 'Vous êtes réduit au silence !',
   'hud.pet.noPetFood': "Vous n'avez aucune nourriture pour votre familier.",
   'hud.pet.petEatsFoodOnly': 'Votre familier ne peut manger que de la nourriture.',
-  'mode.caCopyAria': "Copier l'adresse du contrat",
-  'mode.caLabel': 'Adresse du contrat $WOC',
-  'mode.caNote':
-    "WOC est notre jeton communautaire. Il n'est pas nécessaire pour jouer. Rejoignez le Discord pour discuter de l'utilité et de la dynamique du WOC.",
   'mode.play': 'Jouer',
   'mode.playAria': 'Jouer à Endless Glory',
   'mode.serverAria': 'Choisir le monde : En ligne ou Hors ligne',

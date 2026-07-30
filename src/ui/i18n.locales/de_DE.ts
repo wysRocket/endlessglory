@@ -4931,10 +4931,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': 'Ihr seid stummgeschaltet!',
   'hud.pet.noPetFood': 'Du hast keine Nahrung, um deinen Begleiter zu füttern.',
   'hud.pet.petEatsFoodOnly': 'Dein Begleiter frisst nur Nahrung.',
-  'mode.caCopyAria': 'Vertragsadresse kopieren',
-  'mode.caLabel': '$WOC-Vertragsadresse',
-  'mode.caNote':
-    'WOC ist unser Community-Token. Es wird zum Spielen nicht benötigt. Tritt dem Discord bei, um über den Nutzen und das Schwungrad von WOC zu sprechen.',
   'mode.play': 'Spielen',
   'mode.playAria': 'Endless Glory spielen',
   'mode.serverAria': 'Welt wählen: Online oder Offline',

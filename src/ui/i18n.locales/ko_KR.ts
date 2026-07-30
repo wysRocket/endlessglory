@@ -4053,10 +4053,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hud.errors.silenced': '침묵 상태입니다!',
   'hud.pet.noPetFood': '소환수에게 먹일 음식이 없습니다.',
   'hud.pet.petEatsFoodOnly': '소환수는 음식만 먹을 수 있습니다.',
-  'mode.caCopyAria': '계약 주소 복사',
-  'mode.caLabel': '$WOC 계약 주소',
-  'mode.caNote':
-    'WOC는 커뮤니티 토큰입니다. 플레이에는 필요하지 않습니다. WOC의 활용과 선순환 구조에 관해 이야기하려면 Discord에 참여하세요.',
   'mode.play': '플레이',
   'mode.playAria': 'Endless Glory 플레이',
   'mode.serverAria': '월드 선택: 온라인 또는 오프라인',

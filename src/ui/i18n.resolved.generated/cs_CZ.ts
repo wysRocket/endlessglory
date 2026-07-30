@@ -4170,10 +4170,7 @@ export const cs_CZ: EnTranslations = {
     "playAria": "Hrát Endless Glory",
     "serverLabel": "Vyber si svět",
     "serverAria": "Vybrat svět: online nebo offline",
-    "serverOfflineSub": "Okamžitý lokální svět",
-    "caLabel": "Adresa kontraktu $WOC",
-    "caCopyAria": "Kopírovat adresu kontraktu",
-    "caNote": "WOC je komunitní token. Ke hraní není potřeba. Připoj se na Discord a diskutuj o využití a ekonomickém modelu WOC."
+    "serverOfflineSub": "Okamžitý lokální svět"
   },
   "auth": {
     "enterRealm": "Vstoupit do světa",

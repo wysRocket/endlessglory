@@ -4170,10 +4170,7 @@ export const vi_VN: EnTranslations = {
     "playAria": "Chơi Endless Glory",
     "serverLabel": "Chọn thế giới của bạn",
     "serverAria": "Chọn thế giới: Trực Tuyến hoặc Ngoại Tuyến",
-    "serverOfflineSub": "Thế giới cục bộ tức thì",
-    "caLabel": "Địa Chỉ Hợp Đồng $WOC",
-    "caCopyAria": "Sao chép địa chỉ hợp đồng",
-    "caNote": "WOC là token cộng đồng của chúng tôi. Không cần nó để chơi. Hãy tham gia Discord để thảo luận về tiện ích và vòng xoáy tăng trưởng của WOC."
+    "serverOfflineSub": "Thế giới cục bộ tức thì"
   },
   "auth": {
     "enterRealm": "Vào Thế Giới",

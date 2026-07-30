@@ -6246,10 +6246,6 @@ export const nl_NL: Partial<Record<TranslationKey, string>> = {
   'mobilePreflight.rotateSub': 'Speel in liggend volledig scherm voor de beste mobiele ervaring.',
   'mobilePreflight.rotateTitle': 'Draai naar Liggend',
   'mobilePreflight.title': 'Speel in Liggend Volledig Scherm',
-  'mode.caCopyAria': 'Contractadres kopiëren',
-  'mode.caLabel': '$WOC Contractadres',
-  'mode.caNote':
-    'WOC is onze communitytoken. Het is niet nodig om te spelen. Word lid van Discord om de WOC-toepassing en het vliegwiel te bespreken.',
   'mode.offlineAria': 'Offline Spelen: start direct een lokale singleplayer-sessie',
   'mode.offlineDesc':
     'Direct een singleplayer-wereld in je browser. Er wordt niets opgeslagen: perfect voor een snel gevecht of om te testen.',

@@ -4170,10 +4170,7 @@ export const id_ID: EnTranslations = {
     "playAria": "Mainkan Endless Glory",
     "serverLabel": "Pilih dunia Anda",
     "serverAria": "Pilih dunia: Online atau Offline",
-    "serverOfflineSub": "Dunia lokal seketika",
-    "caLabel": "Alamat Kontrak $WOC",
-    "caCopyAria": "Salin alamat kontrak",
-    "caNote": "WOC adalah token komunitas kami. Token ini tidak diperlukan untuk bermain. Gabung Discord untuk membahas utilitas dan flywheel WOC."
+    "serverOfflineSub": "Dunia lokal seketika"
   },
   "auth": {
     "enterRealm": "Masuki Dunia",

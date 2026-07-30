@@ -100,6 +100,26 @@ describe('Endless Glory emitted surfaces', () => {
     }
   });
 
+  // The $WOC contract-address pill was a Solana mint address baked directly
+  // into index.html with a copy button, presented to every visitor as "our
+  // community token" before they even played. That token belongs to the
+  // upstream project; leaving the pill up would let a visitor reasonably
+  // conclude Endless Glory endorses or issued it, and buy an asset this
+  // project has no relationship to and cannot vouch for.
+  it('never promotes the upstream $WOC token or its contract address', () => {
+    expect(read('index.html')).not.toContain('3WjLscH2JsXLEFJZRA9z8ti8yRGxWGKbqymPd7UicRth');
+    expect(read('index.html')).not.toContain('token-ca');
+    expect(read('src/main.ts')).not.toContain('wireContractAddressCopy');
+    expect(read('src/main.ts')).not.toContain('btn-copy-ca');
+    for (const path of [
+      'src/styles/shell.css',
+      'src/styles/hud.css',
+      'src/styles/hud.mobile.css',
+    ]) {
+      expect(read(path), path).not.toContain('token-ca');
+    }
+  });
+
   // NO legacy carve-outs remain. The download surface went with its upstream
   // binaries, and the protocol scheme itself is rebranded: no shipped install of
   // THIS fork ever registered the old scheme with an OS, so the one reason to keep

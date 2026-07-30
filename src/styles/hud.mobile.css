@@ -4122,7 +4122,6 @@
       max-width: none;
       padding: 14px;
     }
-    body.mobile-touch[data-start-panel="mode-select"] #token-ca,
     body.mobile-touch[data-start-panel="mode-select"] .play-tip,
     body.mobile-touch[data-start-panel="mode-select"] .official-site-copy {
       display: none;

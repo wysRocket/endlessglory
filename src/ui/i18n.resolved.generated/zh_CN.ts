@@ -4170,10 +4170,7 @@ export const zh_CN: EnTranslations = {
     "playAria": "开始游玩 Endless Glory",
     "serverLabel": "选择你的世界",
     "serverAria": "选择世界：在线或离线",
-    "serverOfflineSub": "即时本地世界",
-    "caLabel": "$WOC 合约地址",
-    "caCopyAria": "复制合约地址",
-    "caNote": "WOC 是我们的社区代币。游玩游戏并不需要它。加入 Discord 一起讨论 WOC 的用途与飞轮效应。"
+    "serverOfflineSub": "即时本地世界"
   },
   "auth": {
     "enterRealm": "进入服务器",

@@ -4170,10 +4170,7 @@ export const pt_BR: EnTranslations = {
     "playAria": "Jogar Endless Glory",
     "serverLabel": "Escolha seu mundo",
     "serverAria": "Escolher mundo: Online ou Offline",
-    "serverOfflineSub": "Mundo local instantâneo",
-    "caLabel": "Endereço do contrato $WOC",
-    "caCopyAria": "Copiar endereço do contrato",
-    "caNote": "WOC é o token da nossa comunidade. Não é necessário para jogar. Entre no Discord para discutir a utilidade e o flywheel do WOC."
+    "serverOfflineSub": "Mundo local instantâneo"
   },
   "auth": {
     "enterRealm": "Entrar no mundo",
