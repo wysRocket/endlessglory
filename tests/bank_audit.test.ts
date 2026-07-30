@@ -8,11 +8,11 @@ import {
 } from '../scripts/bank_audit.mjs';
 
 // Fill a bank_ledger row's defaults (snake_case, as Postgres returns it); pass only
-// the fields a case cares about. Every row is 'personal' with realm Claudemoon.
+// the fields a case cares about. Every row is 'personal' with realm Endless Realm.
 function L(o: Partial<BankLedgerAuditRow>): BankLedgerAuditRow {
   return {
     id: 0,
-    realm: 'Claudemoon',
+    realm: 'Endless Realm',
     character_id: 1,
     op: 'deposit',
     item_id: null,
@@ -41,7 +41,7 @@ describe('auditBank', () => {
       characters: [
         {
           id: 1,
-          realm: 'Claudemoon',
+          realm: 'Endless Realm',
           state: { bank: { inventory: [{ itemId: 'wolf_fang', count: 4 }], purchasedSlots: 6 } },
         },
       ],
@@ -80,13 +80,13 @@ describe('auditBank', () => {
         // character 20's bank matches its ledger net, isolating the regression.
         {
           id: 20,
-          realm: 'Claudemoon',
+          realm: 'Endless Realm',
           state: { bank: { inventory: [{ itemId: 'wolf_fang', count: 2 }], purchasedSlots: 0 } },
         },
         // character 40 holds an item its (empty) ledger never recorded.
         {
           id: 40,
-          realm: 'Claudemoon',
+          realm: 'Endless Realm',
           state: { bank: { inventory: [{ itemId: 'iron_ore', count: 3 }], purchasedSlots: 0 } },
         },
       ],
@@ -102,7 +102,7 @@ describe('auditBank', () => {
     // The finding shape carries container / realm / characterId / kind / detail.
     expect(findings.find((f) => f.characterId === 40)).toMatchObject({
       container: 'personal',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       characterId: 40,
       kind: 'ledger_state_mismatch',
     });
@@ -121,9 +121,9 @@ describe('auditBank', () => {
         { id: 3, character_id: 51, op: 'deposit', item_id: 'iron_ore', count: 2 },
       ].map(L),
       characters: [
-        { id: 50, realm: 'Claudemoon', state: null }, // NULL state, ledger activity
-        { id: 51, realm: 'Claudemoon', state: { pos: { x: 0, z: 0 } } }, // state without bank
-        { id: 52, realm: 'Claudemoon', state: null }, // pre-bank, no activity: skipped
+        { id: 50, realm: 'Endless Realm', state: null }, // NULL state, ledger activity
+        { id: 51, realm: 'Endless Realm', state: { pos: { x: 0, z: 0 } } }, // state without bank
+        { id: 52, realm: 'Endless Realm', state: null }, // pre-bank, no activity: skipped
       ],
     });
     expect(findingKindsFor(findings, 50)).toEqual(['ledger_state_mismatch', 'purchased_mismatch']);
@@ -137,7 +137,7 @@ describe('auditBank', () => {
       characters: [
         {
           id: 5,
-          realm: 'Claudemoon',
+          realm: 'Endless Realm',
           state: { bank: { inventory: [{ itemId: 'wolf_fang', count: -2 }], purchasedSlots: 0 } },
         },
       ],
@@ -190,7 +190,7 @@ describe('formatReport', () => {
   it('renders one FINDING line per anomaly plus the per-container summary', () => {
     const finding: BankAuditFinding = {
       container: 'personal',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       characterId: 9,
       kind: 'negative_net',
       detail: 'net -3 of wolf_fang',
@@ -198,7 +198,7 @@ describe('formatReport', () => {
     const report = formatReport(rows, [finding]);
     expect(report).toContain('container personal: ledger rows 1: findings 1');
     expect(report).toContain(
-      'FINDING: container personal: realm Claudemoon: character 9: negative_net: net -3 of wolf_fang',
+      'FINDING: container personal: realm Endless Realm: character 9: negative_net: net -3 of wolf_fang',
     );
     expect(report).not.toContain('OK:');
   });

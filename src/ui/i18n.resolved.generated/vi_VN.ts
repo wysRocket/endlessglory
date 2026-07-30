@@ -1855,7 +1855,7 @@ export const vi_VN: EnTranslations = {
         "titleDiscordian": "Danh Hiệu: Discordian",
         "titleSquire": "Danh Hiệu: Cận Vệ Vương Quốc",
         "chromaBlurple": "Sắc Màu Mech Blurple",
-        "titleChampion": "Danh Hiệu: Nhà Vô Địch Claudemoon",
+        "titleChampion": "Danh Hiệu: Nhà Vô Địch Endless Realm",
         "swagStickers": "Bộ Sticker (giao tận nơi)",
         "swagTee": "Áo Thun (giao tận nơi)"
       },
@@ -5066,7 +5066,7 @@ export const vi_VN: EnTranslations = {
     "applicationCategory": "Trò chơi",
     "operatingSystem": "Trình duyệt web",
     "officialLabel": "Trang web Endless Glory chính thức",
-    "officialBody": "endlessglory.vercel.app là trang MMO trên trình duyệt miễn phí chính thức cho thế giới Claudemoon. Chơi trực tuyến với một nhân vật bền vững, khám phá đơn lẻ ngoại tuyến, đọc wiki và theo dõi các liên kết cộng đồng đã được xác minh từ trang này."
+    "officialBody": "endlessglory.vercel.app là trang MMO trên trình duyệt miễn phí chính thức cho thế giới Endless Realm. Chơi trực tuyến với một nhân vật bền vững, khám phá đơn lẻ ngoại tuyến, đọc wiki và theo dõi các liên kết cộng đồng đã được xác minh từ trang này."
   },
   "a11y": {
     "goHome": "Về trang chủ",
@@ -5305,7 +5305,7 @@ export const vi_VN: EnTranslations = {
     "logoAlt": "Endless Glory",
     "eyebrow": "Bảo trì thế giới",
     "heading": "Thế giới tạm thời không khả dụng.",
-    "body": "Chúng tôi đang khởi động lại dịch vụ trò chơi và dự kiến Claudemoon sẽ trở lại trong giây lát. Trang này sẽ tự động tiếp tục kiểm tra.",
+    "body": "Chúng tôi đang khởi động lại dịch vụ trò chơi và dự kiến Endless Realm sẽ trở lại trong giây lát. Trang này sẽ tự động tiếp tục kiểm tra.",
     "status": "Sớm trở lại"
   },
   "welcome": {

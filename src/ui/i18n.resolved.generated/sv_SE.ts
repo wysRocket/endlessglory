@@ -1855,7 +1855,7 @@ export const sv_SE: EnTranslations = {
         "titleDiscordian": "Titel: Discordian",
         "titleSquire": "Titel: Väpnare av riket",
         "chromaBlurple": "Blurple Mech-färg",
-        "titleChampion": "Titel: Champion of Claudemoon",
+        "titleChampion": "Titel: Champion of Endless Realm",
         "swagStickers": "Klistermärkespaket (skickas)",
         "swagTee": "T-shirt (skickas)"
       },
@@ -5066,7 +5066,7 @@ export const sv_SE: EnTranslations = {
     "applicationCategory": "Spel",
     "operatingSystem": "Webbläsare",
     "officialLabel": "Officiell webbplats för Endless Glory",
-    "officialBody": "endlessglory.vercel.app är den officiella gratis webbläsar-MMO:n för Claudemoon-världen. Spela online med en beständig karaktär, utforska solo offline, läs wikin och följ verifierade gemenskapslänkar från den här webbplatsen."
+    "officialBody": "endlessglory.vercel.app är den officiella gratis webbläsar-MMO:n för Endless Realm-världen. Spela online med en beständig karaktär, utforska solo offline, läs wikin och följ verifierade gemenskapslänkar från den här webbplatsen."
   },
   "a11y": {
     "goHome": "Gå till startsidan",
@@ -5305,7 +5305,7 @@ export const sv_SE: EnTranslations = {
     "logoAlt": "Endless Glory",
     "eyebrow": "Världsunderhåll",
     "heading": "Världen är tillfälligt otillgänglig.",
-    "body": "Vi startar om speltjänsten och förväntar oss att Claudemoon är tillbaka inom kort. Den här sidan fortsätter att kontrollera automatiskt.",
+    "body": "Vi startar om speltjänsten och förväntar oss att Endless Realm är tillbaka inom kort. Den här sidan fortsätter att kontrollera automatiskt.",
     "status": "Tillbaka snart"
   },
   "welcome": {

@@ -1855,7 +1855,7 @@ export const ja_JP: EnTranslations = {
         "titleDiscordian": "称号：Discordian",
         "titleSquire": "称号：レルムの従者",
         "chromaBlurple": "Blurpleメックカラー",
-        "titleChampion": "称号：Claudemoonのチャンピオン",
+        "titleChampion": "称号：Endless Realmのチャンピオン",
         "swagStickers": "ステッカーパック（発送）",
         "swagTee": "Tシャツ（発送）"
       },
@@ -5066,7 +5066,7 @@ export const ja_JP: EnTranslations = {
     "applicationCategory": "ゲーム",
     "operatingSystem": "Webブラウザ",
     "officialLabel": "Endless Glory 公式サイト",
-    "officialBody": "endlessglory.vercel.app は Claudemoon ワールドの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。"
+    "officialBody": "endlessglory.vercel.app は Endless Realm ワールドの公式無料ブラウザMMOです。永続キャラクターでオンラインプレイし、オフラインでソロ探索し、wikiを読み、このサイトから確認済みのコミュニティリンクをたどれます。"
   },
   "a11y": {
     "goHome": "ホームへ移動",
@@ -5305,7 +5305,7 @@ export const ja_JP: EnTranslations = {
     "logoAlt": "Endless Glory",
     "eyebrow": "ワールドメンテナンス",
     "heading": "ワールドは一時的に利用できません。",
-    "body": "ゲームサービスを再起動しています。Claudemoonはまもなく戻る予定です。このページは自動的に確認を続けます。",
+    "body": "ゲームサービスを再起動しています。Endless Realmはまもなく戻る予定です。このページは自動的に確認を続けます。",
     "status": "まもなく復帰"
   },
   "welcome": {

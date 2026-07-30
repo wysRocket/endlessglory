@@ -1855,7 +1855,7 @@ export const da_DK: EnTranslations = {
         "titleDiscordian": "Titel: Discordianer",
         "titleSquire": "Titel: Væbner af Riget",
         "chromaBlurple": "Blurple Mech-kromfarve",
-        "titleChampion": "Titel: Champion af Claudemoon",
+        "titleChampion": "Titel: Champion af Endless Realm",
         "swagStickers": "Klistermærkepakke (sendes)",
         "swagTee": "T-shirt (sendes)"
       },
@@ -5066,7 +5066,7 @@ export const da_DK: EnTranslations = {
     "applicationCategory": "Spil",
     "operatingSystem": "Webbrowser",
     "officialLabel": "Officiel Endless Glory-hjemmeside",
-    "officialBody": "endlessglory.vercel.app er den officielle gratis browser-MMO for Claudemoon-verdenen. Spil online med en vedvarende karakter, udforsk solo offline, læs wikien, og følg verificerede fællesskabslinks fra denne side."
+    "officialBody": "endlessglory.vercel.app er den officielle gratis browser-MMO for Endless Realm-verdenen. Spil online med en vedvarende karakter, udforsk solo offline, læs wikien, og følg verificerede fællesskabslinks fra denne side."
   },
   "a11y": {
     "goHome": "Gå til forsiden",
@@ -5305,7 +5305,7 @@ export const da_DK: EnTranslations = {
     "logoAlt": "Endless Glory",
     "eyebrow": "Verdens-vedligeholdelse",
     "heading": "Verdenen er midlertidigt utilgængelig.",
-    "body": "Vi genstarter spiltjenesten og forventer, at Claudemoon vender tilbage om kort tid. Denne side bliver ved med at tjekke automatisk.",
+    "body": "Vi genstarter spiltjenesten og forventer, at Endless Realm vender tilbage om kort tid. Denne side bliver ved med at tjekke automatisk.",
     "status": "Tilbage snart"
   },
   "welcome": {

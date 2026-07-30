@@ -608,7 +608,7 @@ export const TARGETS = [
             {
               rank: 1,
               name: 'Aldwin',
-              realm: 'Claudemoon',
+              realm: 'Endless Realm',
               cls: 'warrior',
               level: 20,
               renown: 1620,
@@ -626,7 +626,7 @@ export const TARGETS = [
             {
               rank: 3,
               name: 'Cifern',
-              realm: 'Claudemoon',
+              realm: 'Endless Realm',
               cls: 'priest',
               level: 19,
               renown: 1390,
@@ -635,7 +635,7 @@ export const TARGETS = [
             {
               rank: 4,
               name: 'Doran',
-              realm: 'Claudemoon',
+              realm: 'Endless Realm',
               cls: 'rogue',
               level: 20,
               renown: 1350,

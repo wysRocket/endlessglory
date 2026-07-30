@@ -134,6 +134,10 @@ export const DISCORD_SWAG: readonly SwagItem[] = [
     kind: 'title',
     cost: 2_500,
     minTier: 5,
+    // The GRANT ID keeps the legacy 'claudemoon' spelling on purpose: it is a
+    // persisted cosmetic identifier (server/discord.ts grantCosmetic), so renaming
+    // it would orphan every already-granted title. Only the DISPLAY text moved to
+    // "Endless Realm" (hudChrome titleChampion).
     grantId: 'champion_of_claudemoon',
   },
 ] as const;

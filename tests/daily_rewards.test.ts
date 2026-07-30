@@ -419,7 +419,7 @@ describe('daily rewards', () => {
     db.winnerAnnouncements = [
       {
         day: '2026-06-30',
-        realm: 'Claudemoon',
+        realm: 'Endless Realm',
         prizePoolUsd: 150,
         finalizedAt: '2026-07-01T00:00:00.000Z',
         payouts: [],

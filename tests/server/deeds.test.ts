@@ -291,7 +291,7 @@ function buildSheet(
   return characterSheet({
     row: sheetRow(state),
     visibility: extras.visibility ?? 'public',
-    realm: 'Claudemoon',
+    realm: 'Endless Realm',
     origin: 'https://worldofclaudecraft.com',
     guild: null,
     rank: null,

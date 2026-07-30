@@ -432,7 +432,7 @@ describe('relay (in-game "!" community posts)', () => {
     characterName: 'Aldric',
     level: 12,
     className: 'Hunter',
-    realm: 'Claudemoon',
+    realm: 'Endless Realm',
     zone: 'Eastbrook Vale',
     message: 'need a healer for Cragmaw Crypt',
     profileUrl: 'https://woc.test/c/Aldric',
@@ -475,7 +475,7 @@ describe('relay (in-game "!" community posts)', () => {
     expect(embed.description).toBe('need a healer for Cragmaw Crypt');
     expect(embed.fields).toEqual([
       { name: 'Character', value: 'Aldric - Level 12 Hunter', inline: true },
-      { name: 'Location', value: 'Eastbrook Vale (Claudemoon)', inline: true },
+      { name: 'Location', value: 'Eastbrook Vale (Endless Realm)', inline: true },
     ]);
     const button = msg.components[0].components[0];
     expect(button.style).toBe(5); // link button
@@ -506,7 +506,7 @@ describe('significant-activity cards', () => {
   it('level-20 card pings the subject and shows the cap', () => {
     const msg = buildActivityMessage({
       kind: 'levelup',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       profileUrl: 'https://woc.test/c/Aldric',
       level: 20,
       participants: [linked('Aldric', '111')],
@@ -525,7 +525,7 @@ describe('significant-activity cards', () => {
   it('rare-loot card uses the quality color and names the item', () => {
     const msg = buildActivityMessage({
       kind: 'rareloot',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       profileUrl: null,
       itemName: 'Ember Greatsword',
       quality: 'legendary',
@@ -539,7 +539,7 @@ describe('significant-activity cards', () => {
   it('duel card mentions both linked players and names the winner', () => {
     const msg = buildActivityMessage({
       kind: 'duel',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       profileUrl: null,
       winnerName: 'Aldric',
       loserName: 'Mira',
@@ -558,7 +558,7 @@ describe('significant-activity cards', () => {
   it('arena card shows the signed rating delta', () => {
     const msg = buildActivityMessage({
       kind: 'arena',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       profileUrl: null,
       ratingDelta: 24,
       participants: [linked('Aldric', '111')],
@@ -569,7 +569,7 @@ describe('significant-activity cards', () => {
   it('renders a plain name (no ping) for an unlinked participant', () => {
     const msg = buildActivityMessage({
       kind: 'duel',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       profileUrl: null,
       winnerName: 'Aldric',
       loserName: 'Ghost',
@@ -586,7 +586,7 @@ describe('daily rewards winner cards', () => {
       day: '2026-06-30',
       taskName: 'Complete quests',
       nextTaskName: 'Win an arena match',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       prizePoolUsd: 150,
       finalizedAt: '2026-07-01T00:00:00.000Z',
       payouts: [
@@ -627,7 +627,7 @@ describe('daily rewards winner cards', () => {
     expect(msg.embeds[0].description).toContain('**#1** titoisking - 12,345 pts - $30.00 (20%)');
     expect(msg.embeds[0].description).toContain('**#2** alice - 1,000 pts - $22.50 (15%)');
     expect(msg.embeds[0].fields).toEqual([
-      { name: 'Realm', value: 'Claudemoon', inline: true },
+      { name: 'Realm', value: 'Endless Realm', inline: true },
       { name: 'Prize Pool', value: '$150.00', inline: true },
       { name: 'Next task', value: 'Win an arena match', inline: false },
     ]);

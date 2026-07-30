@@ -1855,7 +1855,7 @@ export const pt_BR: EnTranslations = {
         "titleDiscordian": "Título: Discordiano",
         "titleSquire": "Título: Escudeiro do Reino",
         "chromaBlurple": "Croma Mech Blurple",
-        "titleChampion": "Título: Campeão de Claudemoon",
+        "titleChampion": "Título: Campeão de Endless Realm",
         "swagStickers": "Pacote de Adesivos (enviado)",
         "swagTee": "Camiseta (enviada)"
       },
@@ -5066,7 +5066,7 @@ export const pt_BR: EnTranslations = {
     "applicationCategory": "Jogo",
     "operatingSystem": "Navegador web",
     "officialLabel": "Site oficial de Endless Glory",
-    "officialBody": "endlessglory.vercel.app é o MMO de navegador gratuito oficial do mundo Claudemoon. Jogue online com um personagem persistente, explore solo offline, leia a wiki e siga os links verificados da comunidade a partir deste site."
+    "officialBody": "endlessglory.vercel.app é o MMO de navegador gratuito oficial do mundo Endless Realm. Jogue online com um personagem persistente, explore solo offline, leia a wiki e siga os links verificados da comunidade a partir deste site."
   },
   "a11y": {
     "goHome": "Ir para a página inicial",
@@ -5305,7 +5305,7 @@ export const pt_BR: EnTranslations = {
     "logoAlt": "Endless Glory",
     "eyebrow": "Manutenção do mundo",
     "heading": "O mundo está temporariamente indisponível.",
-    "body": "Estamos reiniciando o serviço do jogo e esperamos que Claudemoon volte em breve. Esta página continuará verificando automaticamente.",
+    "body": "Estamos reiniciando o serviço do jogo e esperamos que Endless Realm volte em breve. Esta página continuará verificando automaticamente.",
     "status": "Voltamos em breve"
   },
   "welcome": {

@@ -1820,7 +1820,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.unitFrame.targetLabel': 'Il tuo bersaglio',
   'seo.officialLabel': 'Sito ufficiale di Endless Glory',
   'seo.officialBody':
-    "endlessglory.vercel.app è l'MMO gratuito ufficiale da browser del mondo Claudemoon. Gioca online con un personaggio persistente, esplora offline in solitaria, leggi il wiki e segui i link della community verificati da questo sito.",
+    "endlessglory.vercel.app è l'MMO gratuito ufficiale da browser del mondo Endless Realm. Gioca online con un personaggio persistente, esplora offline in solitaria, leggi il wiki e segui i link della community verificati da questo sito.",
   'hudChrome.questShare.notShareable': 'Questa missione non può essere condivisa.',
   'hudChrome.questShare.notInSharerParty':
     'Devi essere nel gruppo di {name} per accettare quella missione.',
@@ -2598,7 +2598,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'serverUnavailable.eyebrow': 'Manutenzione del mondo',
   'serverUnavailable.heading': 'Il mondo è temporaneamente non disponibile.',
   'serverUnavailable.body':
-    'Stiamo riavviando il servizio di gioco e prevediamo che Claudemoon torni a breve. Questa pagina continuerà a controllare automaticamente.',
+    'Stiamo riavviando il servizio di gioco e prevediamo che Endless Realm torni a breve. Questa pagina continuerà a controllare automaticamente.',
   'serverUnavailable.status': 'Torna presto',
   'hud.core.elite': 'ÉLITE',
   'hud.core.boss': 'BOSS',
@@ -6974,7 +6974,7 @@ export const it_IT: Partial<Record<TranslationKey, string>> = {
   'hudChrome.discord.swag.titleDiscordian': 'Titolo: Discordiano',
   'hudChrome.discord.swag.titleSquire': 'Titolo: Scudiero del Reame',
   'hudChrome.discord.swag.chromaBlurple': 'Cromatura Mech Blurple',
-  'hudChrome.discord.swag.titleChampion': 'Titolo: Campione di Claudemoon',
+  'hudChrome.discord.swag.titleChampion': 'Titolo: Campione di Endless Realm',
   'hudChrome.discord.swag.swagStickers': 'Pacchetto adesivi (spedito)',
   'hudChrome.discord.swag.swagTee': 'Maglietta (spedita)',
   'hudChrome.discord.relay.tooFast':

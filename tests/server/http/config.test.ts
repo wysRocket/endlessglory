@@ -147,17 +147,17 @@ describe('loadConfig', () => {
 
   it('validates REALMS: a usable entry passes, a garbage list throws, same-origin/unset pass', () => {
     expect(() =>
-      loadConfig({ ...MIN_ENV, REALMS: 'Claudemoon=https://claudemoon.example.com=Normal' }),
+      loadConfig({ ...MIN_ENV, REALMS: 'Endless Realm=https://endless-realm.example.com=Normal' }),
     ).not.toThrow();
     // An empty url is the same-origin realm parseRealms keeps.
-    expect(() => loadConfig({ ...MIN_ENV, REALMS: 'Claudemoon=' })).not.toThrow();
+    expect(() => loadConfig({ ...MIN_ENV, REALMS: 'Endless Realm=' })).not.toThrow();
     expect(() => loadConfig({ ...MIN_ENV })).not.toThrow();
     // No '=' at all, or a non-bare url, yields zero usable entries.
-    expect(() => loadConfig({ ...MIN_ENV, REALMS: 'Claudemoon' })).toThrow(/REALMS/);
-    expect(() => loadConfig({ ...MIN_ENV, REALMS: 'Claudemoon=not-a-url' })).toThrow(/REALMS/);
+    expect(() => loadConfig({ ...MIN_ENV, REALMS: 'Endless Realm' })).toThrow(/REALMS/);
+    expect(() => loadConfig({ ...MIN_ENV, REALMS: 'Endless Realm=not-a-url' })).toThrow(/REALMS/);
     // A credentialed url is not a bare origin either (same isBareOrigin rule).
     expect(() =>
-      loadConfig({ ...MIN_ENV, REALMS: 'Claudemoon=https://u:p@claudemoon.example.com' }),
+      loadConfig({ ...MIN_ENV, REALMS: 'Endless Realm=https://u:p@endless-realm.example.com' }),
     ).toThrow(/REALMS/);
   });
 

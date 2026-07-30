@@ -197,7 +197,7 @@ describe('cross-surface parity', () => {
     const sheet = characterSheet({
       row,
       visibility: 'public',
-      realm: 'Claudemoon',
+      realm: 'Endless Realm',
       origin: 'https://worldofclaudecraft.com',
       guild: null,
       rank: null,
