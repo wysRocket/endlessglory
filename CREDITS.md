@@ -53,6 +53,12 @@ provided as a courtesy.
 | KayKit Adventurers 2.0 + Character Animations 1.1 (player base models `public/models/chars/players/{knight,paladin,mage,druid,barbarian,rogue,rogue_hooded,ranger,mage_classic}.glb` and the merged animation library; source for the 9 Emberwood NPC visuals `public/models/emberwood/npcs/emberwood_{barbarian,guard,knight,mage,npc_woman,paladin,priest,ranger,rogue}.glb` via `scripts/retheme_openmmo_npc.py`) | Kay Lousberg (KayKit) | Paid pack, purchase account/date not recorded in the commit that added it (`2133845ed`) | KayKit premium license (purchased; terms not re-confirmed here, TODO owner to fill in) |
 | Amber-Heart Golem base rig/mesh (`public/models/emberwood/creatures/amber_heart_golem.glb`, retextured to obsidian/amber in Blender) | Unverified | Provenance unclear: the commit that added it (`d42b5a05d`) claims an "OpenMMO orc base" but this could not be confirmed or ruled out from the repo alone (distinct Mixamo-style rig from the already-credited Quaternius `orc.glb` mob, but no direct evidence of the claimed source) | TODO owner to confirm actual source and license before relying on this credit |
 
+## Loading art
+
+| Assets | Author | Source | License |
+|---|---|---|---|
+| Loading / "entering the world" key art (`public/loading-screen.jpg`) | Endless Glory | Generated with Google Nano Banana, upscaled to 1536x1024 | Project asset |
+
 ## Brand marks
 
 The four streamer-platform marks inlined as SVG paths in `src/ui/ui_icons.ts`
