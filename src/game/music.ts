@@ -335,7 +335,7 @@ function composeTownEastbrook(): Theme {
   return { bpm: 112, bars: 16, events: ev };
 }
 
-function pushRepeated(
+function _pushRepeated(
   out: NoteEvent[],
   startBeat: number,
   notes: number[],
@@ -382,7 +382,7 @@ function pushVoicing(
 function composeTownFenbridge(): Theme {
   const ev: NoteEvent[] = [];
   // "The Fenward Hearth". C major, 100 bpm, 16 bars, bright and open.
-  // Fenbridge is no longer a 12/8 G major lilt — this is a straight-ahead
+  // Fenbridge is no longer a 12/8 G major lilt  -  this is a straight-ahead
   // C major greeting with a fingerpicked lute ostinato, a warm horn melody,
   // and a glockenspiel counterline. The garrison town gets an inviting,
   // slightly rustic theme that nods to the marsh from a safe distance:
@@ -418,7 +418,7 @@ function composeTownFenbridge(): Theme {
     if (late && bar % 2 === 1) pushNote(ev, b0 + 2.75, t[2] + 24, 0.5, 0.07, 'bell');
   });
 
-  // A tune (horn): the welcoming call — rising fifths, skipping back down
+  // A tune (horn): the welcoming call  -  rising fifths, skipping back down
   const tuneA: Phrase = [
     [0, 72, 0.5],
     [0.5, 76, 0.5],
@@ -512,7 +512,7 @@ function composeTownFenbridge(): Theme {
 function composeTownHighwatch(): Theme {
   const ev: NoteEvent[] = [];
   // "Citadel at Dusk". E minor, 90 bpm, 16 bars. Highwatch is no longer a
-  // B minor horn chorale march — this is a mysterious, grand theme in pure
+  // B minor horn chorale march  -  this is a mysterious, grand theme in pure
   // E aeolian, written for deep bells, a weaving woodwind line, and a
   // low pulse from the war drum that suggests the weight of stone overhead.
   // No strings sustain, no piano hearth, no parade drum flourishes. The
@@ -589,7 +589,7 @@ function composeTownHighwatch(): Theme {
   ];
   pushPhrase(ev, 0, motto, 0.22, 'reed');
   pushPhrase(ev, 0, motto.map(([b, m, d]) => [b, m + 12, d] as Phrase[number]), 0.12, 'oboe');
-  // B section: G major lift — the view from the wall at sunset
+  // B section: G major lift  -  the view from the wall at sunset
   const lift: Phrase = [
     [0, 76, 1],
     [1, 79, 0.5],
@@ -641,7 +641,7 @@ function composeTownHighwatch(): Theme {
 function composeVale(): Theme {
   const ev: NoteEvent[] = [];
   // "The Bend in the Road". G lydian, 84 bpm, 16 bars. Eastbrook Vale's open
-  // wilderness is no longer an A dorian loop — this is a forward-pressing
+  // wilderness is no longer an A dorian loop  -  this is a forward-pressing
   // travel theme in G lydian, the raised fourth (C#) giving every phrase a
   // wanderlust lift. A pizzicato violin trio carries the motive over a
   // walking acoustic bass and a gentle shaker pulse; the B section opens
@@ -812,7 +812,7 @@ function composeLegacyVale(): Theme {
 function composeMarsh(): Theme {
   const ev: NoteEvent[] = [];
   // "Fogbound". E locrian, 72 bpm, 24 bars. Mirefen is no longer a
-  // waterlogged E aeolian requiem — this is a desolate, dry-reed dirge in
+  // waterlogged E aeolian requiem  -  this is a desolate, dry-reed dirge in
   // E locrian, the flattened second (F natural) turning every iv into a
   // minor-second shiver. No piano droplets, no choir of the drowned, no
   // B-section lift into G major. Instead: a single low reed wail against
@@ -889,7 +889,7 @@ function composeMarsh(): Theme {
 function composePeaks(): Theme {
   const ev: NoteEvent[] = [];
   // "Above the Clouds". F lydian, 108 bpm, 20 bars. Thornpeak is no longer a
-  // D major anthem march — this is light, thin-air wonder in F lydian, the
+  // D major anthem march  -  this is light, thin-air wonder in F lydian, the
   // raised fourth (B natural) giving every melodic turn an alpine shimmer.
   // No horn chorale, no war drums, no marching ostinato. Instead: a rippling
   // dulcimer arpeggio that never stops, a flute line that soars and dives
@@ -927,7 +927,7 @@ function composePeaks(): Theme {
     if (bar % 4 === 0) pushPedal(ev, b0, c.root + 12, 'choir', 0.06);
   });
 
-  // A: the soaring flute melody — wide intervals, rising and falling
+  // A: the soaring flute melody  -  wide intervals, rising and falling
   const soar: Phrase = [
     [0, 74, 0.5],
     [0.5, 77, 0.5],
@@ -970,7 +970,7 @@ function composePeaks(): Theme {
     [30, 81, 2],
   ];
   pushPhrase(ev, 0, soar, 0.28, 'flute');
-  // B section: the wind drops into D minor — vertigo
+  // B section: the wind drops into D minor  -  vertigo
   const vertigo: Phrase = [
     [0, 72, 1.5],
     [1.5, 74, 0.5],
@@ -1027,7 +1027,7 @@ function composePeaks(): Theme {
 function composeValeCup(): Theme {
   const ev: NoteEvent[] = [];
   // "Champion's Walk". A major, 120 bpm, 16 bars. The Sowfield tournament
-  // ground is no longer a D major pipe-and-boots stomp — this is a fast,
+  // ground is no longer a D major pipe-and-boots stomp - this is a fast,
   // cinematic A major fanfare for the arriving champion. Brass and strings
   // trade a short heraldic motto over a galloping rhythm: timpani on 1,
   // frame drum on 2 and 4, and a shaker running the gaps. The B section
@@ -1036,15 +1036,14 @@ function composeValeCup(): Theme {
     D = { root: 62 },
     E = { root: 64 },
     F$m = { root: 54, minor: true };
-  const Bm = { root: 59, minor: true },
-    C$m = { root: 49, minor: true };
+  const C$m = { root: 49, minor: true };
   const chords: ChordDef[] = [A, D, A, E, F$m, D, A, E, F$m, C$m, D, A, A, D, E, A];
 
   chords.forEach((c, bar) => {
     const b0 = bar * 4;
     const t = triad(c);
     const late = bar >= 8;
-    // galloping bass: root, fifth, root, octave — a horse's canter
+    // galloping bass: root, fifth, root, octave  -  a horse's canter
     pushNote(ev, b0, c.root - 24, 0.5, 0.42, 'bass');
     pushNote(ev, b0 + 1, c.root - 17, 0.4, 0.28, 'bass');
     pushNote(ev, b0 + 2, c.root - 24, 0.4, 0.34, 'bass');
@@ -1153,7 +1152,7 @@ function composeValeCup(): Theme {
 function composeDungeonHollowCrypt(): Theme {
   const ev: NoteEvent[] = [];
   // "Barrow of the Forgotten". G# minor, 94 bpm, 16 bars. The violated
-  // graveyard is no longer a D phrygian funeral crawl — this is G# minor,
+  // graveyard is no longer a D phrygian funeral crawl  -  this is G# minor,
   // a key that feels wrong under the fingers. Low oboe and reed trade a
   // narrow, rocking two-note lament (G#-F#) over a static pedal. No bell,
   // no hymn, no piano grief. Instead: a subterranean pad, a single war drum
@@ -1163,8 +1162,7 @@ function composeDungeonHollowCrypt(): Theme {
   const G$m = { root: 56, minor: true },
     C$m = { root: 49, minor: true },
     E = { root: 52 };
-  const F$ = { root: 54 },
-    B = { root: 59 };
+  const F$ = { root: 54 };
   const chords: ChordDef[] = [G$m, G$m, C$m, G$m, E, F$, G$m, G$m, C$m, G$m, F$, E, G$m, C$m, F$, G$m];
 
   chords.forEach((c, bar) => {
@@ -1241,14 +1239,14 @@ function composeDungeonHollowCrypt(): Theme {
 function composeDungeonSunkenBastion(): Theme {
   const ev: NoteEvent[] = [];
   // "The Sunken Bell". F# minor, 104 bpm, 16 bars. The drowned keep is no
-  // longer an E minor passacaglia with a ground bass — this is a
+  // longer an E minor passacaglia with a ground bass  -  this is a
   // slow-rise two-chord cycle (F#m - C#m) that breathes like water moving
   // through a flooded hall. A single deep bell tolls at the start of each
   // 4-bar group. Harp arpeggios rise and fall like stirring currents. The
   // oboe carries a lonely, arching melody. No choir, no drums, no fanfare.
   // The floor dropped out; only the quiet remains.
-  const F$m = { root: 54, minor: true },
-    C$m = { root: 49, minor: true };
+  const F$m = { root: 54, minor: true };
+  const C$m = { root: 49, minor: true };
   const D = { root: 50 },
     E = { root: 52 },
     A = { root: 57 };
@@ -1340,7 +1338,7 @@ function composeDungeonSunkenBastion(): Theme {
 function composeDungeonGravewyrmSanctum(): Theme {
   const ev: NoteEvent[] = [];
   // "Serpent Coils". F lydian augmented, 88 bpm, 16 bars. The wyrm's
-  // chamber is no longer a B phrygian ritual heartbeat — this is a
+  // chamber is no longer a B phrygian ritual heartbeat  -  this is a
   // slithering, whole-tone-inflected crawl in F with a raised fourth (B)
   // and a raised fifth (C#) that never quite resolves. The rhythm is
   // irregular: low strings slither in staggered entries, wood blocks
@@ -1477,7 +1475,7 @@ function pushCombatTimpani(out: NoteEvent[], b0: number, scale = 1): void {
 function composeCombat(): Theme {
   const ev: NoteEvent[] = [];
   // "Iron Tide". C phrygian, 138 bpm, 16 bars. No longer a D-based orchestral
-  // cell pattern — this is a percussive, metal-adjacent combat theme in
+  // cell pattern  -  this is a percussive, metal-adjacent combat theme in
   // C phrygian (the flat second (Db) gives every phrase a savage edge).
   // The engine is a constant sixteenth-note staccato string ride on the
   // root-fifth-octave skeleton, timpani hitting every downbeat, and brass
@@ -1534,7 +1532,7 @@ function composeCombat(): Theme {
     if (bar === 7) pushNote(ev, b0 + 3.75, 70, 0.3, 0.14, 'cymSwell');
   }
 
-  // bars 9-12: modulate to the flat VI (Ab) — the dark respite
+  // bars 9-12: modulate to the flat VI (Ab)  -  the dark respite
   const bassAb = (b0: number): void => {
     pushNote(ev, b0, 44, 0.25, 0.5, 'bass');
     pushNote(ev, b0 + 0.5, 44, 0.25, 0.36, 'bass');
@@ -2598,7 +2596,7 @@ export class MusicDirector {
       }
     }
     const combatLayer = this.layers.combat;
-    // ostinato follows the zone's tonal center (see COMBAT_TRANSPOSE) — kept
+    // ostinato follows the zone's tonal center (see COMBAT_TRANSPOSE)  -  kept
     // current on every zone crossing, not just when combat starts, so being
     // chased across a border can't leave it in the previous zone's key
     if (inCombat) combatLayer.transpose = COMBAT_TRANSPOSE[zone];
@@ -2618,7 +2616,7 @@ export class MusicDirector {
     if (!ctx || !this._enabled) return;
     const horizon = ctx.currentTime + LOOKAHEAD;
     for (const layer of Object.values(this.layers)) {
-      // schedule only active layers — don't keep pumping long dungeon notes
+      // schedule only active layers  -  don't keep pumping long dungeon notes
       // while a fading-out gain node is still above zero
       if (layer.target <= 0.001) {
         layer.nextIdx = -1;
