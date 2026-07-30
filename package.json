@@ -4,12 +4,11 @@
   "private": true,
   "license": "MIT",
   "author": {
-    "name": "Levy Street",
-    "email": "woc@levystreet.com"
+    "name": "Endless Glory"
   },
   "type": "module",
   "main": "electron/main.cjs",
-  "description": "World of Claudecraft: a classic-style micro-MMO + headless RL training environment",
+  "description": "Endless Glory: a classic-style micro-MMO + headless RL training environment",
   "scripts": {
     "dev": "vite",
     "release:check": "node scripts/release_version.mjs check",
@@ -261,7 +260,7 @@
     "artifactName": "${name}-${version}-${os}-${arch}.${ext}",
     "publish": {
       "provider": "generic",
-      "url": "https://updates.worldofclaudecraft.com/desktop"
+      "url": "https://endless-glory.vercel.app/desktop"
     }
   },
   "allowScripts": {

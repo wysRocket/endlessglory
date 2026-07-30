@@ -75,6 +75,32 @@ describe('Endless Glory emitted surfaces', () => {
     },
   );
 
+  // The infrastructure half of the rebrand, distinct from the user-facing sweep
+  // above. These are not cosmetic: the publish feed decides what code installed
+  // desktop apps download, PRODUCTION_API_ORIGIN is the backend the desktop app
+  // talks to by default, and the server origins land in verification emails and
+  // shareable player-card URLs. An upstream value in any of them points this
+  // game's users, or its update channel, at somebody else's infrastructure.
+  it('never points its own infrastructure at upstream hosts', () => {
+    const packageJson = JSON.parse(read('package.json')) as {
+      description: string;
+      author: { name: string };
+      build: { publish: { url: string } };
+    };
+    expect(packageJson.build.publish.url).not.toContain('worldofclaudecraft');
+    expect(packageJson.description).not.toMatch(/Claudecraft|ClaudeCraft/);
+    expect(JSON.stringify(packageJson.author)).not.toMatch(/Levy Street|levystreet/);
+
+    for (const path of [
+      'electron/update_guard.cjs',
+      'server/realm.ts',
+      'server/player_card.ts',
+      'server/email/index.ts',
+    ]) {
+      expect(read(path), path).not.toContain('worldofclaudecraft.com');
+    }
+  });
+
   it('uses only the two verified legacy compatibility endpoints', () => {
     const index = read('index.html');
     const handoff = read('src/wallet_handoff.ts');

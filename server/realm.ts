@@ -144,11 +144,9 @@ export const CONFIGURED_PUBLIC_ORIGIN = resolvePublicOrigin(process.env.PUBLIC_O
 export const REALM_PUBLIC_ORIGIN =
   CONFIGURED_PUBLIC_ORIGIN || publicOriginForRealm(REALM, REALM_DIRECTORY);
 
-const DEFAULT_PRODUCTION_PUBLIC_ORIGIN = 'https://worldofclaudecraft.com';
+const DEFAULT_PRODUCTION_PUBLIC_ORIGIN = 'https://endless-glory.vercel.app';
 const TRUSTED_PUBLIC_HOST_ORIGINS = new Map([
-  ['worldofclaudecraft.com', DEFAULT_PRODUCTION_PUBLIC_ORIGIN],
-  ['www.worldofclaudecraft.com', DEFAULT_PRODUCTION_PUBLIC_ORIGIN],
-  ['dev.worldofclaudecraft.com', 'https://dev.worldofclaudecraft.com'],
+  ['endless-glory.vercel.app', DEFAULT_PRODUCTION_PUBLIC_ORIGIN],
 ]);
 
 function firstHeaderValue(value: string | string[] | undefined): string {
