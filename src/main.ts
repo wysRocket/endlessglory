@@ -310,8 +310,6 @@ const IMMOBILE_AURA_KINDS = new Set(['stun', 'root', 'incapacitate', 'polymorph'
 // (src/render/self_motion.ts): ?nopredict restores the pre-prediction behavior.
 const SELF_MOTION_DISABLED = new URLSearchParams(location.search).has('nopredict');
 const IMMOBILE_NOTE_THROTTLE_MS = 1200; // min gap between "Can't move!" floats while held
-const HOMEPAGE_MUSIC_MUTED_KEY = 'woc_homepage_music_muted';
-const HOMEPAGE_MUSIC_VOLUME = 0.225;
 const GRAPHICS_PRESET_HIGH = 3;
 const GRAPHICS_PRESET_ULTRA = 4;
 const LANDING_GRAPHICS_AUTO = 'auto';
@@ -336,10 +334,6 @@ let charselectSelected: CharacterSummary | null = null;
 // playing on) to auto-enter, then consumed by refreshCharacters once its list
 // has loaded (mobile WebView-reload resume; see src/net/resume_play.ts).
 let pendingResume: { characterId: number; realm: string } | null = null;
-let homepageMusic: HTMLAudioElement | null = null;
-let homepageMusicStarted = false;
-let homepageMusicMuted = readHomepageMusicMuted();
-let removeHomepageMusicGestureListeners: (() => void) | null = null;
 
 function isNativeRuntime(): boolean {
   if (NATIVE_APP) return true;
@@ -404,24 +398,6 @@ function escapeHtml(text: string): string {
         return char;
     }
   });
-}
-
-function readHomepageMusicMuted(): boolean {
-  if (typeof window === 'undefined') return false;
-  try {
-    return window.localStorage.getItem(HOMEPAGE_MUSIC_MUTED_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function saveHomepageMusicMuted(muted: boolean): void {
-  if (typeof window === 'undefined') return;
-  try {
-    window.localStorage.setItem(HOMEPAGE_MUSIC_MUTED_KEY, muted ? '1' : '0');
-  } catch {
-    // Private browsing or storage failures should not block the control.
-  }
 }
 
 // --- Cloudflare Turnstile (bot gate on the login/register form) ---------------
@@ -3317,7 +3293,6 @@ async function startGame(
     }),
   );
   // Now in-game: fade the home-page theme out (it kept playing through loading).
-  fadeOutHomepageMusic();
 }
 
 // ---------------------------------------------------------------------------
@@ -5671,53 +5646,6 @@ function wireContractAddressCopy(): void {
   });
 }
 
-function syncHomepageMusicToggle(): void {
-  const btn = document.getElementById('homepage-music-toggle') as HTMLButtonElement | null;
-  if (!btn) return;
-  btn.classList.toggle('is-muted', homepageMusicMuted);
-  btn.setAttribute('aria-pressed', String(!homepageMusicMuted));
-}
-
-function playHomepageMusic(): void {
-  const el = homepageMusic;
-  if (!el || homepageMusicMuted || homepageMusicStarted) return;
-  void el
-    .play()
-    .then(() => {
-      homepageMusicStarted = true;
-      removeHomepageMusicGestureListeners?.();
-      removeHomepageMusicGestureListeners = null;
-    })
-    .catch(() => {
-      // Autoplay still blocked: a later gesture will retry.
-    });
-}
-
-function setHomepageMusicMuted(muted: boolean): void {
-  homepageMusicMuted = muted;
-  saveHomepageMusicMuted(muted);
-  const el = homepageMusic;
-  if (el) {
-    el.muted = muted;
-    if (muted) {
-      el.pause();
-      homepageMusicStarted = false;
-    } else {
-      playHomepageMusic();
-    }
-  }
-  syncHomepageMusicToggle();
-}
-
-function wireHomepageMusicToggle(): void {
-  const btn = document.getElementById('homepage-music-toggle') as HTMLButtonElement | null;
-  if (!btn) return;
-  syncHomepageMusicToggle();
-  btn.addEventListener('click', () => {
-    setHomepageMusicMuted(!homepageMusicMuted);
-  });
-}
-
 // ── Non-custodial Solana wallet linking ─────────────────────────────────────
 // The character-select wallet row connects a Wallet Standard Solana wallet and,
 // once the player is logged in, binds it to their account by signing a
@@ -7440,7 +7368,6 @@ function wireStartScreens(): void {
   hydrateIcons();
   void loadProjectStats();
   wireContractAddressCopy();
-  wireHomepageMusicToggle();
   void wireWallet();
   wireGithubLink();
   wireSteamLink(api);
@@ -9101,52 +9028,6 @@ function wireStartScreens(): void {
   });
 }
 
-// Looping home-page theme. Browsers block audio autoplay until a user gesture,
-// so we try immediately and otherwise start on the first interaction. It keeps
-// playing through the loading screen and fades out once the game is on screen.
-function initHomepageMusic(): void {
-  if (homepageMusic) return;
-  const el = new Audio('/audio/main-theme.mp3');
-  el.loop = true;
-  el.muted = homepageMusicMuted;
-  el.preload = 'auto';
-  el.volume = HOMEPAGE_MUSIC_VOLUME;
-  homepageMusic = el;
-
-  const gestureEvents: Array<keyof WindowEventMap> = ['pointerdown', 'keydown', 'touchstart'];
-  removeHomepageMusicGestureListeners = (): void => {
-    gestureEvents.forEach((ev) => {
-      window.removeEventListener(ev, onGesture);
-    });
-  };
-  const onGesture = (): void => playHomepageMusic();
-  gestureEvents.forEach((ev) => {
-    window.addEventListener(ev, onGesture, { passive: true });
-  });
-  syncHomepageMusicToggle();
-  playHomepageMusic();
-}
-
-function fadeOutHomepageMusic(durationMs = 1600): void {
-  const el = homepageMusic;
-  if (!el) return;
-  homepageMusic = null; // stop further control + block restarts
-  removeHomepageMusicGestureListeners?.();
-  removeHomepageMusicGestureListeners = null;
-  const startVol = el.volume;
-  const steps = 32;
-  let i = 0;
-  const id = window.setInterval(() => {
-    i += 1;
-    el.volume = Math.max(0, startVol * (1 - i / steps));
-    if (i >= steps) {
-      window.clearInterval(id);
-      el.pause();
-      homepageMusicStarted = false;
-    }
-  }, durationMs / steps);
-}
-
 // Apply the persisted UI theme to :root before the home/login/character-select
 // screens paint, so a non-classic theme doesn't flash gold defaults on boot.
 // (startGame() re-applies via its own ThemeStore once the world loads.)
@@ -9191,5 +9072,4 @@ if (editorPlaytest) {
 } else {
   startSitePresence('home');
   wireStartScreens();
-  initHomepageMusic();
 }

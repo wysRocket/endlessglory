@@ -113,17 +113,19 @@ describe('MusicDirector — combat / background mix', () => {
   });
 });
 
-describe('MusicDirector boss combat loop', () => {
+// The authored boss mp3 was removed with the rest of the upstream audio. What
+// matters now is the INVERSE of the old pin: engaging boss combat must not fetch a
+// track, and must no longer duck the procedural score to silence, or dungeon bosses
+// would play nothing at all.
+describe('MusicDirector boss combat without an authored track', () => {
   afterEach(() => {
     vi.unstubAllGlobals();
     vi.restoreAllMocks();
     FakeBufferSource.instances = [];
   });
 
-  it('loads and loops the boss track through the unlocked music AudioContext', async () => {
-    const fetchMock = vi.fn(async () => ({
-      arrayBuffer: async () => new ArrayBuffer(8),
-    }));
+  it('never fetches an audio asset when boss combat engages', async () => {
+    const fetchMock = vi.fn();
     vi.stubGlobal('AudioContext', FakeAudioContext);
     vi.stubGlobal('fetch', fetchMock);
     vi.stubGlobal('window', { setInterval: vi.fn(() => 1) });
@@ -131,18 +133,26 @@ describe('MusicDirector boss combat loop', () => {
     const director = new MusicDirector();
     director.init();
     director.setBossCombat(true);
-    for (let i = 0; i < 10 && FakeBufferSource.instances.length === 0; i++) {
-      await Promise.resolve();
-    }
+    await Promise.resolve();
 
-    expect(fetchMock).toHaveBeenCalledWith('/audio/dungeon-boss-fight.mp3');
-    const source = FakeBufferSource.instances[0];
-    expect(source.loop).toBe(true);
-    expect(source.start).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(FakeBufferSource.instances).toHaveLength(0);
+  });
 
-    director.setBossCombat(false);
-    expect(source.stop).toHaveBeenCalledTimes(1);
-    expect(source.disconnect).toHaveBeenCalledTimes(1);
+  it('keeps the procedural score audible through boss combat and the Sowfield', () => {
+    vi.stubGlobal('AudioContext', FakeAudioContext);
+    vi.stubGlobal('window', { setInterval: vi.fn(() => 1) });
+    const director = new MusicDirector();
+    director.init();
+    const masterTarget = () =>
+      (director as unknown as { masterTarget: () => number }).masterTarget();
+
+    const base = masterTarget();
+    expect(base).toBeGreaterThan(0);
+    director.setBossCombat(true);
+    expect(masterTarget()).toBe(base);
+    director.setSowfieldTrack('match');
+    expect(masterTarget()).toBe(base);
   });
 });
 
@@ -162,15 +172,13 @@ describe('dungeon music entry reset', () => {
     expect(shouldResetMusicForDungeonEntry('nythraxis_boss_arena', null)).toBe(false);
   });
 
-  it('rewinds the active dungeon layer and boss loop on dungeon entry', () => {
+  it('rewinds the active dungeon layer on dungeon entry', () => {
     const director = new MusicDirector();
     const layer = { target: 1, anchor: 100, nextIdx: 7, loopCount: 3 };
-    const bossElement = { currentTime: 19 };
     (director as unknown as { ctx: { currentTime: number } }).ctx = { currentTime: 42 };
     (director as unknown as { layers: Record<string, typeof layer> }).layers = {
       dungeon_hollow_crypt: layer,
     };
-    (director as unknown as { bossElement: typeof bossElement }).bossElement = bossElement;
 
     director.resetForDungeonEntry('nythraxis_boss_arena');
 
@@ -178,7 +186,6 @@ describe('dungeon music entry reset', () => {
     expect(layer.nextIdx).toBe(-1);
     expect(layer.loopCount).toBe(0);
     expect(layer.anchor).toBe(42);
-    expect(bossElement.currentTime).toBe(0);
   });
 });
 
