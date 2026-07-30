@@ -1096,7 +1096,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'stats.realmName': '世界名稱',
   'footer.copyright': '2026 Endless Glory',
   'footer.githubLabel': '開源專案',
-  'footer.whitepaper': '白皮書',
   'footer.terms': '服務條款',
   'footer.privacy': '隱私權政策',
   'footer.discordLabel': '加入Discord社區',

@@ -23,21 +23,22 @@ describe('Electron wallet browser handoff', () => {
   });
 
   it('parses only the wallet-handoff custom protocol target', () => {
-    expect(parseWalletHandoffDeepLink(`worldofclaudecraft://wallet-handoff?code=${code}`)).toEqual({
+    expect(parseWalletHandoffDeepLink(`endlessglory://wallet-handoff?code=${code}`)).toEqual({
       code,
     });
-    expect(
-      parseWalletHandoffDeepLink(`worldofclaudecraft://desktop-login?code=${code}`),
-    ).toBeNull();
+    expect(parseWalletHandoffDeepLink(`endlessglory://desktop-login?code=${code}`)).toBeNull();
     expect(
       parseWalletHandoffDeepLink(`https://example.com/wallet-handoff?code=${code}`),
     ).toBeNull();
   });
 
-  it('emits the same registered legacy callback scheme from the browser return page', () => {
+  it('emits the same registered callback scheme from the browser return page', () => {
+    // Both sides of the handoff seam (this page and electron/wallet_handoff.cjs)
+    // must agree on the scheme, and neither may still carry the retired upstream
+    // one: a half-rename would make every wallet handoff die silently.
     const entry = readFileSync(join(__dirname, '..', 'src', 'wallet_handoff.ts'), 'utf8');
-    expect(entry).toContain('worldofclaudecraft://wallet-handoff?code=');
-    expect(entry).not.toContain('endlessglory://wallet-handoff');
+    expect(entry).toContain('endlessglory://wallet-handoff?code=');
+    expect(entry).not.toContain('worldofclaudecraft://');
   });
 
   it('localizes the standalone browser page title at runtime', () => {

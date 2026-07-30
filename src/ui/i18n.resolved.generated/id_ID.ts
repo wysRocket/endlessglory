@@ -4115,7 +4115,6 @@ export const id_ID: EnTranslations = {
   "footer": {
     "copyright": "2026 Endless Glory",
     "githubLabel": "Proyek Sumber Terbuka",
-    "whitepaper": "Whitepaper",
     "terms": "Ketentuan Layanan",
     "privacy": "Kebijakan Privasi",
     "discordLabel": "Gabung Discord"

@@ -3943,7 +3943,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 Endless Glory',
   'footer.discordLabel': 'Gabung Discord',
   'footer.githubLabel': 'Proyek Sumber Terbuka',
-  'footer.whitepaper': 'Whitepaper',
   'footer.privacy': 'Kebijakan Privasi',
   'footer.terms': 'Ketentuan Layanan',
   'game.hud.lowEnergy': 'Energi Rendah',

@@ -990,7 +990,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'footer.githubLabel': 'Open-source projekt',
   'footer.privacy': 'Zásady ochrany soukromí',
   'footer.terms': 'Podmínky služby',
-  'footer.whitepaper': 'Whitepaper',
   'seo.applicationCategory': 'Hra',
   'seo.description':
     'Vydej se na epické dobrodružství ve Endless Glory, klasicky laděném micro-MMO hratelném přímo v prohlížeči. Připoj se k trvalému sdílenému světu, zvyšuj úrovně tříd a porážej nepřátele!',

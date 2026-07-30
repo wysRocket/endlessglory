@@ -1142,7 +1142,6 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'stats.realmName': 'Название игрового мира',
   'footer.copyright': '2026 Endless Glory',
   'footer.githubLabel': 'Проект с открытым исходным кодом',
-  'footer.whitepaper': 'Белая книга',
   'footer.terms': 'Условия использования',
   'footer.privacy': 'Политика конфиденциальности',
   'footer.discordLabel': 'Присоединиться к Discord',

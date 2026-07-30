@@ -4115,7 +4115,6 @@ export const fr_CA: EnTranslations = {
   "footer": {
     "copyright": "2026 Endless Glory",
     "githubLabel": "Projet open source",
-    "whitepaper": "Livre blanc",
     "terms": "Conditions d'utilisation",
     "privacy": "Politique de confidentialité",
     "discordLabel": "Rejoindre le Discord"

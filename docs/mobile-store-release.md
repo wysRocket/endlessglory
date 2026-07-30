@@ -76,7 +76,7 @@ Replace the IP with the Mac's current Wi-Fi/LAN address. Do not use
 ## Native Discord Authentication
 
 Discord login and account linking open the system browser, return through the
-`worldofclaudecraft://discord-auth` app URL, and exchange a short-lived,
+`endlessglory://discord-auth` app URL, and exchange a short-lived,
 single-use handoff code with the game server. The exchange also requires an
 app-generated verifier that never appears in the callback URL, so another app
 cannot use an intercepted custom-scheme callback. Starting the flow also uses
@@ -106,13 +106,13 @@ Apple relay email addresses are accepted and stored only when Apple marks the ad
 verified.
 
 The production server needs no new secret for native iOS sign-in. It defaults the token
-audience to the existing bundle ID, `com.worldofclaudecraft`. Set
-`APPLE_CLIENT_ID=com.worldofclaudecraft` only if an explicit deployment value is
+audience to the existing bundle ID, `com.endlessglory`. Set
+`APPLE_CLIENT_ID=com.endlessglory` only if an explicit deployment value is
 preferred. A different bundle ID must set `APPLE_CLIENT_ID` to that exact identifier.
 
 Before archiving:
 
-1. In Apple Developer, open Identifiers, select `com.worldofclaudecraft`, enable
+1. In Apple Developer, open Identifiers, select `com.endlessglory`, enable
    Sign in with Apple, and configure it as the primary App ID unless it belongs to an
    existing Sign in with Apple app group.
 2. In Xcode, confirm the App target has the Sign in with Apple capability. The checked-in
@@ -151,7 +151,7 @@ offline launch to ensure startup does not depend on an update service.
 ## Store Review Notes
 
 - App name: World of ClaudeCraft.
-- Bundle/application ID: `com.worldofclaudecraft`.
+- Bundle/application ID: `com.endlessglory`.
 - App Store tags: Action, Fantasy, Free, Co-Op, PvP, Leaderboard, MMO,
   Multiplayer, Open World.
 - The iOS asset catalog includes Light, Dark, and Tinted app icon variants. The

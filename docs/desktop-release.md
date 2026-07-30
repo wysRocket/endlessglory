@@ -13,7 +13,7 @@ One codebase produces two distribution channels:
 Sign-in is email and Discord only, identical to the web flow: email/password logs in
 inside the app, and "Continue with Discord" opens the player's default browser on the
 `/desktop-login` page, which hands a one-time code back to the app over the
-`worldofclaudecraft://desktop-login` deep link. There is no Steam sign-in on any
+`endlessglory://desktop-login` deep link. There is no Steam sign-in on any
 channel; on the Steam channel the shell's one Steam surface is the account-link
 ticket behind the Book of Deeds achievement mirror (`electron/steam.cjs`).
 
@@ -84,7 +84,7 @@ Never commit any of these values; they are env vars in CI or the local shell.
 
 ## Deploying the game server (required before any public desktop release)
 
-The desktop app is served from the private origin `app://worldofclaudecraft` and
+The desktop app is served from the private origin `app://endlessglory` and
 calls `https://worldofclaudecraft.com`, so production must run this branch's server
 before a public desktop build ships. The server side is already on the branch and
 needs no desktop-specific configuration: deploy it like any server update
@@ -109,7 +109,7 @@ carries for desktop:
 Verify after deploying (should print the origin back):
 
 ```bash
-curl -s -D - -o /dev/null -H "Origin: app://worldofclaudecraft" \
+curl -s -D - -o /dev/null -H "Origin: app://endlessglory" \
   https://worldofclaudecraft.com/api/project-stats | grep -i access-control-allow-origin
 ```
 
@@ -496,12 +496,12 @@ Rules that keep this working:
    PRIME-relaunched child` in `main.log` (the child writes it; the parent exits
    before file logging exists).
    Known follow-ups, not yet addressed: the relaunch's interaction with the
-   second-instance deep-link path (`worldofclaudecraft://` login handoff) has not
+   second-instance deep-link path (`endlessglory://` login handoff) has not
    been verified against a login link that arrives during the brief relaunch
    window, and the Steam channel's process tracking (overlay, playtime) has not
    been verified against the parent exiting within milliseconds of launch.
 3. Login both paths: email/password in-app, and Discord via the external browser +
-   `worldofclaudecraft://desktop-login` deep link handoff (app focuses and enters
+   `endlessglory://desktop-login` deep link handoff (app focuses and enters
    the world; second-instance and cold-start deep links both work).
 4. Play 5 minutes: steady frame rate, alt-tab out/in does not hitch or freeze the
    world (backgroundThrottling stays off).

@@ -3830,7 +3830,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 Endless Glory',
   'footer.discordLabel': 'Bliv medlem af Discord',
   'footer.githubLabel': 'Open Source-projekt',
-  'footer.whitepaper': 'Whitepaper',
   'footer.privacy': 'Privatlivspolitik',
   'footer.terms': 'Servicevilkår',
   'game.hud.lowEnergy': 'Lav Energi',

@@ -4115,7 +4115,6 @@ export const en_XA: EnTranslations = {
   "footer": {
     "copyright": "[2026 Éñðļéšš Ĝļóŕý]",
     "githubLabel": "[Óþéñ Šóúŕçé Þŕóĵéçţ]",
-    "whitepaper": "[Ŵĥíţéþáþéŕ]",
     "terms": "[Ţéŕɱš óƒ Šéŕʋíçé]",
     "privacy": "[Þŕíʋáçý Þóļíçý]",
     "discordLabel": "[Ĵóíñ ţĥé Ðíšçóŕð]"

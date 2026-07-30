@@ -37,7 +37,7 @@ describe('wallet handoff focus management', () => {
   it('focuses the completion status when the protocol return leaves the page open', () => {
     replaceWalletHandoffContent(
       root,
-      '<h1 tabindex="-1" data-wallet-handoff-complete>Complete</h1><a href="worldofclaudecraft://wallet-handoff">Return</a>',
+      '<h1 tabindex="-1" data-wallet-handoff-complete>Complete</h1><a href="endlessglory://wallet-handoff">Return</a>',
       { focusSelector: '[data-wallet-handoff-complete]' },
     );
 

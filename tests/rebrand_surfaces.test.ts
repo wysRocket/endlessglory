@@ -49,14 +49,9 @@ function readBytes(path: string): Buffer {
 }
 
 function withoutCompatibilityIdentifiers(path: string, source: string): string {
-  let scrubbed = source;
-  if (path === 'index.html') {
-    // The desktop download URLs are gone; only the whitepaper filename remains.
-    scrubbed = scrubbed.replace('/World-of-ClaudeCraft-Whitepaper-v1.0.pdf', '');
-  }
-  if (path === 'src/wallet_handoff.ts') {
-    scrubbed = scrubbed.replace('worldofclaudecraft://wallet-handoff', '');
-  }
+  const scrubbed = source;
+  // index.html no longer carries any compatibility identifiers: the download
+  // URLs and the upstream whitepaper PDF are both gone.
   return scrubbed;
 }
 
@@ -84,7 +79,7 @@ describe('Endless Glory emitted surfaces', () => {
       author: { name: string };
       build: { publish: { url: string } };
     };
-    expect(packageJson.build.publish.url).not.toContain('worldofclaudecraft');
+    expect(packageJson.build.publish.url).not.toContain('endlessglory');
     expect(packageJson.description).not.toMatch(/Claudecraft|ClaudeCraft/);
     expect(JSON.stringify(packageJson.author)).not.toMatch(/Levy Street|levystreet/);
 
@@ -105,18 +100,21 @@ describe('Endless Glory emitted surfaces', () => {
     }
   });
 
-  // ONE legacy carve-out remains, down from two. The desktop download surface was
-  // removed outright (it served upstream-hosted binaries), so index.html no longer
-  // needs the updates.worldofclaudecraft.com exception. The wallet-handoff scheme
-  // stays: it is registered with the OS on existing installs, so renaming it would
-  // break deep links for anyone who already installed the app.
-  it('keeps only the registered protocol scheme as a legacy carve-out', () => {
+  // NO legacy carve-outs remain. The download surface went with its upstream
+  // binaries, and the protocol scheme itself is rebranded: no shipped install of
+  // THIS fork ever registered the old scheme with an OS, so the one reason to keep
+  // it (deep-link compatibility for existing installs) never applied here. The
+  // scheme must agree on both sides of the seam or wallet handoff dies silently.
+  it('uses the rebranded protocol scheme consistently across the handoff seam', () => {
     const index = read('index.html');
     const handoff = read('src/wallet_handoff.ts');
+    const electron = read('electron/wallet_handoff.cjs');
     expect(index).not.toContain('updates.worldofclaudecraft.com');
     expect(index).not.toContain('world-of-claudecraft-');
-    expect(handoff).toContain('worldofclaudecraft://wallet-handoff');
-    expect(handoff).not.toContain('endlessglory://wallet-handoff');
+    expect(handoff).toContain('endlessglory://wallet-handoff');
+    expect(electron).toContain('endlessglory:');
+    expect(handoff).not.toContain('worldofclaudecraft');
+    expect(electron).not.toContain('worldofclaudecraft');
   });
 
   it('brands the desktop package while preserving the registered protocol scheme', () => {
@@ -142,7 +140,7 @@ describe('Endless Glory emitted surfaces', () => {
       expect.arrayContaining(['build/icon.png', 'build/icon.ico', 'build/icon.icns']),
     );
     expect(packageJson.build.protocols).toEqual([
-      { name: 'Endless Glory Login', schemes: ['worldofclaudecraft'] },
+      { name: 'Endless Glory Login', schemes: ['endlessglory'] },
     ]);
   });
 

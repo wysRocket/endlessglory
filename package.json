@@ -1,5 +1,5 @@
 {
-  "name": "world-of-claudecraft",
+  "name": "endless-glory",
   "version": "0.28.0",
   "private": true,
   "license": "MIT",
@@ -160,7 +160,7 @@
     "rolldown": "1.2.0"
   },
   "build": {
-    "appId": "com.worldofclaudecraft.desktop",
+    "appId": "com.endlessglory.desktop",
     "productName": "Endless Glory",
     "icon": "build/icon.png",
     "files": [
@@ -189,7 +189,7 @@
       {
         "name": "Endless Glory Login",
         "schemes": [
-          "worldofclaudecraft"
+          "endlessglory"
         ]
       }
     ],

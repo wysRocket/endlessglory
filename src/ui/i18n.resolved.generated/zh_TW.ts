@@ -4115,7 +4115,6 @@ export const zh_TW: EnTranslations = {
   "footer": {
     "copyright": "2026 Endless Glory",
     "githubLabel": "開源專案",
-    "whitepaper": "白皮書",
     "terms": "服務條款",
     "privacy": "隱私權政策",
     "discordLabel": "加入Discord社區"

@@ -13,7 +13,7 @@ import {
 
 const PACKAGE_JSON = JSON.stringify(
   {
-    name: 'world-of-claudecraft',
+    name: 'endless-glory',
     version: '0.20.0',
     private: true,
   },
@@ -23,12 +23,12 @@ const PACKAGE_JSON = JSON.stringify(
 
 const PACKAGE_LOCK = JSON.stringify(
   {
-    name: 'world-of-claudecraft',
+    name: 'endless-glory',
     version: '0.20.0',
     lockfileVersion: 3,
     packages: {
       '': {
-        name: 'world-of-claudecraft',
+        name: 'endless-glory',
         version: '0.20.0',
       },
       'node_modules/example': {
@@ -114,7 +114,7 @@ describe('release version transforms', () => {
   it('updates package.json without disturbing surrounding fields', () => {
     const out = JSON.parse(setPackageVersion(PACKAGE_JSON, '0.21.0'));
     expect(out.version).toBe('0.21.0');
-    expect(out.name).toBe('world-of-claudecraft');
+    expect(out.name).toBe('endless-glory');
     expect(out.private).toBe(true);
   });
 

@@ -4115,7 +4115,6 @@ export const ja_JP: EnTranslations = {
   "footer": {
     "copyright": "2026 Endless Glory",
     "githubLabel": "オープンソースプロジェクト",
-    "whitepaper": "ホワイトペーパー",
     "terms": "利用規約",
     "privacy": "プライバシーポリシー",
     "discordLabel": "Discordに参加する"

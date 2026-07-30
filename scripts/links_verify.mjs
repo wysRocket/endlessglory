@@ -54,13 +54,10 @@ const server = http.createServer((req, res) => {
 
 const PORT = 8799;
 const EXPECTED_LINKS = [
+  // The community/social rows were removed in the Endless Glory rebrand: every
+  // one of them pointed at the UPSTREAM project's channels. Only the play link
+  // remains until this project has channels of its own.
   'https://endlessglory.vercel.app/',
-  'https://x.com/WoClaudecraft',
-  'https://www.instagram.com/worldofclaudecraft/',
-  'https://www.tiktok.com/@worldofclaudecraft',
-  'https://www.youtube.com/@WoClaudeCraft',
-  'https://www.reddit.com/r/WorldofClaudecraft/',
-  'https://github.com/levy-street/world-of-claudecraft',
 ];
 
 const problems = [];

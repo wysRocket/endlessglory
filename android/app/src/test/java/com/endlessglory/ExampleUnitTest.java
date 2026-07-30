@@ -1,4 +1,4 @@
-package com.worldofclaudecraft;
+package com.endlessglory;
 
 import static org.junit.Assert.*;
 

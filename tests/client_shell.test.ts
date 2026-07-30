@@ -67,10 +67,6 @@ const supportHtml = readFileSync(
   new URL('../public/support.html', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
-const whitepaperUrl = new URL(
-  '../public/World-of-ClaudeCraft-Whitepaper-v1.0.pdf',
-  import.meta.url,
-);
 const viteConfig = readFileSync(new URL('../vite.config.ts', import.meta.url), 'utf8').replace(
   /\r\n/g,
   '\n',
@@ -750,25 +746,28 @@ describe('client HTML shell', () => {
       '<link rel="canonical" href="https://endlessglory.vercel.app/data-deletion" />',
     );
     expect(dataDeletionHtml).toContain('<h1>Data Deletion</h1>');
-    expect(dataDeletionHtml).toContain('href="mailto:woc@levystreet.com"');
-    expect(dataDeletionHtml).toContain('href="https://discord.com/invite/worldofclaudecraft"');
+    // The contact is the Endless Glory operator, never the upstream project:
+    // data-deletion requests landing in another studio's inbox would be both a
+    // dead end for the player and a privacy leak.
+    expect(dataDeletionHtml).toContain('href="mailto:sergekoval75@gmail.com"');
+    expect(dataDeletionHtml).not.toContain('levystreet');
+    expect(dataDeletionHtml).not.toContain('discord.com/invite/worldofclaudecraft');
     expect(dataDeletionHtml).toContain('href="/support">Support</a>');
     expect(supportHtml).toContain(
       '<link rel="canonical" href="https://endlessglory.vercel.app/support" />',
     );
     expect(supportHtml).toContain('<h1>Support</h1>');
-    expect(supportHtml).toContain('href="mailto:woc@levystreet.com"');
-    expect(supportHtml).toContain('href="https://discord.com/invite/worldofclaudecraft"');
+    expect(supportHtml).toContain('href="mailto:sergekoval75@gmail.com"');
+    expect(supportHtml).not.toContain('levystreet');
+    expect(supportHtml).not.toContain('discord.com/invite/worldofclaudecraft');
     expect(supportHtml).toContain('href="/data-deletion">Data Deletion page</a>');
     expect(supportHtml).toContain('"@type": "ContactPage"');
-    expect(html).toContain(
-      'href="/World-of-ClaudeCraft-Whitepaper-v1.0.pdf" class="footer-link" data-i18n="footer.whitepaper"',
-    );
+    // The whitepaper link is gone: the PDF was the UPSTREAM project's tokenomics
+    // document, shipped verbatim from public/.
+    expect(html).not.toContain('Whitepaper');
     expect(html.indexOf('data-i18n="footer.whitepaper"')).toBeLessThan(
       html.indexOf('data-i18n="footer.terms"'),
     );
-    expect(existsSync(whitepaperUrl)).toBe(true);
-    expect(statSync(whitepaperUrl).size).toBeGreaterThan(0);
     expect(html).toContain('href="/terms" class="footer-link" data-i18n="footer.terms"');
     expect(html).toContain('href="/privacy" class="footer-link" data-i18n="footer.privacy"');
     expect(viteConfig).toContain("['/privacy', '/privacy.html']");

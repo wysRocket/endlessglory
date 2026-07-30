@@ -1130,7 +1130,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'stats.realmName': 'ワールド名',
   'footer.copyright': '2026 Endless Glory',
   'footer.githubLabel': 'オープンソースプロジェクト',
-  'footer.whitepaper': 'ホワイトペーパー',
   'footer.terms': '利用規約',
   'footer.privacy': 'プライバシーポリシー',
   'footer.discordLabel': 'Discordに参加する',

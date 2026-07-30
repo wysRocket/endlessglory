@@ -21,7 +21,7 @@ function parseWalletHandoffDeepLink(value) {
   } catch {
     return null;
   }
-  if (url.protocol !== 'worldofclaudecraft:' || url.hostname !== 'wallet-handoff') return null;
+  if (url.protocol !== 'endlessglory:' || url.hostname !== 'wallet-handoff') return null;
   const code = sanitizeWalletHandoffCode(url.searchParams.get('code'));
   return code ? { code } : null;
 }

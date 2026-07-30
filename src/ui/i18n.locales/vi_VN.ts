@@ -3913,7 +3913,6 @@ export const vi_VN: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 Endless Glory',
   'footer.discordLabel': 'Tham Gia Discord',
   'footer.githubLabel': 'Dự Án Mã Nguồn Mở',
-  'footer.whitepaper': 'Sách trắng',
   'footer.privacy': 'Chính Sách Bảo Mật',
   'footer.terms': 'Điều Khoản Dịch Vụ',
   'game.hud.lowEnergy': 'Cạn Năng Lượng',

@@ -1131,7 +1131,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'stats.realmName': '월드 이름',
   'footer.copyright': '2026 Endless Glory',
   'footer.githubLabel': '오픈 소스 프로젝트',
-  'footer.whitepaper': '백서',
   'footer.terms': '서비스 이용약관',
   'footer.privacy': '개인정보 처리방침',
   'footer.discordLabel': 'Discord 참여하기',

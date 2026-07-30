@@ -2183,7 +2183,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'stats.realmName': 'Weltname',
   'footer.copyright': '2026 Endless Glory',
   'footer.githubLabel': 'Open-Source-Projekt',
-  'footer.whitepaper': 'Whitepaper',
   'footer.terms': 'Nutzungsbedingungen',
   'footer.privacy': 'Datenschutzerklärung',
   'footer.discordLabel': 'Tritt dem Discord bei',

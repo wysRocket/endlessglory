@@ -13,13 +13,13 @@ import {
   withCspHeader,
 } from '../electron/shell_guards.cjs';
 
-const APP = 'app://worldofclaudecraft';
+const APP = 'app://endlessglory';
 const DEV = 'http://127.0.0.1:5173';
 
 describe('deriveOrigin (app:// origin-"null" trap)', () => {
   it('derives protocol//host for the app scheme instead of collapsing to "null"', () => {
-    expect(deriveOrigin('app://worldofclaudecraft/index.html')).toBe('app://worldofclaudecraft');
-    expect(deriveOrigin('app://worldofclaudecraft')).toBe('app://worldofclaudecraft');
+    expect(deriveOrigin('app://endlessglory/index.html')).toBe('app://endlessglory');
+    expect(deriveOrigin('app://endlessglory')).toBe('app://endlessglory');
     // Every app:// host shares the SAME opaque URL.origin ("null"); protocol//host keeps them apart.
     expect(deriveOrigin('app://otherhost/x')).toBe('app://otherhost');
   });
@@ -39,8 +39,8 @@ describe('deriveOrigin (app:// origin-"null" trap)', () => {
 describe('originAllowed', () => {
   const allowed = new Set([APP, DEV]);
   it('allows the app origin regardless of path', () => {
-    expect(originAllowed('app://worldofclaudecraft/index.html', allowed)).toBe(true);
-    expect(originAllowed('app://worldofclaudecraft/assets/main-abc.js', allowed)).toBe(true);
+    expect(originAllowed('app://endlessglory/index.html', allowed)).toBe(true);
+    expect(originAllowed('app://endlessglory/assets/main-abc.js', allowed)).toBe(true);
   });
   it('denies a different app host, foreign https, and malformed URLs', () => {
     expect(originAllowed('app://otherhost/', allowed)).toBe(false);
@@ -65,7 +65,7 @@ describe('appNavigationOrigins', () => {
 describe('navigationAllowed', () => {
   const main = new Set([APP, DEV]);
   it('allows main-frame navigation within the app and dev origins', () => {
-    expect(navigationAllowed('app://worldofclaudecraft/play', true, main)).toBe(true);
+    expect(navigationAllowed('app://endlessglory/play', true, main)).toBe(true);
     expect(navigationAllowed('http://127.0.0.1:5173/x', true, main)).toBe(true);
   });
   it('blocks main-frame navigation to a foreign origin', () => {
@@ -305,12 +305,12 @@ describe('isTrustedSender', () => {
     expect(isTrustedSender(undefined, allowed)).toBe(false);
   });
   it('accepts the app frame and the dev-server frame', () => {
-    const appFrame = { origin: APP, url: 'app://worldofclaudecraft/index.html' };
+    const appFrame = { origin: APP, url: 'app://endlessglory/index.html' };
     expect(isTrustedSender(appFrame, allowed)).toBe(true);
     expect(isTrustedSender({ origin: DEV, url: `${DEV}/` }, allowed)).toBe(true);
   });
   it('falls back to frame.url when frame.origin is the opaque "null" string', () => {
-    expect(isTrustedSender({ origin: 'null', url: 'app://worldofclaudecraft/x' }, allowed)).toBe(
+    expect(isTrustedSender({ origin: 'null', url: 'app://endlessglory/x' }, allowed)).toBe(
       true,
     );
   });

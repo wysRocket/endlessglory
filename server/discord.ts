@@ -100,8 +100,11 @@ const STATE_TTL_MINUTES = 10;
 // (the player may also type a password / 2FA code on the link path), a bit longer
 // than the OAuth state TTL since a human decision sits in the middle.
 const PENDING_LOGIN_TTL_MINUTES = 15;
-const DEFAULT_INVITE = 'https://discord.com/invite/worldofclaudecraft';
-const NATIVE_DISCORD_REDIRECT = 'worldofclaudecraft://discord-auth';
+// No hardcoded invite fallback: the old default pointed at the UPSTREAM
+// project's Discord, so an unset DISCORD_GUILD_INVITE sent this game's players
+// into a different game's community. Unset now means '' and the client fails
+// closed (its invite opener does nothing on an empty URL).
+const NATIVE_DISCORD_REDIRECT = 'endlessglory://discord-auth';
 const NATIVE_REDIRECT_STATE_PREFIX = `${NATIVE_DISCORD_REDIRECT}?challenge=`;
 
 // Lightweight local instrumentation hook. Admin-dashboard usage metrics require a
@@ -130,7 +133,7 @@ export function discordConfig(): DiscordConfig | null {
     clientId,
     clientSecret,
     guildId: process.env.DISCORD_GUILD_ID ?? '',
-    inviteUrl: process.env.DISCORD_GUILD_INVITE || DEFAULT_INVITE,
+    inviteUrl: process.env.DISCORD_GUILD_INVITE || '',
     botToken: process.env.DISCORD_BOT_TOKEN ?? '',
   };
 }
@@ -151,7 +154,7 @@ export function discordEnabled(): boolean {
 }
 
 export function discordInviteUrl(): string {
-  return process.env.DISCORD_GUILD_INVITE || DEFAULT_INVITE;
+  return process.env.DISCORD_GUILD_INVITE || '';
 }
 
 function redirectUriFor(req: http.IncomingMessage): string {

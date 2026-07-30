@@ -120,12 +120,12 @@ changes, each its own commit.
   username/password logs in in place via api.login. Only "Continue with Discord" is routed to
   the external browser (#btn-login-discord calls the preload openBrowserLogin bridge in the
   desktop build), because its OAuth redirect is off-origin and the navigation guard blocks it
-  in-app; it returns via the worldofclaudecraft://desktop-login?code= deep link (unchanged).
+  in-app; it returns via the endlessglory://desktop-login?code= deep link (unchanged).
 
 Known dependency, not a wrapper bug (server deploy): the packaged app is served from origin
-app://worldofclaudecraft and calls https://worldofclaudecraft.com, a cross-origin request that
+app://endlessglory and calls https://worldofclaudecraft.com, a cross-origin request that
 needs the server to reflect Access-Control-Allow-Origin for that origin. This branch's server
-already allows it (server/web_login_guard.ts DESKTOP_APP_ORIGINS includes app://worldofclaudecraft,
+already allows it (server/web_login_guard.ts DESKTOP_APP_ORIGINS includes app://endlessglory,
 reflected by maybeCors), but a live probe of production returns no CORS header for that origin,
 so production has not been deployed with this support yet. Until it is, the desktop app cannot
 reach the REST API from production (login, realm list, and the landing-page player counts all
@@ -202,7 +202,7 @@ provisioning table in docs/desktop-release.md): the Developer ID certificate +
 notarytool API key, the Azure Artifact Signing account + service principal, the
 update host for https://updates.worldofclaudecraft.com/desktop, the Steam
 partner app + depots, the optional crash-minidump endpoint, and deploying this
-branch's server so production reflects CORS for app://worldofclaudecraft.
+branch's server so production reflects CORS for app://endlessglory.
 
 ### Independent re-verification passes (2026-07-01)
 
@@ -249,12 +249,12 @@ finding was applied (commits 8bae7110 and 3d4e49b8):
   `registerSchemesAsPrivileged`; `fileInside()` path-traversal guard; BrowserWindow with
   `contextIsolation:true`, `nodeIntegration:false`, `sandbox:true`; `setMenu(null)`;
   `setWindowOpenHandler` denies all and forwards http/https to `shell.openExternal`;
-  permission handlers use a deny-list; single-instance lock; `worldofclaudecraft://`
+  permission handlers use a deny-list; single-instance lock; `endlessglory://`
   deep-link for `desktop-login`; plus the since-removed steamworks.js integration.
 - `electron/preload.cjs` (15 lines): `contextBridge.exposeInMainWorld('wocDesktop', ...)`
   exposing `openBrowserLogin`, `takeLoginCode`, `onLoginCode` (plus one since-removed
   Steam bridge method).
-- `build` block: appId `com.worldofclaudecraft.desktop`; targets mac dmg+zip, win nsis+zip,
+- `build` block: appId `com.endlessglory.desktop`; targets mac dmg+zip, win nsis+zip,
   linux AppImage+deb; `asarUnpack` of `node_modules/steamworks.js/dist/**`; `protocols`
   block for the `worldofclaudecraft` scheme. No signing, notarization, fuses, asarIntegrity,
   or publish/updater config.
@@ -315,7 +315,7 @@ Verified strengths, worth preserving through any refactor:
   route is discriminated correctly (extensionless miss falls back to index.html; a missing
   `.js`/`.css` 404s instead of serving wrong-MIME HTML).
 - Textbook single-instance plus deep-link: `requestSingleInstanceLock` with quit-on-loser,
-  an argv `find(startsWith('worldofclaudecraft://'))` scan robust to argv reordering, the
+  an argv `find(startsWith('endlessglory://'))` scan robust to argv reordering, the
   dev-vs-packaged `setAsDefaultProtocolClient` branch, and a macOS `open-url` handler
   registered before ready. Cold-start codes are buffered in `pendingLoginCode`.
 - Tight deep-link validation: rejects anything whose protocol is not `worldofclaudecraft:`
@@ -383,7 +383,7 @@ All pure code and config, no new dependency except electron-updater.
 - S4. IPC handlers do not validate the sender frame. `desktop-login-take-code` and
   `desktop-login-open-browser` (`main.cjs:171-181`) mint or return sensitive values with no
   sender check. Add one shared `isTrustedSender(frame)` helper (frame origin is
-  `app://worldofclaudecraft` or the dev URL) and apply it at the top of every handler,
+  `app://endlessglory` or the dev URL) and apply it at the top of every handler,
   returning null/void otherwise. Risk is low today given sandbox plus contextIsolation plus
   no webviewTag, but it is cheap defense-in-depth and the documented pattern. Source:
   security checklist item 17. (A third, since-removed Steam handler was also covered at the
@@ -528,7 +528,7 @@ launched under Steam. That is additive and does not change distribution; gate it
 CI that verifies the prebuilt addon loads under the exact Electron version.
 
 The desktop login surface (used by BOTH email and Discord) is: `openDesktopLogin()`, the
-`worldofclaudecraft://desktop-login?code=` deep link, `deliverLoginCode()` /
+`endlessglory://desktop-login?code=` deep link, `deliverLoginCode()` /
 `pendingLoginCode`, and the `openBrowserLogin` / `takeLoginCode` / `onLoginCode` bridges.
 
 ---

@@ -141,7 +141,7 @@ afterEach(() => {
 const noopGrant = () => {};
 const NATIVE_VERIFIER = 'A'.repeat(43);
 const NATIVE_CHALLENGE = createHash('sha256').update(NATIVE_VERIFIER).digest('base64url');
-const NATIVE_STATE_REDIRECT = `worldofclaudecraft://discord-auth?challenge=${NATIVE_CHALLENGE}`;
+const NATIVE_STATE_REDIRECT = `endlessglory://discord-auth?challenge=${NATIVE_CHALLENGE}`;
 function parse(res: any) {
   return { status: res.statusCode, data: res.body ? JSON.parse(res.body) : {} };
 }
@@ -241,7 +241,9 @@ describe('GET /api/discord (status)', () => {
     expect(data.linked).toBe(false);
     expect(data.points).toBe(0);
     expect(data.statusTier).toBe(0);
-    expect(data.inviteUrl).toBe('https://discord.com/invite/worldofclaudecraft');
+    // Fail-closed: no DISCORD_GUILD_INVITE in the test env and no hardcoded
+    // fallback (the old one was the upstream project's server).
+    expect(data.inviteUrl).toBe('');
   });
 
   it('reports linked status, points and derived tier', async () => {
@@ -627,7 +629,7 @@ describe('GET /api/auth/discord/callback', () => {
     );
     expect(res.statusCode).toBe(302);
     const location = new URL(String(res.headers.Location));
-    expect(location.protocol).toBe('worldofclaudecraft:');
+    expect(location.protocol).toBe('endlessglory:');
     expect(location.hostname).toBe('discord-auth');
     expect(location.searchParams.get('mode')).toBe('login');
     const handoffCode = location.searchParams.get('code') ?? '';
@@ -704,7 +706,7 @@ describe('GET /api/auth/discord/callback', () => {
     );
     expect(res.statusCode).toBe(302);
     const location = new URL(String(res.headers.Location));
-    expect(location.protocol).toBe('worldofclaudecraft:');
+    expect(location.protocol).toBe('endlessglory:');
     expect(location.searchParams.get('ok')).toBe('0');
     expect(location.searchParams.get('error')).toBe('cancelled');
     expect(fetchSpy).not.toHaveBeenCalled();
@@ -753,7 +755,7 @@ describe('GET /api/auth/discord/callback', () => {
     );
     expect(res.statusCode).toBe(302);
     const location = new URL(String(res.headers.Location));
-    expect(location.protocol).toBe('worldofclaudecraft:');
+    expect(location.protocol).toBe('endlessglory:');
     expect(location.searchParams.get('ok')).toBe('1');
     expect(location.searchParams.get('mode')).toBe('link');
     expect(location.searchParams.get('username')).toBe('Maxp');

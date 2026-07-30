@@ -1,4 +1,4 @@
-package com.worldofclaudecraft;
+package com.endlessglory;
 
 import com.getcapacitor.JSObject;
 import com.getcapacitor.Plugin;

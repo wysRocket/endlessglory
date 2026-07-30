@@ -4068,7 +4068,7 @@ async function completeDesktopBrowserLogin(): Promise<boolean> {
   try {
     const { code } = await api.createDesktopLoginCode();
     if (!code) throw new Error('missing desktop login code');
-    location.href = `worldofclaudecraft://desktop-login?code=${encodeURIComponent(code)}`;
+    location.href = `endlessglory://desktop-login?code=${encodeURIComponent(code)}`;
   } catch (err) {
     loginError(userFacingApiError(err));
     show('#login-panel');
@@ -7415,7 +7415,7 @@ function wireStartScreens(): void {
     // in place (doAuth -> api.login) without ever leaving the app. Only "Continue with
     // Discord" bounces to the external browser (wired below), because its OAuth redirect
     // would be blocked by the shell's in-app navigation guard; it returns a one-time code
-    // via the worldofclaudecraft://desktop-login deep link (onLoginCode ->
+    // via the endlessglory://desktop-login deep link (onLoginCode ->
     // completeDesktopAppLogin).
     show('#login-panel');
   };

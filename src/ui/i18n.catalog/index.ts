@@ -269,7 +269,6 @@ export const en = {
   footer: {
     copyright: '2026 Endless Glory',
     githubLabel: 'Open Source Project',
-    whitepaper: 'Whitepaper',
     terms: 'Terms of Service',
     privacy: 'Privacy Policy',
     discordLabel: 'Join the Discord',

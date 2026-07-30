@@ -65,7 +65,7 @@ if (relaunchForLinuxPrime({ log: console })) {
   process.exit(0);
 }
 
-const APP_ORIGIN = 'app://worldofclaudecraft';
+const APP_ORIGIN = 'app://endlessglory';
 // The Vite dev server URL is a DEV-ONLY seam (electron-dev.mjs sets it): its
 // origin joins the trusted set for BOTH navigation and IPC-sender trust, and it
 // is loaded as the UI, so a packaged build must never honor it from runtime
@@ -74,7 +74,7 @@ const APP_ORIGIN = 'app://worldofclaudecraft';
 const devServerUrl = app.isPackaged ? undefined : process.env.VITE_DEV_SERVER_URL;
 // Origins the main frame may navigate to (app origin, plus the dev server in dev).
 const appOrigins = appNavigationOrigins(APP_ORIGIN, devServerUrl);
-const deepLinkProtocol = 'worldofclaudecraft';
+const deepLinkProtocol = 'endlessglory';
 let mainWindow = null;
 let pendingLoginCode = null;
 let pendingWalletHandoffCode = null;
@@ -416,7 +416,7 @@ function handleDeepLink(url) {
   } catch {
     return;
   }
-  if (parsed.protocol !== 'worldofclaudecraft:' || parsed.hostname !== 'desktop-login') return;
+  if (parsed.protocol !== 'endlessglory:' || parsed.hostname !== 'desktop-login') return;
   const code = parsed.searchParams.get('code');
   if (!code) return;
   deliverLoginCode(code);

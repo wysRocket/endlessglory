@@ -42,7 +42,7 @@ const CHALLENGE_TTL_MINUTES = 10;
 
 function requestDomain(req: http.IncomingMessage): string {
   const host = (req.headers.host ?? '').split(':')[0];
-  return host || 'world-of-claudecraft';
+  return host || 'endless-glory';
 }
 
 // POST /api/wallet/link/challenge  { address }  → { nonce, message }

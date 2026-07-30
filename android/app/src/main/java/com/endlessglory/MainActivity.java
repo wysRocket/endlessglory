@@ -1,4 +1,4 @@
-package com.worldofclaudecraft;
+package com.endlessglory;
 
 import android.os.Bundle;
 import com.getcapacitor.BridgeActivity;

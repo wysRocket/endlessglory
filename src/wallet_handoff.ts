@@ -99,9 +99,9 @@ function renderBusy(wallet: string): void {
 function renderComplete(): void {
   if (!root || !code) return;
   // Keep the installed desktop callback scheme stable. Electron packages and
-  // existing OS registrations accept worldofclaudecraft://; changing only the
+  // existing OS registrations accept endlessglory://; changing only the
   // browser return page would strand successful wallet authorizations.
-  const returnUrl = `worldofclaudecraft://wallet-handoff?code=${encodeURIComponent(code)}`;
+  const returnUrl = `endlessglory://wallet-handoff?code=${encodeURIComponent(code)}`;
   replaceWalletHandoffContent(
     root,
     `<div class="wallet-handoff-card">` +

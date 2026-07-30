@@ -2956,7 +2956,6 @@ export type TranslationKeyFlat =
   | 'footer.githubLabel'
   | 'footer.privacy'
   | 'footer.terms'
-  | 'footer.whitepaper'
   | 'game.hud.lowEnergy'
   | 'game.hud.lowMana'
   | 'game.leaderboard.empty'

@@ -4115,7 +4115,6 @@ export const ko_KR: EnTranslations = {
   "footer": {
     "copyright": "2026 Endless Glory",
     "githubLabel": "오픈 소스 프로젝트",
-    "whitepaper": "백서",
     "terms": "서비스 이용약관",
     "privacy": "개인정보 처리방침",
     "discordLabel": "Discord 참여하기"

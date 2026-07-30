@@ -97,7 +97,7 @@ describe('desktop app origins (Electron shell)', () => {
 
   it('rejects look-alike, web, native, and missing origins', () => {
     expect(isDesktopAppRequest(req({ origin: 'app://evil' }))).toBe(false);
-    expect(isDesktopAppRequest(req({ origin: 'app://worldofclaudecraft.evil' }))).toBe(false);
+    expect(isDesktopAppRequest(req({ origin: 'app://endlessglory.evil' }))).toBe(false);
     expect(isDesktopAppRequest(req({ origin: 'https://worldofclaudecraft.com' }))).toBe(false);
     expect(isDesktopAppRequest(req({ origin: 'capacitor://localhost' }))).toBe(false);
     expect(isDesktopAppRequest(req({}))).toBe(false);
@@ -129,7 +129,7 @@ describe('API CORS reflection allow-list (allowedCorsOrigin)', () => {
 
   it('does not reflect look-alikes, unlisted origins, or a missing Origin', () => {
     expect(allowedCorsOrigin('app://evil')).toBeNull();
-    expect(allowedCorsOrigin('app://worldofclaudecraft.evil')).toBeNull();
+    expect(allowedCorsOrigin('app://endlessglory.evil')).toBeNull();
     // Unlisted here because REALM_ORIGINS is empty in the test env; a
     // deployment that lists the site origin as a realm URL reflects it. The
     // same-origin page never needs CORS either way.

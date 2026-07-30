@@ -260,7 +260,7 @@ bump the version, rebuild, upload, and watch the toast + install cycle.
 - **Sign-in**: email and Discord only, exactly the web flow (email/password
   in-app; Discord via the default browser and the deep link below). There is
   no Steam sign-in on any channel.
-- **Deep link**: `worldofclaudecraft://desktop-login?code=...` completes the
+- **Deep link**: `endlessglory://desktop-login?code=...` completes the
   browser login handoff (cold start and second-instance both handled).
 - **Inspect a build's channel**: `npx asar extract-file <app>/Contents/
   Resources/app.asar package.json` (run OUTSIDE the repo root: it writes
@@ -270,7 +270,7 @@ bump the version, rebuild, upload, and watch the toast + install cycle.
   verification builds. `WOC_DISTRIBUTION=steam npm run electron:dev` exercises
   the steam runtime path unpackaged.
 - **Production server dependency**: the packaged app calls
-  `https://worldofclaudecraft.com` from origin `app://worldofclaudecraft`;
+  `https://worldofclaudecraft.com` from origin `app://endlessglory`;
   production must be running this branch's server (CORS reflection for that
   origin) or every REST call fails. The log file shows the CORS errors
   plainly until then. Deploying is the standard server update in `DEPLOY.md`
@@ -288,7 +288,7 @@ bump the version, rebuild, upload, and watch the toast + install cycle.
   actual Windows and Linux builds + launches, a real signed+notarized mac
   build, a full universal-arch `electron:build`, an end-to-end update apply
   (requires a signed build + a live feed), and the two login paths + the
-  `worldofclaudecraft://desktop-login` deep-link handoff AGAINST PRODUCTION
+  `endlessglory://desktop-login` deep-link handoff AGAINST PRODUCTION
   (blocked until this branch's server deploys and production reflects CORS for
   the `app://` origin; both flows have packaged-build evidence against a local
   server from the earlier shell passes). Everything else in this file has
