@@ -301,10 +301,10 @@ For off-box safety, sync the directory to S3 occasionally:
   read by `server/welcome.ts` (behind a short in-process cache) and served to
   signed-in clients via `GET /api/welcome/flags`; the client-side half of the
   gate lives in `src/ui/store_promo_card.ts`.
-- **Claudium economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
-  game server. Use `http://127.0.0.1:8798/v1/claudium/` only when both services
+- **Credits economy service**: `WOC_ECONOMY_SERVICE_URL` is resolved by the
+  game server. Use `http://127.0.0.1:8798/v1/credits/` only when both services
   run directly on the host. For the Compose game container with a host-run
-  economy service, use `http://host.docker.internal:8798/v1/claudium/`.
+  economy service, use `http://host.docker.internal:8798/v1/credits/`.
   A separately deployed economy service should use its internal or remote DNS
   URL instead.
 - **Never** set `ALLOW_DEV_COMMANDS=1` in production: it enables the full

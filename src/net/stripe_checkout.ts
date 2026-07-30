@@ -1,4 +1,4 @@
-import type { ClaudiumStripeIntent } from './economy_sdk';
+import type { CreditsStripeIntent } from './economy_sdk';
 
 declare global {
   interface Window {
@@ -86,7 +86,7 @@ function checkoutOverlay(labels: StripeCheckoutLabels): HTMLElement {
 }
 
 export async function openStripeCheckout(
-  intent: ClaudiumStripeIntent,
+  intent: CreditsStripeIntent,
   labels: StripeCheckoutLabels,
   options: StripeCheckoutOptions = {},
 ): Promise<void> {
@@ -121,7 +121,7 @@ export async function openStripeCheckout(
     checkout.mount('#stripe-checkout-mount');
   } catch (err) {
     console.warn(
-      '[claudium] Stripe checkout failed',
+      '[credits] Stripe checkout failed',
       err instanceof Error ? err.message : String(err),
     );
     const mount = overlay.querySelector<HTMLElement>('#stripe-checkout-mount');

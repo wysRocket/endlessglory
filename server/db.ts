@@ -1162,7 +1162,7 @@ export interface RequestMetadata {
 export interface AccountCosmetics {
   completedQuestIds: string[];
   mechChromaIds: string[];
-  // Season 1 Armory weapon skins: owned skin ids (granted on Claudium spend,
+  // Season 1 Armory weapon skins: owned skin ids (granted on Credits spend,
   // reconciled from the economy service) and the applied-skin-per-weapon-type
   // loadout. Account-wide by design; characters never carry either.
   weaponSkinIds: string[];

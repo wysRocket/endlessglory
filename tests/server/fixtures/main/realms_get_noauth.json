@@ -1,7 +1,7 @@
 {
   "body": "{\"characters\":{},\"current\":\"Endless Realm\",\"realms\":[{\"name\":\"Endless Realm\",\"type\":\"Normal\",\"url\":\"\"}]}",
   "headers": {
-    "content-length": 98,
+    "content-length": 104,
     "content-type": "application/json",
     "cross-origin-opener-policy": "same-origin",
     "cross-origin-resource-policy": "same-origin",

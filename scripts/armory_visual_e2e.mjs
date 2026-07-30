@@ -180,12 +180,12 @@ async function enter(page, user, charName, cls) {
 const pageA = await browser.newPage();
 await enter(pageA, `arm_${UNIQ}`, `Solbearer${UNIQ}`, 'warrior');
 
-// Credit Claudium straight into the dev ledger (no free-grant API by design).
+// Credit Credits straight into the dev ledger (no free-grant API by design).
 const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
 await db.connect();
 const acc = await db.query('SELECT id FROM accounts WHERE username = $1', [`arm_${UNIQ}`]);
 await db.query(
-  `INSERT INTO claudium_ledger (account_id, delta, reason, ref, idempotency_key, at_ms)
+  `INSERT INTO credits_ledger (account_id, delta, reason, ref, idempotency_key, at_ms)
    VALUES ($1, 20000, 'purchase', 'visual-e2e', $2, $3)`,
   [acc.rows[0].id, `visual-${UNIQ}`, Date.now()],
 );

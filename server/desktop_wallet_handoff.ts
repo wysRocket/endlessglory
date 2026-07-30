@@ -179,7 +179,7 @@ export function createDesktopWalletHandoffStore(
         !Number.isFinite(authorization.expiresAtMs) ||
         authorization.expiresAtMs <= now()
       ) {
-        throw handoffError('invalid Claudium transaction authorization');
+        throw handoffError('invalid Credits transaction authorization');
       }
       authorizedTransactions.set(transactionKey(accountId, authorization.reference), {
         accountId,
@@ -197,7 +197,7 @@ export function createDesktopWalletHandoffStore(
         authorization.expectedAddress !== request.expectedAddress ||
         authorization.expiresAtMs <= now()
       ) {
-        throw handoffError('transaction is not backed by an authorized Claudium quote');
+        throw handoffError('transaction is not backed by an authorized Credits quote');
       }
       return createEntry(
         accountId,

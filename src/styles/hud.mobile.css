@@ -2286,7 +2286,7 @@
     padding: 18px;
     background:
       linear-gradient(90deg, rgb(3 10 16 / 96%), rgb(4 17 27 / 76%)),
-      url("/claudium/claudium_coin_hero_3q.webp") 100% 50% / 190px auto no-repeat;
+      url("/credits/credits_coin_hero_3q.webp") 100% 50% / 190px auto no-repeat;
   }
   body.mobile-touch .woc-store-balance {
     width: min(190px, 100%);
@@ -2466,7 +2466,7 @@
   body.mobile-touch #loot-settings-window,
   body.mobile-touch #town-focus-window,
   body.mobile-touch #dev-command-window,
-  body.mobile-touch #claudium-window {
+  body.mobile-touch #credits-window {
     left: 10px;
     right: 10px;
     top: 10px;
@@ -2534,114 +2534,114 @@
   body.mobile-touch .dev-command-footer > span {
     display: none;
   }
-  body.mobile-touch #claudium-window .cl-body {
+  body.mobile-touch #credits-window .cl-body {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
     padding: 10px;
   }
-  body.mobile-touch #claudium-window .cl-balance {
+  body.mobile-touch #credits-window .cl-balance {
     grid-template-columns: 72px 1fr;
     gap: 10px;
     min-height: 86px;
     padding: 8px 12px 8px 6px;
   }
-  body.mobile-touch #claudium-window .cl-balance-art {
+  body.mobile-touch #credits-window .cl-balance-art {
     width: 72px;
     height: 70px;
   }
-  body.mobile-touch #claudium-window .cl-wallet-balances {
+  body.mobile-touch #credits-window .cl-wallet-balances {
     grid-column: 1 / -1;
     grid-template-columns: 1fr 1fr;
     justify-items: start;
   }
-  body.mobile-touch #claudium-window .cl-wallet-connect {
+  body.mobile-touch #credits-window .cl-wallet-connect {
     grid-template-columns: 1fr;
   }
-  body.mobile-touch #claudium-window .cl-wallet-connect button {
+  body.mobile-touch #credits-window .cl-wallet-connect button {
     grid-column: 1;
     grid-row: auto;
     min-height: 40px;
   }
-  body.mobile-touch #claudium-window .cl-rail {
+  body.mobile-touch #credits-window .cl-rail {
     min-height: 44px;
     padding: 7px 8px;
     font-size: 12px;
   }
-  body.mobile-touch #claudium-window .cl-sku-list {
+  body.mobile-touch #credits-window .cl-sku-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
-  body.mobile-touch #claudium-window .cl-sku {
+  body.mobile-touch #credits-window .cl-sku {
     min-height: 236px;
     padding: 0 8px 10px;
   }
-  body.mobile-touch #claudium-window .cl-pack-art {
+  body.mobile-touch #credits-window .cl-pack-art {
     min-height: 118px;
     margin: 0 -8px 4px;
   }
-  body.mobile-touch #claudium-window .cl-pack-art img {
+  body.mobile-touch #credits-window .cl-pack-art img {
     width: 112px;
     height: 108px;
   }
-  body.mobile-touch #claudium-window .cl-sku-buy {
+  body.mobile-touch #credits-window .cl-sku-buy {
     min-height: 40px;
   }
-  body.mobile-touch #claudium-window .cl-body {
+  body.mobile-touch #credits-window .cl-body {
     max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 78px);
     padding: 10px;
   }
-  body.mobile-touch #claudium-window .cl-balance {
+  body.mobile-touch #credits-window .cl-balance {
     grid-template-columns: 72px 1fr;
     gap: 10px;
     min-height: 86px;
     padding: 8px 12px 8px 6px;
   }
-  body.mobile-touch #claudium-window .cl-balance-art {
+  body.mobile-touch #credits-window .cl-balance-art {
     width: 72px;
     height: 70px;
   }
-  body.mobile-touch #claudium-window .cl-wallet-balances {
+  body.mobile-touch #credits-window .cl-wallet-balances {
     grid-column: 1 / -1;
     grid-template-columns: 1fr 1fr;
     justify-items: start;
   }
-  body.mobile-touch #claudium-window .cl-rail {
+  body.mobile-touch #credits-window .cl-rail {
     min-height: 44px;
     padding: 7px 8px;
     font-size: 12px;
   }
-  body.mobile-touch #claudium-window .cl-sku-list {
+  body.mobile-touch #credits-window .cl-sku-list {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 8px;
   }
-  body.mobile-touch #claudium-window .cl-sku {
+  body.mobile-touch #credits-window .cl-sku {
     min-height: 236px;
     padding: 0 8px 10px;
   }
-  body.mobile-touch #claudium-window .cl-pack-art {
+  body.mobile-touch #credits-window .cl-pack-art {
     min-height: 118px;
     margin: 0 -8px 4px;
   }
-  body.mobile-touch #claudium-window .cl-pack-art img {
+  body.mobile-touch #credits-window .cl-pack-art img {
     width: 112px;
     height: 108px;
   }
-  body.mobile-touch #claudium-window .cl-sku-buy {
+  body.mobile-touch #credits-window .cl-sku-buy {
     min-height: 40px;
   }
   @media (orientation: landscape) {
-    body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
+    body.mobile-touch #credits-window .cl-body:has(> .cl-wallet-connect) {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
       gap: 10px;
     }
     body.mobile-touch
-      #claudium-window
+      #credits-window
       .cl-body:has(> .cl-wallet-connect)
       > :not(.cl-balance, .cl-wallet-connect) {
       grid-column: 1 / -1;
     }
-    body.mobile-touch #claudium-window .cl-wallet-connect {
+    body.mobile-touch #credits-window .cl-wallet-connect {
       margin-top: 0;
     }
   }

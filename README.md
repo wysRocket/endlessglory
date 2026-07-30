@@ -52,7 +52,7 @@ Same seed, same world, everywhere. And almost nothing is a shipped asset: the to
 - **Full desktop apps for Windows, Linux, and macOS**, with native installers, automatic updates, and the same online world as the browser.
 - **Headless RL environment** with Gymnasium bindings, reward shaping, and a benchmark mode.
 - **$WOC utility, fully optional**: link a Solana wallet for holder flair, Daily Rewards, and a discounted payment option in the cosmetic store. The game remains free to play and non-custodial.
-- **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Claudium purchased with fiat, SOL, USDC, or $WOC. Cosmetics never provide combat power.
+- **Season 1 Armory**: collect cosmetic weapon skins through the WOC Store, using Credits purchased with fiat, SOL, USDC, or $WOC. Cosmetics never provide combat power.
 
 ## Screenshots
 
@@ -174,8 +174,8 @@ Endless Glory is web3-native around **$WOC**, our community token on Solana. Con
 
 $WOC also has optional utility in the live game:
 
-- **WOC Store**: buy Claudium, the one-way cosmetic currency, with fiat, SOL, USDC, or $WOC. The $WOC payment rail receives a service-quoted discount.
-- **Season 1 Armory**: spend Claudium on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
+- **WOC Store**: buy Credits, the one-way cosmetic currency, with fiat, SOL, USDC, or $WOC. The $WOC payment rail receives a service-quoted discount.
+- **Season 1 Armory**: spend Credits on cosmetic weapon-skin collections. Store purchases do not add stats or combat power.
 - **Daily Rewards**: eligible verified holders can earn points through a daily spin and rotating tasks, then compete for a share of the daily prize pool.
 
 None of this is needed to play. Wallet linking is optional and non-custodial, there is no pay-to-win, and the whole game plays fine without ever connecting a wallet.
@@ -244,7 +244,7 @@ Press `G` or the arena button to queue. Matchmaking teleports fighters into a pr
 - **Ravenpost mail**: send items and coin to other characters, with attachments held safely until claimed.
 - **Guilds**: charters, rosters, ranks, and guild chat.
 - **Daily Rewards**: verified $WOC holders can earn leaderboard points from a daily spin and rotating tasks, with automatic payouts from the daily prize pool.
-- **WOC Store and Season 1 Armory**: buy Claudium with fiat, SOL, USDC, or $WOC, then spend it on purely cosmetic weapon skins.
+- **WOC Store and Season 1 Armory**: buy Credits with fiat, SOL, USDC, or $WOC, then spend it on purely cosmetic weapon skins.
 - **Eating and drinking**: sit to restore over 18 seconds, broken by damage or standing, and yes, you can eat and drink at once.
 - **Vendors** that buy food and water and sell honest white gear, with coin shown in gold, silver, and copper.
 - **A personal bank** (the Gilded Strongbox): bursars in each hub town keep a vault per character, from 24 slots up to 96 with coin-bought expansions, plus bonus slots earned online for a verified email, linked accounts, and referrals.

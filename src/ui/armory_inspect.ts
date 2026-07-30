@@ -190,13 +190,13 @@ export class ArmoryInspect {
     const row = this.row;
     if (!host || !row) return;
     const price =
-      row.costClaudium === null
+      row.costCredits === null
         ? ''
-        : `<span class="armory-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">` +
-          `<strong>${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</strong></span>`;
+        : `<span class="armory-price"><img src="/credits/icons/credits_coin_64.webp" alt="">` +
+          `<strong>${formatNumber(row.costCredits, { maximumFractionDigits: 0 })}</strong></span>`;
     let actions = '';
     if (!row.owned) {
-      const canBuy = row.purchasable && row.costClaudium !== null;
+      const canBuy = row.purchasable && row.costCredits !== null;
       const label = canBuy ? t('hudChrome.wocStore.buySkin') : t('hudChrome.wocStore.unavailable');
       actions =
         `${price}<button type="button" class="armory-buy" data-armory-buy${canBuy ? '' : ' disabled'}>` +

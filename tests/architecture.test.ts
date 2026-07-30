@@ -156,7 +156,7 @@ const UI_PURE_CORES = [
   'src/ui/hud/vendor/heroic_vendor_view.ts',
   'src/ui/hud/vendor/train_view.ts',
   'src/ui/card_duel_view.ts',
-  'src/ui/claudium_view.ts',
+  'src/ui/credits_view.ts',
   'src/ui/woc_store_view.ts',
   'src/ui/wallet_connection_view.ts',
   'src/ui/hud/loot/loot_roll_status_view.ts',

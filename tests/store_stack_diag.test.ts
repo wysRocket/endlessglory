@@ -13,9 +13,9 @@ describe('StoreStackDiag', () => {
 
     // Assert
     expect(diag.trail()).toEqual([
-      { at: 1000, store: true, claudium: false, stacked: false },
-      { at: 2000, store: true, claudium: true, stacked: true },
-      { at: 3000, store: false, claudium: true, stacked: false },
+      { at: 1000, store: true, credits: false, stacked: false },
+      { at: 2000, store: true, credits: true, stacked: true },
+      { at: 3000, store: false, credits: true, stacked: false },
     ]);
   });
 

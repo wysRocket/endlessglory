@@ -100,7 +100,7 @@ import {
   desktopWalletManagerView,
   disconnectDesktopWalletSession,
 } from './net/desktop_wallet_manager';
-import { EconomyClient, newIdempotencyKey, startClaudiumPurchase } from './net/economy_sdk';
+import { EconomyClient, newIdempotencyKey, startCreditsPurchase } from './net/economy_sdk';
 // The wallet module is loaded lazily via dynamic import() in the wallet
 // controller below, so it stays out of the main entry chunk and only loads when
 // the feature is enabled + used.
@@ -194,7 +194,7 @@ import {
 import { deleteCharButtonHtml } from './ui/char_delete_button';
 import { ChatCommandMenu } from './ui/chat_command_menu';
 import { CLASS_DETAILS, SIGNATURE_ABILITIES } from './ui/class_details_data';
-import { claudiumBalanceAddress } from './ui/claudium_view';
+import { creditsBalanceAddress } from './ui/credits_view';
 import { ensureDeedLocalesLoaded } from './ui/deed_i18n';
 import { isDevGuiCommand } from './ui/dev_command_view';
 import { devTierByIndex, devTierDisplayName } from './ui/dev_tier';
@@ -216,7 +216,7 @@ import { renderDiscordWidget } from './ui/discord_widget';
 import { classDisplayName, tEntity } from './ui/entity_i18n';
 import { showEntryGuardBanner } from './ui/entry_guard_banner';
 import { FocusManager, type FocusTrapHandle } from './ui/focus_manager';
-import { type ClaudiumHooks, Hud } from './ui/hud';
+import { type CreditsHooks, Hud } from './ui/hud';
 import { resolveActionBarVisibility } from './ui/hud/action_bar/action_bar_visibility_core';
 import { chatInputSize } from './ui/hud/chat/chat_input_autosize';
 import { wireSkinPicker } from './ui/hud/cosmetics/skin_picker';
@@ -2027,9 +2027,9 @@ async function startGame(
         }),
     });
     // Native iOS and Android expose neither Daily Rewards nor the WOC Store.
-    // Every Claudium purchase surface stays absent until native billing is implemented.
-    // Claudium store, online only. The client SDK hits the game server's
-    // same-origin /api/claudium/* routes, which proxy to the economy service and
+    // Every Credits purchase surface stays absent until native billing is implemented.
+    // Credits store, online only. The client SDK hits the game server's
+    // same-origin /api/credits/* routes, which proxy to the economy service and
     // fail closed; the SDK itself returns typed unavailable states, never throws.
     // The game therefore boots and plays with the service OFF: snapshot() resolves
     // to the disabled state and the window renders its empty notice.
@@ -2054,7 +2054,7 @@ async function startGame(
       if (!cached || Date.now() - cached.atMs > nativePriceCacheTtlMs) return null;
       return cached.amountBase;
     };
-    const claudiumHooks: ClaudiumHooks = {
+    const creditsHooks: CreditsHooks = {
       balance: async () => (await economy.balance()).balance,
       storeSnapshot: async () => {
         const snapshot = await economy.storeSnapshot();
@@ -2102,8 +2102,8 @@ async function startGame(
         // every SOL/USDC/WOC buy button stays disabled (null balance => unaffordable). With
         // it the button enables on the linked balance; the buy click then surfaces the
         // existing "connect a wallet first" prompt so they connect to sign, instead of
-        // hitting a dead button. Selection pinned by tests/claudium_view.test.ts.
-        const walletAddress = claudiumBalanceAddress(
+        // hitting a dead button. Selection pinned by tests/credits_view.test.ts.
+        const walletAddress = creditsBalanceAddress(
           wallet.currentWallet().address,
           linkedWalletPubkey,
         );
@@ -2144,10 +2144,10 @@ async function startGame(
       },
       buy: async (rail, sku) => {
         await (async () => {
-          const refreshClaudiumLater = () => {
-            void hud.refreshClaudium();
+          const refreshCreditsLater = () => {
+            void hud.refreshCredits();
           };
-          const result = await startClaudiumPurchase(economy, rail, sku, {
+          const result = await startCreditsPurchase(economy, rail, sku, {
             nativePayer:
               desktopWalletBrowserHandoffAvailable() && linkedWalletPubkey
                 ? linkedWalletPubkey
@@ -2156,17 +2156,17 @@ async function startGame(
               openStripeCheckout(
                 intent,
                 {
-                  title: t('hudChrome.claudium.checkoutTitle'),
-                  close: t('hudChrome.claudium.checkoutClose'),
-                  loading: t('hudChrome.claudium.checkoutLoading'),
-                  failed: t('hudChrome.claudium.checkoutFailed'),
+                  title: t('hudChrome.credits.checkoutTitle'),
+                  close: t('hudChrome.credits.checkoutClose'),
+                  loading: t('hudChrome.credits.checkoutLoading'),
+                  failed: t('hudChrome.credits.checkoutFailed'),
                 },
                 {
                   onComplete: () => {
-                    refreshClaudiumLater();
-                    window.setTimeout(refreshClaudiumLater, 1500);
-                    window.setTimeout(refreshClaudiumLater, 4000);
-                    window.setTimeout(refreshClaudiumLater, 8000);
+                    refreshCreditsLater();
+                    window.setTimeout(refreshCreditsLater, 1500);
+                    window.setTimeout(refreshCreditsLater, 4000);
+                    window.setTimeout(refreshCreditsLater, 8000);
                   },
                 },
               ),
@@ -2190,44 +2190,44 @@ async function startGame(
             },
           });
           if ('ok' in result && !result.ok) {
-            throw new Error(t('hudChrome.claudium.checkoutUnavailable'));
+            throw new Error(t('hudChrome.credits.checkoutUnavailable'));
           }
           if ('settled' in result && result.settled) {
-            await hud.refreshClaudium();
-            window.setTimeout(refreshClaudiumLater, 1500);
+            await hud.refreshCredits();
+            window.setTimeout(refreshCreditsLater, 1500);
             return;
           }
           if ('settled' in result && !result.settled) {
-            throw new Error(t('hudChrome.claudium.checkoutNotSettled'));
+            throw new Error(t('hudChrome.credits.checkoutNotSettled'));
           }
         })().catch((err) => {
           const message = err instanceof Error ? err.message : '';
           if (/connect a wallet first/i.test(message)) {
-            throw new Error(t('hudChrome.claudium.checkoutWalletRequired'));
+            throw new Error(t('hudChrome.credits.checkoutWalletRequired'));
           }
           if (/wallet cannot sign and send transactions/i.test(message)) {
-            throw new Error(t('hudChrome.claudium.checkoutWalletUnsupported'));
+            throw new Error(t('hudChrome.credits.checkoutWalletUnsupported'));
           }
-          throw new Error(message || t('hudChrome.claudium.checkoutFailed'));
+          throw new Error(message || t('hudChrome.credits.checkoutFailed'));
         });
       },
-      spend: async (itemId, kind, expectedCostClaudium) => {
+      spend: async (itemId, kind, expectedCostCredits) => {
         const result = await economy.spend({
           itemId,
           kind,
-          expectedCostClaudium,
+          expectedCostCredits,
           idempotencyKey: newIdempotencyKey(),
         });
         return {
           granted: result.granted,
           balance: result.balance,
-          costClaudium: result.costClaudium,
+          costCredits: result.costCredits,
           reason: result.reason,
         };
       },
     };
     if (!NATIVE_APP) {
-      hud.attachClaudium(claudiumHooks);
+      hud.attachCredits(creditsHooks);
       if (
         shouldShowStorePromo({
           nativeApp: NATIVE_APP,

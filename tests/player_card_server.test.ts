@@ -815,13 +815,13 @@ describe('GET /p/<slug>', () => {
       const html = String(res.body);
       expect(res.statusCode).toBe(200);
       expect(html).toContain(
-        '<link rel="canonical" href="https://worldofclaudecraft.com/p/sir-test">',
+        '<link rel="canonical" href="https://endless-glory.vercel.app/p/sir-test">',
       );
       expect(html).toContain(
-        'property="og:url" content="https://worldofclaudecraft.com/p/sir-test"',
+        'property="og:url" content="https://endless-glory.vercel.app/p/sir-test"',
       );
       expect(html).toContain(
-        'property="og:image" content="https://worldofclaudecraft.com/p/sir-test/card.png"',
+        'property="og:image" content="https://endless-glory.vercel.app/p/sir-test/card.png"',
       );
       expect(html).toContain('src="/p/sir-test/card.png"');
       expect(html).toContain('href="/?ref=sir-test"');
@@ -830,7 +830,7 @@ describe('GET /p/<slug>', () => {
     });
   });
 
-  it('uses the trusted dev host in production mode instead of the production fallback', async () => {
+  it('matches the trusted production host header instead of falling through to the default', async () => {
     await withReloadedCardRoutes({ NODE_ENV: 'production' }, async (routes) => {
       cardRows = [
         { character_id: 5, account_id: 1, png: validCardPng, title: 't', description: 'd' },
@@ -838,20 +838,20 @@ describe('GET /p/<slug>', () => {
       const res = makeRes();
       await routes(
         makeGetReq('/p/sir-test', {
-          headers: { host: 'dev.worldofclaudecraft.com', 'x-forwarded-proto': 'https' },
+          headers: { host: 'endless-glory.vercel.app', 'x-forwarded-proto': 'https' },
         }),
         res,
       );
       const html = String(res.body);
       expect(res.statusCode).toBe(200);
       expect(html).toContain(
-        '<link rel="canonical" href="https://dev.worldofclaudecraft.com/p/sir-test">',
+        '<link rel="canonical" href="https://endless-glory.vercel.app/p/sir-test">',
       );
       expect(html).toContain(
-        'property="og:url" content="https://dev.worldofclaudecraft.com/p/sir-test"',
+        'property="og:url" content="https://endless-glory.vercel.app/p/sir-test"',
       );
       expect(html).toContain(
-        'property="og:image" content="https://dev.worldofclaudecraft.com/p/sir-test/card.png"',
+        'property="og:image" content="https://endless-glory.vercel.app/p/sir-test/card.png"',
       );
       expect(html).toContain('src="/p/sir-test/card.png"');
       expect(html).toContain('href="/?ref=sir-test"');

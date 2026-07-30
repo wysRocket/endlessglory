@@ -2446,8 +2446,8 @@ export class GameServer {
 
   /**
    * Mirror Season 1 Armory weapon-skin ownership into accounts.cosmetics and
-   * push it to any live session on the account. Injected into the Claudium
-   * spend/store routes via configureClaudiumRuntime (server/claudium.ts); the
+   * push it to any live session on the account. Injected into the Credits
+   * spend/store routes via configureCreditsRuntime (server/credits.ts); the
    * economy service's grant ledger stays the purchase source of truth.
    */
   grantWeaponSkinsToAccount(accountId: number, skinIds: string[]): void {

@@ -1,32 +1,32 @@
-// Pure, host-agnostic view model for the CLAUDIUM window.
+// Pure, host-agnostic view model for the CREDITS window.
 //
 // The pure-core half of the pure-core + thin-consumer split (root CLAUDE.md
-// Conventions; reference vendor_view.ts / stat_tooltip_view.ts). CLAUDIUM is a
+// Conventions; reference vendor_view.ts / stat_tooltip_view.ts). CREDITS is a
 // server-authoritative soft currency: the peg, prices, SKU credits, balance, and
 // purchase amounts ALL come from the economy service. This core recomputes NONE of
 // them; it only projects the service payloads into the render rows and the
 // per-rail availability the window paints. DOM-free and i18n-free so
-// tests/claudium_view.test.ts can drive it directly.
+// tests/credits_view.test.ts can drive it directly.
 //
 // The one non-negotiable: when the balance is null (the service is off) the model
 // is a clean disabled/empty state, NEVER an error crash.
 
-/** A price rung as returned by the service (usd + Claudium credited). */
-export interface ClaudiumSkuInput {
+/** A price rung as returned by the service (usd + Credits credited). */
+export interface CreditsSkuInput {
   sku: string;
   usd: number;
-  claudium: number;
+  credits: number;
   /** False when the Stripe price env var for this SKU is not configured. */
   stripeConfigured?: boolean;
 }
 
-export interface ClaudiumWalletBalancesInput {
+export interface CreditsWalletBalancesInput {
   solLamports: string | null;
   usdcBaseUnits: string | null;
   wocBaseUnits: string | null;
 }
 
-export interface ClaudiumNativeSkuPriceInput {
+export interface CreditsNativeSkuPriceInput {
   sku: string;
   solAmountBase?: string | null;
   usdcAmountBase?: string | null;
@@ -34,20 +34,20 @@ export interface ClaudiumNativeSkuPriceInput {
 }
 
 /** The raw inputs, all sourced from the service via the SDK. */
-export interface ClaudiumViewInput {
-  /** Integer Claudium balance, or null when the service is off. */
+export interface CreditsViewInput {
+  /** Integer Credits balance, or null when the service is off. */
   balance: number | null;
-  skus: readonly ClaudiumSkuInput[];
+  skus: readonly CreditsSkuInput[];
   nativeRails?: Partial<Record<'sol' | 'usdc' | 'woc', boolean>>;
-  walletBalances?: ClaudiumWalletBalancesInput;
-  nativePrices?: readonly ClaudiumNativeSkuPriceInput[];
+  walletBalances?: CreditsWalletBalancesInput;
+  nativePrices?: readonly CreditsNativeSkuPriceInput[];
 }
 
-/** One buy-picker row: the money label and the Claudium credited, both from the service. */
-export interface ClaudiumBuyRow {
+/** One buy-picker row: the money label and the Credits credited, both from the service. */
+export interface CreditsBuyRow {
   sku: string;
   usd: number;
-  claudium: number;
+  credits: number;
   stripeConfigured: boolean;
   solAffordable: boolean;
   usdcAffordable: boolean;
@@ -58,27 +58,27 @@ export interface ClaudiumBuyRow {
 }
 
 /** Which purchase rails the window may enable. */
-export interface ClaudiumRailAvailability {
+export interface CreditsRailAvailability {
   /** Stripe is available when there is at least one SKU rung to buy. */
   stripe: boolean;
   /** SOL is available when the native SOL rail is configured in the economy service. */
   sol: boolean;
   /** USDC is available when the stablecoin rail and SKU quote are both present. */
   usdc: boolean;
-  /** WOC is available only when the oracle price (base units per Claudium) is present. */
+  /** WOC is available only when the oracle price (base units per Credits) is present. */
   woc: boolean;
 }
 
-export interface ClaudiumView {
+export interface CreditsView {
   /** True when the service is off (balance null): render the disabled/empty state. */
   disabled: boolean;
   /** Whether a numeric balance is known (false in the disabled state). */
   hasBalance: boolean;
   /** The integer balance to render, or null in the disabled state. */
   balance: number | null;
-  walletBalances: ClaudiumWalletBalancesInput;
-  buyRows: ClaudiumBuyRow[];
-  rails: ClaudiumRailAvailability;
+  walletBalances: CreditsWalletBalancesInput;
+  buyRows: CreditsBuyRow[];
+  rails: CreditsRailAvailability;
   /** True when neither rail can transact (nothing to buy or oracle down + no skus). */
   buyDisabled: boolean;
 }
@@ -92,7 +92,7 @@ export interface ClaudiumView {
  * buy click then surfaces the existing "connect a wallet first" prompt to sign).
  * With neither, return null: the caller skips the balance reads entirely.
  */
-export function claudiumBalanceAddress(
+export function creditsBalanceAddress(
   connectedAddress: string | null,
   linkedWalletPubkey: string | null,
 ): string | null {
@@ -116,7 +116,7 @@ function affordable(balance: string | null | undefined, cost: string | null | un
  * Funded state: buy rows mirror the SKU ladder verbatim. Card is available when
  * its configured SKU ladder is non-empty; each native rail also requires a quote.
  */
-export function buildClaudiumView(input: ClaudiumViewInput): ClaudiumView {
+export function buildCreditsView(input: CreditsViewInput): CreditsView {
   if (input.balance === null) {
     return {
       disabled: true,
@@ -136,10 +136,10 @@ export function buildClaudiumView(input: ClaudiumViewInput): ClaudiumView {
     usdcBaseUnits: null,
     wocBaseUnits: null,
   };
-  const buyRows: ClaudiumBuyRow[] = input.skus.map((s) => ({
+  const buyRows: CreditsBuyRow[] = input.skus.map((s) => ({
     sku: s.sku,
     usd: s.usd,
-    claudium: s.claudium,
+    credits: s.credits,
     stripeConfigured: s.stripeConfigured !== false,
     solAmountBase: nativePriceBySku.get(s.sku)?.solAmountBase ?? null,
     usdcAmountBase: nativePriceBySku.get(s.sku)?.usdcAmountBase ?? null,

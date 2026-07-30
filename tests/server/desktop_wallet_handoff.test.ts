@@ -165,7 +165,7 @@ describe('desktop wallet handoff store', () => {
         reference: 'CLM_missing',
         expectedAddress: 'expected-wallet',
       }),
-    ).toThrow('authorized Claudium quote');
+    ).toThrow('authorized Credits quote');
 
     store.authorizeTransaction(9, {
       reference: 'CLM_expiring',
@@ -183,7 +183,7 @@ describe('desktop wallet handoff store', () => {
         reference: 'CLM_expiring',
         expectedAddress: 'expected-wallet',
       }),
-    ).toThrow('authorized Claudium quote');
+    ).toThrow('authorized Credits quote');
   });
 
   it('never lets a transaction handoff outlive its authorized quote', () => {

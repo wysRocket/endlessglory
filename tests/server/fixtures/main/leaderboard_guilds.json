@@ -1,7 +1,7 @@
 {
   "body": "{\"board\":\"guilds\",\"leaders\":[],\"metric\":\"guildLifetimeXp\",\"page\":0,\"pageCount\":1,\"pageSize\":50,\"realm\":\"Endless Realm\",\"scope\":\"realm\",\"total\":0}",
   "headers": {
-    "content-length": 142,
+    "content-length": 145,
     "content-type": "application/json",
     "cross-origin-opener-policy": "same-origin",
     "cross-origin-resource-policy": "same-origin",

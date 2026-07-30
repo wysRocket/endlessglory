@@ -1,6 +1,6 @@
-// Client-side typed fetch wrapper for the CLAUDIUM economy surface.
+// Client-side typed fetch wrapper for the CREDITS economy surface.
 //
-// Same-origin only: it talks to the GAME server's /api/claudium/* routes (never
+// Same-origin only: it talks to the GAME server's /api/credits/* routes (never
 // the economy service directly). Those routes proxy to the service and already
 // fail closed, so this layer only has to survive a network hiccup or a logged-out
 // caller. It NEVER throws into render: every failure resolves to the same typed
@@ -9,55 +9,55 @@
 
 import { apiUrl } from './online';
 
-export type ClaudiumRail = 'stripe' | 'sol' | 'usdc' | 'woc';
-export type ClaudiumPriceRail = 'stripe' | 'woc';
-export type ClaudiumNativeRail = 'sol' | 'usdc' | 'woc';
+export type CreditsRail = 'stripe' | 'sol' | 'usdc' | 'woc';
+export type CreditsPriceRail = 'stripe' | 'woc';
+export type CreditsNativeRail = 'sol' | 'usdc' | 'woc';
 
-export interface ClaudiumBalance {
+export interface CreditsBalance {
   available?: boolean;
   balance: number | null;
 }
 
-export interface ClaudiumPrice {
+export interface CreditsPrice {
   rail: string;
-  usdPerClaudium: number | null;
-  wocBaseUnitsPerClaudium: string | null;
+  usdPerCredits: number | null;
+  wocBaseUnitsPerCredits: string | null;
 }
 
-export interface ClaudiumSku {
+export interface CreditsSku {
   sku: string;
   usd: number;
-  claudium: number;
+  credits: number;
   stripeConfigured?: boolean;
 }
 
-export interface ClaudiumStoreItem {
+export interface CreditsStoreItem {
   itemId: string;
   name: string;
   kind: 'cosmetic' | 'skin' | 'item';
-  costClaudium: number;
+  costCredits: number;
   owned: boolean;
 }
 
-export interface ClaudiumStoreSnapshot {
+export interface CreditsStoreSnapshot {
   available: boolean;
   balance: number | null;
-  items: ClaudiumStoreItem[];
+  items: CreditsStoreItem[];
 }
 
-export interface ClaudiumPackSnapshot {
+export interface CreditsPackSnapshot {
   available: boolean;
   balance: number | null;
-  skus: ClaudiumSku[];
-  nativeRails: Record<ClaudiumNativeRail, boolean>;
+  skus: CreditsSku[];
+  nativeRails: Record<CreditsNativeRail, boolean>;
 }
 
-export interface ClaudiumStripeIntent {
+export interface CreditsStripeIntent {
   clientSecret: string;
   publishableKey: string;
 }
 
-export interface ClaudiumWocIntent {
+export interface CreditsWocIntent {
   amountBase: string;
   burnBase: string;
   treasuryBase: string;
@@ -66,43 +66,43 @@ export interface ClaudiumWocIntent {
   expiresAtMs: number;
 }
 
-export interface ClaudiumPurchase {
+export interface CreditsPurchase {
   ok: boolean;
   purchaseId: string | null;
-  rail: ClaudiumRail | null;
-  claudium: number | null;
-  stripe: ClaudiumStripeIntent | null;
-  woc: ClaudiumWocIntent | null;
+  rail: CreditsRail | null;
+  credits: number | null;
+  stripe: CreditsStripeIntent | null;
+  woc: CreditsWocIntent | null;
   reason: string | null;
 }
 
-export interface ClaudiumNativeRails {
+export interface CreditsNativeRails {
   available?: boolean;
-  rails: Record<ClaudiumNativeRail, boolean>;
+  rails: Record<CreditsNativeRail, boolean>;
 }
 
-export interface ClaudiumNativePrice {
-  rail: ClaudiumNativeRail;
-  claudium: number | null;
+export interface CreditsNativePrice {
+  rail: CreditsNativeRail;
+  credits: number | null;
   amountBase: string | null;
   reason?: string;
 }
 
-export interface ClaudiumSolBalance {
+export interface CreditsSolBalance {
   owner: string;
   lamports: string | null;
 }
 
-export interface ClaudiumUsdcBalance {
+export interface CreditsUsdcBalance {
   owner: string;
   amountBase: string | null;
 }
 
-export interface ClaudiumNativeQuote {
+export interface CreditsNativeQuote {
   ok: boolean;
   reference: string | null;
-  rail: ClaudiumNativeRail | null;
-  claudium: number | null;
+  rail: CreditsNativeRail | null;
+  credits: number | null;
   amountBase: string | null;
   destination: string | null;
   mint: string | null;
@@ -112,16 +112,16 @@ export interface ClaudiumNativeQuote {
   reason: string | null;
 }
 
-export interface ClaudiumNativeConfirm {
+export interface CreditsNativeConfirm {
   settled: boolean;
   balance: number | null;
   reason: string | null;
 }
 
-export interface ClaudiumSpend {
+export interface CreditsSpend {
   granted: boolean;
   balance: number | null;
-  costClaudium: number | null;
+  costCredits: number | null;
   reason: string | null;
 }
 
@@ -131,32 +131,32 @@ export interface EconomyClientConfig {
   base?: string;
 }
 
-const OFF_BALANCE: ClaudiumBalance = { available: false, balance: null };
-const OFF_PRICE = (rail: string): ClaudiumPrice => ({
+const OFF_BALANCE: CreditsBalance = { available: false, balance: null };
+const OFF_PRICE = (rail: string): CreditsPrice => ({
   rail,
-  usdPerClaudium: null,
-  wocBaseUnitsPerClaudium: null,
+  usdPerCredits: null,
+  wocBaseUnitsPerCredits: null,
 });
-const OFF_SKUS: ClaudiumSku[] = [];
-const OFF_STORE: ClaudiumStoreItem[] = [];
-const OFF_NATIVE_RAILS: ClaudiumNativeRails = {
+const OFF_SKUS: CreditsSku[] = [];
+const OFF_STORE: CreditsStoreItem[] = [];
+const OFF_NATIVE_RAILS: CreditsNativeRails = {
   available: false,
   rails: { sol: false, usdc: false, woc: false },
 };
-const OFF_PURCHASE: ClaudiumPurchase = {
+const OFF_PURCHASE: CreditsPurchase = {
   ok: false,
   purchaseId: null,
   rail: null,
-  claudium: null,
+  credits: null,
   stripe: null,
   woc: null,
   reason: 'unavailable',
 };
-const OFF_NATIVE_QUOTE: ClaudiumNativeQuote = {
+const OFF_NATIVE_QUOTE: CreditsNativeQuote = {
   ok: false,
   reference: null,
   rail: null,
-  claudium: null,
+  credits: null,
   amountBase: null,
   destination: null,
   mint: null,
@@ -165,15 +165,15 @@ const OFF_NATIVE_QUOTE: ClaudiumNativeQuote = {
   transactionBase64: null,
   reason: 'unavailable',
 };
-const OFF_NATIVE_CONFIRM: ClaudiumNativeConfirm = {
+const OFF_NATIVE_CONFIRM: CreditsNativeConfirm = {
   settled: false,
   balance: null,
   reason: 'unavailable',
 };
-const OFF_SPEND: ClaudiumSpend = {
+const OFF_SPEND: CreditsSpend = {
   granted: false,
   balance: null,
-  costClaudium: null,
+  costCredits: null,
   reason: 'unavailable',
 };
 
@@ -232,26 +232,26 @@ export class EconomyClient {
     }
   }
 
-  balance(): Promise<ClaudiumBalance> {
-    return this.get('/api/claudium/balance', OFF_BALANCE);
+  balance(): Promise<CreditsBalance> {
+    return this.get('/api/credits/balance', OFF_BALANCE);
   }
 
-  price(rail: ClaudiumPriceRail): Promise<ClaudiumPrice> {
-    return this.get(`/api/claudium/price/${rail}`, OFF_PRICE(rail));
+  price(rail: CreditsPriceRail): Promise<CreditsPrice> {
+    return this.get(`/api/credits/price/${rail}`, OFF_PRICE(rail));
   }
 
-  skus(): Promise<ClaudiumSku[]> {
-    return this.get('/api/claudium/skus', { skus: OFF_SKUS }).then((r) => r.skus ?? OFF_SKUS);
+  skus(): Promise<CreditsSku[]> {
+    return this.get('/api/credits/skus', { skus: OFF_SKUS }).then((r) => r.skus ?? OFF_SKUS);
   }
 
-  store(): Promise<ClaudiumStoreItem[]> {
-    return this.get('/api/claudium/store', { items: OFF_STORE }).then((r) => r.items ?? OFF_STORE);
+  store(): Promise<CreditsStoreItem[]> {
+    return this.get('/api/credits/store', { items: OFF_STORE }).then((r) => r.items ?? OFF_STORE);
   }
 
-  async storeSnapshot(): Promise<ClaudiumStoreSnapshot> {
+  async storeSnapshot(): Promise<CreditsStoreSnapshot> {
     const [balance, store] = await Promise.all([
-      this.getResult('/api/claudium/balance', OFF_BALANCE),
-      this.getResult<{ available?: boolean; items: ClaudiumStoreItem[] }>('/api/claudium/store', {
+      this.getResult('/api/credits/balance', OFF_BALANCE),
+      this.getResult<{ available?: boolean; items: CreditsStoreItem[] }>('/api/credits/store', {
         available: false,
         items: OFF_STORE,
       }),
@@ -267,14 +267,14 @@ export class EconomyClient {
     };
   }
 
-  async packSnapshot(): Promise<ClaudiumPackSnapshot> {
+  async packSnapshot(): Promise<CreditsPackSnapshot> {
     const [balance, skus, nativeRails] = await Promise.all([
-      this.getResult('/api/claudium/balance', OFF_BALANCE),
-      this.getResult<{ available?: boolean; skus: ClaudiumSku[] }>('/api/claudium/skus', {
+      this.getResult('/api/credits/balance', OFF_BALANCE),
+      this.getResult<{ available?: boolean; skus: CreditsSku[] }>('/api/credits/skus', {
         available: false,
         skus: OFF_SKUS,
       }),
-      this.getResult('/api/claudium/native/rails', OFF_NATIVE_RAILS),
+      this.getResult('/api/credits/native/rails', OFF_NATIVE_RAILS),
     ]);
     return {
       available:
@@ -290,28 +290,28 @@ export class EconomyClient {
     };
   }
 
-  nativeRails(): Promise<ClaudiumNativeRails> {
-    return this.get('/api/claudium/native/rails', OFF_NATIVE_RAILS);
+  nativeRails(): Promise<CreditsNativeRails> {
+    return this.get('/api/credits/native/rails', OFF_NATIVE_RAILS);
   }
 
-  nativePrice(rail: ClaudiumNativeRail, sku: string): Promise<ClaudiumNativePrice> {
-    return this.get(`/api/claudium/native/price/${rail}?sku=${encodeURIComponent(sku)}`, {
+  nativePrice(rail: CreditsNativeRail, sku: string): Promise<CreditsNativePrice> {
+    return this.get(`/api/credits/native/price/${rail}?sku=${encodeURIComponent(sku)}`, {
       rail,
-      claudium: null,
+      credits: null,
       amountBase: null,
       reason: 'unavailable',
     });
   }
 
-  solBalance(owner: string): Promise<ClaudiumSolBalance> {
-    return this.get(`/api/claudium/native/balance/sol/${encodeURIComponent(owner)}`, {
+  solBalance(owner: string): Promise<CreditsSolBalance> {
+    return this.get(`/api/credits/native/balance/sol/${encodeURIComponent(owner)}`, {
       owner,
       lamports: null,
     });
   }
 
-  usdcBalance(owner: string): Promise<ClaudiumUsdcBalance> {
-    return this.get(`/api/claudium/native/balance/usdc/${encodeURIComponent(owner)}`, {
+  usdcBalance(owner: string): Promise<CreditsUsdcBalance> {
+    return this.get(`/api/credits/native/balance/usdc/${encodeURIComponent(owner)}`, {
       owner,
       amountBase: null,
     });
@@ -321,29 +321,29 @@ export class EconomyClient {
     rail: 'stripe';
     sku: string;
     idempotencyKey: string;
-  }): Promise<ClaudiumPurchase> {
-    return this.post('/api/claudium/purchase', input, OFF_PURCHASE);
+  }): Promise<CreditsPurchase> {
+    return this.post('/api/credits/purchase', input, OFF_PURCHASE);
   }
 
   nativeQuote(input: {
-    rail: ClaudiumNativeRail;
+    rail: CreditsNativeRail;
     sku: string;
     payer: string;
-  }): Promise<ClaudiumNativeQuote> {
-    return this.post('/api/claudium/native/quote', input, OFF_NATIVE_QUOTE);
+  }): Promise<CreditsNativeQuote> {
+    return this.post('/api/credits/native/quote', input, OFF_NATIVE_QUOTE);
   }
 
-  nativeConfirm(input: { reference: string; signature: string }): Promise<ClaudiumNativeConfirm> {
-    return this.post('/api/claudium/native/confirm', input, OFF_NATIVE_CONFIRM);
+  nativeConfirm(input: { reference: string; signature: string }): Promise<CreditsNativeConfirm> {
+    return this.post('/api/credits/native/confirm', input, OFF_NATIVE_CONFIRM);
   }
 
   spend(input: {
     itemId: string;
     kind: 'cosmetic' | 'skin' | 'item';
-    expectedCostClaudium: number;
+    expectedCostCredits: number;
     idempotencyKey: string;
-  }): Promise<ClaudiumSpend> {
-    return this.post('/api/claudium/spend', input, OFF_SPEND);
+  }): Promise<CreditsSpend> {
+    return this.post('/api/credits/spend', input, OFF_SPEND);
   }
 }
 
@@ -358,7 +358,7 @@ function delayMs(ms: number): Promise<void> {
   return new Promise((resolve) => window.setTimeout(resolve, ms));
 }
 
-function shouldRetryNativeConfirm(result: ClaudiumNativeConfirm): boolean {
+function shouldRetryNativeConfirm(result: CreditsNativeConfirm): boolean {
   return !result.settled && NATIVE_CONFIRM_RETRY_REASONS.has(result.reason ?? '');
 }
 
@@ -367,7 +367,7 @@ export async function confirmNativeSettlement(
   reference: string,
   signature: string,
   opts: NativeConfirmRetryOptions = {},
-): Promise<ClaudiumNativeConfirm> {
+): Promise<CreditsNativeConfirm> {
   const wait = opts.delayMs ?? delayMs;
   const now = opts.nowMs ?? (() => Date.now());
   const maxElapsedMs = opts.maxElapsedMs ?? NATIVE_CONFIRM_MAX_RETRY_MS;
@@ -403,12 +403,12 @@ export async function confirmNativeSettlement(
  * - nativeSignAndSend: sign and send the service-built SOL, USDC, or WOC transaction,
  *   returning its signature to post to nativeConfirm. Needs a live wallet.
  */
-export interface ClaudiumSigners {
-  stripe?(intent: ClaudiumStripeIntent, purchaseId: string): Promise<void>;
+export interface CreditsSigners {
+  stripe?(intent: CreditsStripeIntent, purchaseId: string): Promise<void>;
   nativePayer?: string | null;
   nativeSignAndSend?(
     transactionBase64: string,
-    rail: ClaudiumNativeRail,
+    rail: CreditsNativeRail,
     reference: string,
   ): Promise<string>;
 }
@@ -419,12 +419,12 @@ export interface ClaudiumSigners {
  * credit; it only sequences the SDK calls. If the service is off (ok:false) or the
  * needed signer is not wired, it returns without charging anything.
  */
-export async function startClaudiumPurchase(
+export async function startCreditsPurchase(
   client: EconomyClient,
-  rail: ClaudiumRail,
+  rail: CreditsRail,
   sku: string,
-  signers: ClaudiumSigners = {},
-): Promise<ClaudiumPurchase | ClaudiumNativeQuote | ClaudiumNativeConfirm> {
+  signers: CreditsSigners = {},
+): Promise<CreditsPurchase | CreditsNativeQuote | CreditsNativeConfirm> {
   if (rail === 'stripe') {
     const purchase = await client.purchase({ rail, sku, idempotencyKey: newIdempotencyKey() });
     if (!purchase.ok || !purchase.purchaseId) return purchase;

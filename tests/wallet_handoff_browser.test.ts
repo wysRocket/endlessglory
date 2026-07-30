@@ -76,7 +76,7 @@ afterEach(() => {
 });
 
 describe('desktop browser wallet handoff options', () => {
-  it('offers message-only wallets for linking but not for Claudium transactions', () => {
+  it('offers message-only wallets for linking but not for Credits transactions', () => {
     registerWallet('Message Wallet', false);
     registerWallet('Transaction Wallet', true);
 

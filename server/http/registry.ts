@@ -26,7 +26,7 @@ import { routes as adminRoutes } from '../admin';
 import { routes as appleAuthRoutes } from '../apple_auth';
 import { routes as authRoutes } from '../auth_routes';
 import { routes as characterRoutes } from '../characters';
-import { routes as claudiumRoutes } from '../claudium';
+import { routes as creditsRoutes } from '../credits';
 import { routes as dailyRewardRoutes } from '../daily_rewards';
 import { routes as deedsRoutes } from '../deeds';
 import { routes as desktopLoginRoutes } from '../desktop_login_routes';
@@ -125,7 +125,7 @@ export const apiRoutes: readonly RouteDef[] = [
   ...discordRoutes,
   ...githubRoutes,
   ...desktopLoginRoutes,
-  ...claudiumRoutes,
+  ...creditsRoutes,
   ...dailyRewardRoutes,
   ...mapsRoutes,
   ...userAssetsRoutes,

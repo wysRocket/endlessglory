@@ -259,11 +259,11 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     const root = rootStub();
     const dialog: { body: string; onOk?: () => void } = { body: '' };
     const order: string[] = [];
-    const openClaudium = vi.fn(() => order.push('claudium'));
+    const openCredits = vi.fn(() => order.push('credits'));
     const spendStoreItem = vi.fn(async () => ({
       granted: false,
       balance: 100,
-      costClaudium: 1_000,
+      costCredits: 1_000,
       reason: 'insufficient_balance',
     }));
     const window = new DailyRewardsWindow({
@@ -273,7 +273,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
       captureFocus: () => null,
       restoreFocus: () => undefined,
       spendStoreItem,
-      openClaudium,
+      openCredits,
       confirmDialog: (_title, body, _ok, _cancel, onOk) => {
         dialog.body = body;
         dialog.onOk = onOk;
@@ -281,7 +281,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     });
     const row = {
       skin: WEAPON_SKINS.cinderbrand_sword,
-      costClaudium: 200,
+      costCredits: 200,
     } as ArmorySkinRow;
     Object.assign(window as unknown as Record<string, unknown>, {
       armoryInspect: { close: () => order.push('inspect') },
@@ -297,8 +297,8 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     expect(dialog.body).toContain('Cinderbrand');
     expect(dialog.onOk).toBeTypeOf('function');
     dialog.onOk?.();
-    expect(openClaudium).toHaveBeenCalledOnce();
-    expect(order).toEqual(['inspect', 'claudium']);
+    expect(openCredits).toHaveBeenCalledOnce();
+    expect(order).toEqual(['inspect', 'credits']);
   });
 
   it('refreshes and requires a new confirmation when the service price changed', async () => {
@@ -306,7 +306,7 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     const spendStoreItem = vi.fn(async () => ({
       granted: false,
       balance: 2_000,
-      costClaudium: 1_000,
+      costCredits: 1_000,
       reason: 'price_changed',
     }));
     const window = new DailyRewardsWindow({
@@ -320,12 +320,12 @@ describe('DailyRewardsWindow store refresh behavior', () => {
     });
     const original = {
       skin: WEAPON_SKINS.cinderbrand_sword,
-      costClaudium: 200,
+      costCredits: 200,
       purchasable: true,
       owned: false,
       affordable: true,
     } as ArmorySkinRow;
-    const current = { ...original, costClaudium: 1_000 } as ArmorySkinRow;
+    const current = { ...original, costCredits: 1_000 } as ArmorySkinRow;
     Object.assign(window as unknown as Record<string, unknown>, {
       armorySections: [],
       renderStore: async () => {

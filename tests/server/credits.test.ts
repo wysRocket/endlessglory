@@ -1,4 +1,4 @@
-process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_claudium_routes';
+process.env.DATABASE_URL ||= 'postgres://test:test@127.0.0.1:5433/wocc_credits_routes';
 
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
@@ -14,68 +14,68 @@ vi.mock('../../server/db', () => ({
   scopeAllowsMutation: vi.fn(() => true),
 }));
 
-vi.mock('../../server/claudium_proxy', async (importActual) => {
-  const actual = await importActual<typeof import('../../server/claudium_proxy')>();
+vi.mock('../../server/credits_proxy', async (importActual) => {
+  const actual = await importActual<typeof import('../../server/credits_proxy')>();
   return {
     ...actual,
-    claudiumSpend: vi.fn(),
-    claudiumStore: vi.fn(),
+    creditsSpend: vi.fn(),
+    creditsStore: vi.fn(),
   };
 });
 
 import {
-  claudiumPreAuthMutationRateLimited,
-  configureClaudiumRuntime,
-  handleClaudiumApi,
-  resetClaudiumDbForTests,
+  creditsPreAuthMutationRateLimited,
+  configureCreditsRuntime,
+  handleCreditsApi,
+  resetCreditsDbForTests,
   routes,
-  setClaudiumDbForTests,
-} from '../../server/claudium';
-import { claudiumSpend, claudiumStore, claudiumStripeWebhook } from '../../server/claudium_proxy';
+  setCreditsDbForTests,
+} from '../../server/credits';
+import { creditsSpend, creditsStore, creditsStripeWebhook } from '../../server/credits_proxy';
 import { desktopWalletHandoffs } from '../../server/desktop_wallet_handoff';
 import { compose } from '../../server/http/compose';
 import {
-  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
-  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
-  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
-  CLAUDIUM_SPEND_MAX_PER_MINUTE,
-  resetClaudiumMutationRateLimits,
+  CREDITS_CONFIRM_MAX_PER_MINUTE,
+  CREDITS_PURCHASE_MAX_PER_MINUTE,
+  CREDITS_QUOTE_MAX_PER_MINUTE,
+  CREDITS_SPEND_MAX_PER_MINUTE,
+  resetCreditsMutationRateLimits,
 } from '../../server/ratelimit';
 import { FakeRes, fakeCtx, makeReq } from './helpers';
 
-const spendMock = vi.mocked(claudiumSpend);
-const storeMock = vi.mocked(claudiumStore);
+const spendMock = vi.mocked(creditsSpend);
+const storeMock = vi.mocked(creditsStore);
 const grantWeaponSkins = vi.fn();
 
 const MONETARY_MUTATION_ROUTES = [
   {
-    path: '/api/claudium/purchase',
-    limit: CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+    path: '/api/credits/purchase',
+    limit: CREDITS_PURCHASE_MAX_PER_MINUTE,
   },
   {
-    path: '/api/claudium/native/quote',
-    limit: CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+    path: '/api/credits/native/quote',
+    limit: CREDITS_QUOTE_MAX_PER_MINUTE,
   },
   {
-    path: '/api/claudium/native/confirm',
-    limit: CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+    path: '/api/credits/native/confirm',
+    limit: CREDITS_CONFIRM_MAX_PER_MINUTE,
   },
   {
-    path: '/api/claudium/spend',
-    limit: CLAUDIUM_SPEND_MAX_PER_MINUTE,
+    path: '/api/credits/spend',
+    limit: CREDITS_SPEND_MAX_PER_MINUTE,
   },
 ] as const;
 
 beforeEach(() => {
   vi.clearAllMocks();
-  resetClaudiumMutationRateLimits();
-  configureClaudiumRuntime({ grantWeaponSkins });
+  resetCreditsMutationRateLimits();
+  configureCreditsRuntime({ grantWeaponSkins });
 });
 
 afterEach(() => {
   desktopWalletHandoffs.clear();
-  resetClaudiumDbForTests();
-  resetClaudiumMutationRateLimits();
+  resetCreditsDbForTests();
+  resetCreditsMutationRateLimits();
   vi.unstubAllEnvs();
   vi.unstubAllGlobals();
 });
@@ -84,22 +84,22 @@ function responseJson(res: FakeRes): unknown {
   return JSON.parse(res.body);
 }
 
-describe('Claudium spend entitlement mirroring', () => {
+describe('Credits spend entitlement mirroring', () => {
   it('does not advertise the legacy SOL price route that the service does not expose', async () => {
     const fetchMock = vi.fn();
     vi.stubGlobal('fetch', fetchMock);
     const res = new FakeRes();
 
-    await handleClaudiumApi(
-      makeReq({ method: 'GET', url: '/api/claudium/price/sol' }),
+    await handleCreditsApi(
+      makeReq({ method: 'GET', url: '/api/credits/price/sol' }),
       res as never,
       7,
     );
 
     expect(responseJson(res)).toEqual({
       rail: '',
-      usdPerClaudium: null,
-      wocBaseUnitsPerClaudium: null,
+      usdPerCredit: null,
+      wocBaseUnitsPerCredit: null,
     });
     expect(fetchMock).not.toHaveBeenCalled();
   });
@@ -115,7 +115,7 @@ describe('Claudium spend entitlement mirroring', () => {
     'limits invalid-token floods on $path before they can perform unlimited DB reads',
     async ({ path, limit }) => {
       const accountAndScopeForToken = vi.fn(async () => null);
-      setClaudiumDbForTests({ accountAndScopeForToken });
+      setCreditsDbForTests({ accountAndScopeForToken });
       const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
       if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
       const runMiddleware = compose([...route.middleware]);
@@ -148,7 +148,7 @@ describe('Claudium spend entitlement mirroring', () => {
         scope: 'full' as const,
       }));
       const moderationStatusForAccount = vi.fn(async () => ({ locked: false }) as never);
-      setClaudiumDbForTests({ accountAndScopeForToken, moderationStatusForAccount });
+      setCreditsDbForTests({ accountAndScopeForToken, moderationStatusForAccount });
       const route = routes.find((entry) => entry.method === 'POST' && entry.path === path);
       if (!route?.middleware) throw new Error(`missing mutation middleware for ${path}`);
       const runMiddleware = compose([...route.middleware]);
@@ -186,7 +186,7 @@ describe('Claudium spend entitlement mirroring', () => {
     async ({ path, limit }) => {
       const resolveBearer = vi.fn(async () => undefined);
       const attempt = async (): Promise<boolean> => {
-        const outcome = claudiumPreAuthMutationRateLimited(
+        const outcome = creditsPreAuthMutationRateLimited(
           makeReq({
             method: 'POST',
             url: path,
@@ -212,36 +212,36 @@ describe('Claudium spend entitlement mirroring', () => {
           itemId: 'guildmark_arming_sword',
           name: 'Guildmark Arming Sword',
           kind: 'skin',
-          costClaudium: 200,
+          costCredits: 200,
           owned: false,
         },
         {
           itemId: 'retired_placeholder_hat',
           name: 'Retired Placeholder Hat',
           kind: 'cosmetic',
-          costClaudium: 10,
+          costCredits: 10,
           owned: false,
         },
         {
           itemId: 'unknown_weapon_skin',
           name: 'Unknown Weapon Skin',
           kind: 'skin',
-          costClaudium: 10,
+          costCredits: 10,
           owned: false,
         },
         {
           itemId: '__proto__',
           name: 'Prototype Pollution Skin',
           kind: 'skin',
-          costClaudium: 10,
+          costCredits: 10,
           owned: false,
         },
       ],
     });
     const res = new FakeRes();
 
-    await handleClaudiumApi(
-      makeReq({ method: 'GET', url: '/api/claudium/store' }),
+    await handleCreditsApi(
+      makeReq({ method: 'GET', url: '/api/credits/store' }),
       res as never,
       7,
     );
@@ -253,7 +253,7 @@ describe('Claudium spend entitlement mirroring', () => {
           itemId: 'guildmark_arming_sword',
           name: 'Guildmark Arming Sword',
           kind: 'skin',
-          costClaudium: 200,
+          costCredits: 200,
           owned: false,
         },
       ],
@@ -264,14 +264,14 @@ describe('Claudium spend entitlement mirroring', () => {
     { itemId: 'guildmark_arming_sword', kind: 'item' },
     { itemId: 'retired_placeholder_hat', kind: 'skin' },
     { itemId: '__proto__', kind: 'skin' },
-  ])('rejects unsupported store spend $itemId/$kind before debiting Claudium', async (body) => {
+  ])('rejects unsupported store spend $itemId/$kind before debiting Credits', async (body) => {
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/spend',
-        body: { ...body, expectedCostClaudium: 200, idempotencyKey: 'unsupported-key' },
+        url: '/api/credits/spend',
+        body: { ...body, expectedCostCredits: 200, idempotencyKey: 'unsupported-key' },
       }),
       res as never,
       7,
@@ -280,7 +280,7 @@ describe('Claudium spend entitlement mirroring', () => {
     expect(responseJson(res)).toEqual({
       granted: false,
       balance: null,
-      costClaudium: null,
+      costCredits: null,
       reason: 'unknown_item',
     });
     expect(spendMock).not.toHaveBeenCalled();
@@ -289,14 +289,14 @@ describe('Claudium spend entitlement mirroring', () => {
   it('rejects a string expected cost before calling the monetary service', async () => {
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/spend',
+        url: '/api/credits/spend',
         body: {
           itemId: 'guildmark_arming_sword',
           kind: 'skin',
-          expectedCostClaudium: '200',
+          expectedCostCredits: '200',
           idempotencyKey: 'string-cost-key',
         },
       }),
@@ -307,7 +307,7 @@ describe('Claudium spend entitlement mirroring', () => {
     expect(responseJson(res)).toEqual({
       granted: false,
       balance: null,
-      costClaudium: null,
+      costCredits: null,
       reason: 'invalid_request',
     });
     expect(spendMock).not.toHaveBeenCalled();
@@ -320,7 +320,7 @@ describe('Claudium spend entitlement mirroring', () => {
       // against either representation.
       granted: true,
       balance: 0,
-      costClaudium: 200,
+      costCredits: 200,
       reason: 'already_granted',
     });
     storeMock.mockResolvedValue({
@@ -330,14 +330,14 @@ describe('Claudium spend entitlement mirroring', () => {
           itemId: 'guildmark_arming_sword',
           name: 'Guildmark Arming Sword',
           kind: 'skin',
-          costClaudium: 200,
+          costCredits: 200,
           owned: true,
         },
         {
           itemId: 'solheim_sword',
           name: 'Solheim, Last Light of the Dawn',
           kind: 'skin',
-          costClaudium: 5000,
+          costCredits: 5000,
           owned: false,
         },
       ],
@@ -345,23 +345,23 @@ describe('Claudium spend entitlement mirroring', () => {
 
     const req = makeReq({
       method: 'POST',
-      url: '/api/claudium/spend',
+      url: '/api/credits/spend',
       body: {
         itemId: 'solheim_sword',
         kind: 'skin',
-        expectedCostClaudium: 200,
+        expectedCostCredits: 200,
         idempotencyKey: 'reused-key',
       },
     });
     const res = new FakeRes();
 
-    await handleClaudiumApi(req, res as never, 7);
+    await handleCreditsApi(req, res as never, 7);
 
     expect(spendMock).toHaveBeenCalledWith({
       accountId: 7,
       itemId: 'solheim_sword',
       kind: 'skin',
-      expectedCostClaudium: 200,
+      expectedCostCredits: 200,
       idempotencyKey: 'reused-key',
     });
     expect(storeMock).toHaveBeenCalledWith(7);
@@ -372,7 +372,7 @@ describe('Claudium spend entitlement mirroring', () => {
     spendMock.mockResolvedValue({
       granted: true,
       balance: 300,
-      costClaudium: 200,
+      costCredits: 200,
       reason: null,
     });
     storeMock.mockResolvedValue({
@@ -382,7 +382,7 @@ describe('Claudium spend entitlement mirroring', () => {
           itemId: 'guildmark_arming_sword',
           name: 'Guildmark Arming Sword',
           kind: 'skin',
-          costClaudium: 200,
+          costCredits: 200,
           owned: true,
         },
       ],
@@ -390,23 +390,23 @@ describe('Claudium spend entitlement mirroring', () => {
 
     const req = makeReq({
       method: 'POST',
-      url: '/api/claudium/spend',
+      url: '/api/credits/spend',
       body: {
         itemId: 'guildmark_arming_sword',
         kind: 'skin',
-        expectedCostClaudium: 200,
+        expectedCostCredits: 200,
         idempotencyKey: 'fresh-key',
       },
     });
     const res = new FakeRes();
 
-    await handleClaudiumApi(req, res as never, 7);
+    await handleCreditsApi(req, res as never, 7);
 
     expect(spendMock).toHaveBeenCalledWith({
       accountId: 7,
       itemId: 'guildmark_arming_sword',
       kind: 'skin',
-      expectedCostClaudium: 200,
+      expectedCostCredits: 200,
       idempotencyKey: 'fresh-key',
     });
     expect(storeMock).toHaveBeenCalledWith(7);
@@ -414,38 +414,38 @@ describe('Claudium spend entitlement mirroring', () => {
   });
 });
 
-describe('Claudium economy-service transport contract', () => {
+describe('Credits economy-service transport contract', () => {
   it('marks typed HTTP 200 read fallbacks unavailable when the economy service is off', async () => {
     vi.stubEnv('WOC_ECONOMY_SERVICE_URL', '');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', '');
     const cases = [
       {
-        url: '/api/claudium/balance',
+        url: '/api/credits/balance',
         expected: { available: false, balance: null },
       },
       {
-        url: '/api/claudium/skus',
+        url: '/api/credits/skus',
         expected: { available: false, skus: [] },
       },
       {
-        url: '/api/claudium/native/rails',
+        url: '/api/credits/native/rails',
         expected: { available: false, rails: { sol: false, usdc: false, woc: false } },
       },
       {
-        url: '/api/claudium/native/balance/usdc/walletowner',
+        url: '/api/credits/native/balance/usdc/walletowner',
         expected: { owner: 'walletowner', amountBase: null },
       },
     ];
 
     for (const { url, expected } of cases) {
       const res = new FakeRes();
-      await handleClaudiumApi(makeReq({ method: 'GET', url }), res as never, 7);
+      await handleCreditsApi(makeReq({ method: 'GET', url }), res as never, 7);
       expect(responseJson(res)).toEqual(expected);
     }
   });
 
   it('marks typed read responses available only after authoritative service data loads', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     vi.stubGlobal(
       'fetch',
@@ -455,7 +455,7 @@ describe('Claudium economy-service transport contract', () => {
           return new Response(JSON.stringify({ balance: 250 }), { status: 200 });
         }
         if (url.endsWith('/skus')) {
-          return new Response(JSON.stringify([{ sku: 'claudium_500', usd: 4.99, claudium: 500 }]), {
+          return new Response(JSON.stringify([{ sku: 'credits_500', usd: 4.99, claudium: 500 }]), {
             status: 200,
           });
         }
@@ -474,35 +474,35 @@ describe('Claudium economy-service transport contract', () => {
     );
     const cases = [
       {
-        url: '/api/claudium/balance',
+        url: '/api/credits/balance',
         expected: { available: true, balance: 250 },
       },
       {
-        url: '/api/claudium/skus',
+        url: '/api/credits/skus',
         expected: {
           available: true,
-          skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+          skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
         },
       },
       {
-        url: '/api/claudium/native/rails',
+        url: '/api/credits/native/rails',
         expected: { available: true, rails: { sol: true, usdc: true, woc: true } },
       },
       {
-        url: '/api/claudium/native/balance/usdc/walletowner',
+        url: '/api/credits/native/balance/usdc/walletowner',
         expected: { owner: 'walletowner', amountBase: '12345678' },
       },
     ];
 
     for (const { url, expected } of cases) {
       const res = new FakeRes();
-      await handleClaudiumApi(makeReq({ method: 'GET', url }), res as never, 7);
+      await handleCreditsApi(makeReq({ method: 'GET', url }), res as never, 7);
       expect(responseJson(res)).toEqual(expected);
     }
   });
 
   it('forwards Stripe webhook bytes and signature without reserializing them', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
       Promise.resolve(new Response(JSON.stringify({ received: true }), { status: 200 })),
@@ -510,7 +510,7 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubGlobal('fetch', fetchMock);
     const rawBody = Buffer.from('{\n  "type": "checkout.session.completed"\n}\n');
 
-    await expect(claudiumStripeWebhook(rawBody, 't=123,v1=signature')).resolves.toEqual({
+    await expect(creditsStripeWebhook(rawBody, 't=123,v1=signature')).resolves.toEqual({
       received: true,
     });
 
@@ -521,7 +521,7 @@ describe('Claudium economy-service transport contract', () => {
   });
 
   it('keeps accountId numeric in purchase JSON bodies', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     let sent: unknown;
     vi.stubGlobal(
@@ -541,11 +541,11 @@ describe('Claudium economy-service transport contract', () => {
     );
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/purchase',
-        body: { rail: 'stripe', sku: 'claudium_500', idempotencyKey: 'purchase-key' },
+        url: '/api/credits/purchase',
+        body: { rail: 'stripe', sku: 'credits_500', idempotencyKey: 'purchase-key' },
       }),
       res as never,
       7,
@@ -561,7 +561,7 @@ describe('Claudium economy-service transport contract', () => {
     { stripe: { clientSecret: '', publishableKey: 'pk_test' }, label: 'empty client secret' },
     { stripe: { clientSecret: 'secret', publishableKey: '' }, label: 'empty publishable key' },
   ])('fails closed on a malformed 2xx Stripe success: $label', async ({ stripe }) => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     vi.stubGlobal(
       'fetch',
@@ -580,11 +580,11 @@ describe('Claudium economy-service transport contract', () => {
     );
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/purchase',
-        body: { rail: 'stripe', sku: 'claudium_500', idempotencyKey: 'purchase-key' },
+        url: '/api/credits/purchase',
+        body: { rail: 'stripe', sku: 'credits_500', idempotencyKey: 'purchase-key' },
       }),
       res as never,
       7,
@@ -595,7 +595,7 @@ describe('Claudium economy-service transport contract', () => {
       ok: false,
       purchaseId: null,
       rail: null,
-      claudium: null,
+      credits: null,
       stripe: null,
       woc: null,
       reason: 'unavailable',
@@ -603,7 +603,7 @@ describe('Claudium economy-service transport contract', () => {
   });
 
   it('preserves authoritative 2xx purchase refusals as ok:false', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     vi.stubGlobal(
       'fetch',
@@ -611,11 +611,11 @@ describe('Claudium economy-service transport contract', () => {
     );
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/purchase',
-        body: { rail: 'stripe', sku: 'claudium_500', idempotencyKey: 'purchase-key' },
+        url: '/api/credits/purchase',
+        body: { rail: 'stripe', sku: 'credits_500', idempotencyKey: 'purchase-key' },
       }),
       res as never,
       7,
@@ -626,7 +626,7 @@ describe('Claudium economy-service transport contract', () => {
       ok: false,
       purchaseId: null,
       rail: null,
-      claudium: null,
+      credits: null,
       stripe: null,
       woc: null,
       reason: 'rail_disabled',
@@ -638,11 +638,11 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubGlobal('fetch', fetchMock);
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/purchase',
-        body: { rail: 'woc', sku: 'claudium_500', idempotencyKey: 'purchase-key' },
+        url: '/api/credits/purchase',
+        body: { rail: 'woc', sku: 'credits_500', idempotencyKey: 'purchase-key' },
       }),
       res as never,
       7,
@@ -653,7 +653,7 @@ describe('Claudium economy-service transport contract', () => {
       ok: false,
       purchaseId: null,
       rail: null,
-      claudium: null,
+      credits: null,
       stripe: null,
       woc: null,
       reason: 'invalid_request',
@@ -662,7 +662,7 @@ describe('Claudium economy-service transport contract', () => {
   });
 
   it('drops partial purchase fields while preserving an authoritative refusal reason', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     vi.stubGlobal(
       'fetch',
@@ -682,10 +682,10 @@ describe('Claudium economy-service transport contract', () => {
     );
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/purchase',
+        url: '/api/credits/purchase',
         body: { rail: 'stripe', sku: 'retired_sku', idempotencyKey: 'purchase-key' },
       }),
       res as never,
@@ -697,7 +697,7 @@ describe('Claudium economy-service transport contract', () => {
       ok: false,
       purchaseId: null,
       rail: null,
-      claudium: null,
+      credits: null,
       stripe: null,
       woc: null,
       reason: 'unknown_sku',
@@ -705,7 +705,7 @@ describe('Claudium economy-service transport contract', () => {
   });
 
   it('preserves authoritative native-quote refusals as ok:false', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
       Promise.resolve(new Response(JSON.stringify({ reason: 'rail_disabled' }), { status: 200 })),
@@ -713,11 +713,11 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubGlobal('fetch', fetchMock);
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/native/quote',
-        body: { rail: 'sol', sku: 'claudium_500', payer: 'payer-address' },
+        url: '/api/credits/native/quote',
+        body: { rail: 'sol', sku: 'credits_500', payer: 'payer-address' },
       }),
       res as never,
       7,
@@ -728,7 +728,7 @@ describe('Claudium economy-service transport contract', () => {
       ok: false,
       reference: null,
       rail: null,
-      claudium: null,
+      credits: null,
       amountBase: null,
       destination: null,
       mint: null,
@@ -742,14 +742,14 @@ describe('Claudium economy-service transport contract', () => {
     const request = fetchMock.mock.calls[0]?.[1] as RequestInit;
     expect(JSON.parse(String(request.body))).toEqual({
       rail: 'sol',
-      sku: 'claudium_500',
+      sku: 'credits_500',
       payer: 'payer-address',
       fulfillment: { kind: 'credit', accountId: 7 },
     });
   });
 
   it('accepts USDC as a native quote rail', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     const quoteExpiryMs = Date.now() + 60_000;
     const fetchMock = vi.fn(
@@ -772,11 +772,11 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubGlobal('fetch', fetchMock);
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/native/quote',
-        body: { rail: 'usdc', sku: 'claudium_500', payer: 'payer-address' },
+        url: '/api/credits/native/quote',
+        body: { rail: 'usdc', sku: 'credits_500', payer: 'payer-address' },
       }),
       res as never,
       7,
@@ -801,14 +801,14 @@ describe('Claudium economy-service transport contract', () => {
     });
     expect(JSON.parse(String(fetchMock.mock.calls[0]?.[1]?.body))).toEqual({
       rail: 'usdc',
-      sku: 'claudium_500',
+      sku: 'credits_500',
       payer: 'payer-address',
       fulfillment: { kind: 'credit', accountId: 7 },
     });
   });
 
   it('binds native confirmation to the authenticated account', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
       Promise.resolve(
@@ -821,10 +821,10 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubGlobal('fetch', fetchMock);
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'POST',
-        url: '/api/claudium/native/confirm',
+        url: '/api/credits/native/confirm',
         body: { reference: 'payment-reference', signature: 'payment-signature' },
       }),
       res as never,
@@ -846,8 +846,8 @@ describe('Claudium economy-service transport contract', () => {
     });
   });
 
-  it('prices bonus packs by service SKU instead of treating credited Claudium as USD cents', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+  it('prices bonus packs by service SKU instead of treating credited Credits as USD cents', async () => {
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     const fetchMock = vi.fn(async (_input: string | URL | Request, _init?: RequestInit) =>
       Promise.resolve(
@@ -859,10 +859,10 @@ describe('Claudium economy-service transport contract', () => {
     vi.stubGlobal('fetch', fetchMock);
     const res = new FakeRes();
 
-    await handleClaudiumApi(
+    await handleCreditsApi(
       makeReq({
         method: 'GET',
-        url: '/api/claudium/native/price/sol?sku=claudium_13000',
+        url: '/api/credits/native/price/sol?sku=credits_13000',
       }),
       res as never,
       7,
@@ -870,16 +870,16 @@ describe('Claudium economy-service transport contract', () => {
 
     expect(responseJson(res)).toEqual({
       rail: 'sol',
-      claudium: 13_000,
+      credits: 13_000,
       amountBase: '9999000',
     });
     expect(String(fetchMock.mock.calls[0]?.[0])).toBe(
-      'https://economy.example/v1/claudium/native/price/sol?sku=claudium_13000',
+      'https://economy.example/v1/credits/native/price/sol?sku=credits_13000',
     );
   });
 
   it('maps history responses to the economy SDK ledger-entry shape', async () => {
-    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/claudium/');
+    vi.stubEnv('WOC_ECONOMY_SERVICE_URL', 'https://economy.example/v1/credits/');
     vi.stubEnv('WOC_ECONOMY_INTERNAL_SECRET', 'test-secret');
     vi.stubGlobal(
       'fetch',
@@ -903,7 +903,7 @@ describe('Claudium economy-service transport contract', () => {
                 ref: 'other-account-purchase',
                 atMs: 1235,
               },
-              { id: 'legacy-row', kind: 'spend', claudium: -200, atMs: 1233 },
+              { id: 'legacy-row', kind: 'spend', credits: -200, atMs: 1233 },
             ]),
             { status: 200 },
           ),
@@ -911,8 +911,8 @@ describe('Claudium economy-service transport contract', () => {
     );
     const res = new FakeRes();
 
-    await handleClaudiumApi(
-      makeReq({ method: 'GET', url: '/api/claudium/history' }),
+    await handleCreditsApi(
+      makeReq({ method: 'GET', url: '/api/credits/history' }),
       res as never,
       7,
     );

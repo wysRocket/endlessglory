@@ -22,7 +22,7 @@ export interface WocStoreItemInput {
   itemId: string;
   name: string;
   kind: 'cosmetic' | 'skin' | 'item';
-  costClaudium: number;
+  costCredits: number;
   owned: boolean;
 }
 
@@ -32,8 +32,8 @@ export interface ArmorySkinRow {
   skin: WeaponSkinDef;
   /** Store card / inspect thumbnail (rarity-themed render). */
   art: string;
-  /** Claudium cost from the economy service, or null when the SKU is unavailable. */
-  costClaudium: number | null;
+  /** Credits cost from the economy service, or null when the SKU is unavailable. */
+  costCredits: number | null;
   /** The economy service has this SKU with a valid price, so Buy can succeed. */
   purchasable: boolean;
   owned: boolean;
@@ -81,25 +81,25 @@ export function buildArmorySections(
   for (const skin of WEAPON_SKIN_LIST) {
     const service = serviceRows.get(skin.id);
     const owned = (service?.owned ?? false) || ctx.cosmetics.weaponSkinIds.includes(skin.id);
-    const costClaudium =
-      service && Number.isFinite(service.costClaudium) && service.costClaudium > 0
-        ? service.costClaudium
+    const costCredits =
+      service && Number.isFinite(service.costCredits) && service.costCredits > 0
+        ? service.costCredits
         : null;
     const row: ArmorySkinRow = {
       skin,
       art: armorySkinArt(skin.id),
-      costClaudium,
-      purchasable: costClaudium !== null,
+      costCredits,
+      purchasable: costCredits !== null,
       owned,
       applied: owned && ctx.cosmetics.weaponSkinLoadout[skin.weaponType] === skin.id,
       canApplyNow: owned && applicableTypes.has(skin.weaponType),
-      affordable: !owned && balance !== null && costClaudium !== null && balance >= costClaudium,
+      affordable: !owned && balance !== null && costCredits !== null && balance >= costCredits,
       shortfall:
-        costClaudium === null || balance === null
+        costCredits === null || balance === null
           ? null
           : owned
             ? 0
-            : Math.max(0, costClaudium - balance),
+            : Math.max(0, costCredits - balance),
       eligibleClasses: eligibleClassesForWeaponSkinType(skin.weaponType),
     };
     let section = sections.get(skin.collection);

@@ -93,7 +93,7 @@ describe('installWindowDrag', () => {
       },
     } as unknown as CSSStyleDeclaration;
     const el = {
-      id: options?.elId ?? 'claudium-window',
+      id: options?.elId ?? 'credits-window',
       dataset: {} as Record<string, string>,
       style,
       classList: {

@@ -1,14 +1,14 @@
-# Claudium visual identity (pin before generating; reference on every asset)
+# Credits visual identity (pin before generating; reference on every asset)
 
-Claudium is the in-game SOFT currency (1 Claudium = 0.01 USD, one-way, cosmetics only).
+Credits is the in-game SOFT currency (1 Credits = 0.01 USD, one-way, cosmetics only).
 It must read as premium + trustworthy (real money buys it) AND belong to the World of
-ClaudeCraft fantasy world. It is DISTINCT from $WOC (the tradable gold token): Claudium
+ClaudeCraft fantasy world. It is DISTINCT from $WOC (the tradable gold token): Credits
 is platinum/arcane, not gold.
 
 ## The mark
 A round coin/token with a hexagonal inset bezel and a luminous gem CORE. The face carries
 a single arcane sigil: a crescent cradling a faceted gem, reading subtly as a "C"
-(Claudium). Rim has fine radial fluting plus a thin ring of engraved runes/circuitry that
+(Credits). Rim has fine radial fluting plus a thin ring of engraved runes/circuitry that
 bridges fantasy (runes) and fintech (clean circuit geometry). Strong circular silhouette so
 it is recognizable at 16px.
 

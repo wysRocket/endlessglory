@@ -1,10 +1,10 @@
-// Screenshots for the Claudium store window, proving TWO things at once:
+// Screenshots for the Credits store window, proving TWO things at once:
 //   1. GRACEFUL DEGRADATION: with NO economy service running, the window opens
-//      through its real module (Hud.claudiumWindow) and renders a CLEAN disabled
+//      through its real module (Hud.creditsWindow) and renders a CLEAN disabled
 //      state, and the game boots + plays regardless. Offline the window has no
 //      economy hooks, so snapshot() resolves to the service-off disabled model,
 //      exactly mirroring a dead service.
-//   2. THE FUNDED UI RENDERS: we inject deps (via Hud.attachClaudium) returning a
+//   2. THE FUNDED UI RENDERS: we inject deps (via Hud.attachCredits) returning a
 //      balance + skus + a couple store items, re-open, and shoot the funded state.
 //
 // Modeled on scripts/clock_shot.mjs (offline boot: #btn-offline, #char-name, the
@@ -14,7 +14,7 @@ import puppeteer from 'puppeteer-core';
 import { BROWSER_PATH as EDGE } from './browser_path.mjs';
 
 const URL = process.env.GAME_URL ?? 'http://localhost:5173';
-const OUT = 'docs/screenshots/claudium';
+const OUT = 'docs/screenshots/credits';
 fs.mkdirSync(OUT, { recursive: true });
 
 const browser = await puppeteer.launch({
@@ -64,13 +64,13 @@ const shoot = async (name) => {
 // the graceful-degradation proof: the store opens and renders cleanly with the
 // service dead.
 await page.evaluate(() => {
-  window.__game.hud.toggleClaudium();
+  window.__game.hud.toggleCredits();
 });
-await shoot('claudium_service_off');
+await shoot('credits_service_off');
 
 // Close before re-opening the funded state.
 await page.evaluate(() => {
-  window.__game.hud.toggleClaudium();
+  window.__game.hud.toggleCredits();
 });
 await new Promise((r) => setTimeout(r, 200));
 
@@ -79,32 +79,32 @@ await new Promise((r) => setTimeout(r, 200));
 // computes nothing; it renders exactly what these deps return.
 await page.evaluate(() => {
   const packs = [
-    { sku: 'claudium_500', usd: 4.99, claudium: 500 },
-    { sku: 'claudium_1050', usd: 9.99, claudium: 1050 },
-    { sku: 'claudium_2200', usd: 19.99, claudium: 2200 },
-    { sku: 'claudium_4000', usd: 34.99, claudium: 4000 },
-    { sku: 'claudium_6000', usd: 49.99, claudium: 6000 },
-    { sku: 'claudium_13000', usd: 99.99, claudium: 13000 },
+    { sku: 'credits_500', usd: 4.99, credits: 500 },
+    { sku: 'credits_1050', usd: 9.99, credits: 1050 },
+    { sku: 'credits_2200', usd: 19.99, credits: 2200 },
+    { sku: 'credits_4000', usd: 34.99, credits: 4000 },
+    { sku: 'credits_6000', usd: 49.99, credits: 6000 },
+    { sku: 'credits_13000', usd: 99.99, credits: 13000 },
   ];
-  window.__game.hud.attachClaudium({
+  window.__game.hud.attachCredits({
     balance: async () => 1250,
     storeSnapshot: async () => ({ balance: 1250, storeItems: [] }),
     snapshot: async () => ({
       balance: 1250,
       skus: packs,
-      price: { usdPerClaudium: 0.01, wocBaseUnitsPerClaudium: 42 },
+      price: { usdPerCredits: 0.01, wocBaseUnitsPerCredits: 42 },
       storeItems: [
-        { itemId: 'hat_gold', name: 'Gilded Circlet', kind: 'cosmetic', costClaudium: 500 },
-        { itemId: 'skin_ember', name: 'Ember Warplate Skin', kind: 'skin', costClaudium: 2000 },
-        { itemId: 'trail_frost', name: 'Frostfall Trail', kind: 'item', costClaudium: 750 },
+        { itemId: 'hat_gold', name: 'Gilded Circlet', kind: 'cosmetic', costCredits: 500 },
+        { itemId: 'skin_ember', name: 'Ember Warplate Skin', kind: 'skin', costCredits: 2000 },
+        { itemId: 'trail_frost', name: 'Frostfall Trail', kind: 'item', costCredits: 750 },
       ],
     }),
     buy: async () => {},
     spend: async () => ({ granted: true, balance: 1250 }),
   });
-  window.__game.hud.toggleClaudium();
+  window.__game.hud.toggleCredits();
 });
-await shoot('claudium_funded');
+await shoot('credits_funded');
 
 console.log(errors.length ? 'ERRORS:\n' + errors.join('\n') : 'no console/page errors');
 await browser.close();

@@ -1455,7 +1455,7 @@
     border: 1px solid #6f592d;
     background:
       linear-gradient(90deg, rgb(3 10 16 / 96%) 0%, rgb(4 17 27 / 72%) 58%, transparent),
-      url("/claudium/claudium_coin_hero_3q.webp") 88% 50% / 270px auto no-repeat,
+      url("/credits/credits_coin_hero_3q.webp") 88% 50% / 270px auto no-repeat,
       radial-gradient(circle at 86% 50%, rgb(44 184 232 / 24%), transparent 38%);
   }
   .woc-store-hero > div:first-child {
@@ -2756,13 +2756,13 @@
     background: #f5c84322;
   }
 
-  /* ---------- claudium ---------- */
+  /* ---------- credits ---------- */
   /* These are the two largest overlapping HUD surfaces. Paint containment keeps
      an internal refresh or moving sibling from invalidating the WebGL canvas
      behind their opaque frames. Isolation also keeps their stacking contexts
      independent when Chromium reallocates layers with DevTools open. */
   #daily-rewards-window,
-  #claudium-window {
+  #credits-window {
     contain: paint;
     isolation: isolate;
   }
@@ -2776,7 +2776,7 @@
      transform, so the standing promotion bought nothing worth that risk.
      body.store-stack-open itself is still maintained (hud.ts
      syncAnyWindowOpenState) as the store-lifecycle diagnostic signal. */
-  #claudium-window {
+  #credits-window {
     width: min(940px, calc(100vw - 40px));
     max-height: calc(100vh - 40px);
     border-color: #8d7138;
@@ -2789,7 +2789,7 @@
      backdrop blur compositor adds no visual benefit and can drop the front
      window's root layer for a frame when the two windows overlap. */
   body.frosted-panels #daily-rewards-window,
-  body.frosted-panels #claudium-window {
+  body.frosted-panels #credits-window {
     -webkit-backdrop-filter: none;
     backdrop-filter: none;
   }
@@ -2798,7 +2798,7 @@
      pauses its decorative border raster and both large shadows use a smaller
      damage region until the final left/top position is committed. */
   body.window-drag-active #daily-rewards-window,
-  body.window-drag-active #claudium-window {
+  body.window-drag-active #credits-window {
     box-shadow: 0 12px 36px rgb(0 0 0 / 72%);
   }
   body.window-drag-active .armory-section.rarity-legendary .armory-card {
@@ -3103,7 +3103,7 @@
     background: #f5c8431f;
     opacity: 1;
   }
-  .cl-sku-claudium {
+  .cl-sku-credits {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -3113,7 +3113,7 @@
     font-size: 17px;
     text-align: center;
   }
-  .cl-sku-claudium img {
+  .cl-sku-credits img {
     width: 22px;
     height: 22px;
   }
@@ -4884,7 +4884,7 @@
   .woc-balance.is-verified {
     color: var(--color-text-success);
   }
-  .claudium-launcher {
+  .credits-launcher {
     display: inline-flex;
     align-items: center;
     gap: 5px;
@@ -4899,16 +4899,16 @@
     white-space: nowrap;
     cursor: var(--cursor-pointer);
   }
-  .claudium-launcher:hover,
-  .claudium-launcher:focus-visible {
+  .credits-launcher:hover,
+  .credits-launcher:focus-visible {
     border-color: #8cecff;
     background: #4ac9ef28;
   }
-  .claudium-launcher:focus-visible {
+  .credits-launcher:focus-visible {
     outline: 2px solid var(--focus-ring);
     outline-offset: 2px;
   }
-  .claudium-coin {
+  .credits-coin {
     display: block;
     width: 20px;
     height: 20px;

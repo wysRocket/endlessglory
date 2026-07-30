@@ -1,21 +1,21 @@
 import { describe, expect, it } from 'vitest';
 import {
-  buildClaudiumView,
-  type ClaudiumViewInput,
-  claudiumBalanceAddress,
-} from '../src/ui/claudium_view';
+  buildCreditsView,
+  type CreditsViewInput,
+  creditsBalanceAddress,
+} from '../src/ui/credits_view';
 
-// The pure Claudium view core is DOM/i18n/net-free, so it drives directly here.
+// The pure Credits view core is DOM/i18n/net-free, so it drives directly here.
 // Two states matter: a funded state (service on) and the service-off disabled
 // state (balance null). The core recomputes NOTHING; it only projects the
 // service payloads into render rows + per-rail availability.
 
-const funded: ClaudiumViewInput = {
+const funded: CreditsViewInput = {
   balance: 1250,
   skus: [
-    { sku: 's1', usd: 1, claudium: 100 },
-    { sku: 's10', usd: 10, claudium: 1000 },
-    { sku: 's100', usd: 100, claudium: 10000 },
+    { sku: 's1', usd: 1, credits: 100 },
+    { sku: 's10', usd: 10, credits: 1000 },
+    { sku: 's100', usd: 100, credits: 10000 },
   ],
   nativeRails: { sol: true, usdc: true, woc: true },
   walletBalances: {
@@ -45,9 +45,9 @@ const funded: ClaudiumViewInput = {
   ],
 };
 
-describe('buildClaudiumView disabled state (service off)', () => {
+describe('buildCreditsView disabled state (service off)', () => {
   it('renders a clean empty state when balance is null, not an error', () => {
-    const view = buildClaudiumView({
+    const view = buildCreditsView({
       balance: null,
       skus: [],
     });
@@ -61,9 +61,9 @@ describe('buildClaudiumView disabled state (service off)', () => {
 
   it('stays disabled even if skus/price somehow arrive with a null balance', () => {
     // A null balance is authoritative: the service is off, so nothing transacts.
-    const view = buildClaudiumView({
+    const view = buildCreditsView({
       balance: null,
-      skus: [{ sku: 's1', usd: 1, claudium: 100 }],
+      skus: [{ sku: 's1', usd: 1, credits: 100 }],
     });
     expect(view.disabled).toBe(true);
     expect(view.buyRows).toEqual([]);
@@ -71,9 +71,9 @@ describe('buildClaudiumView disabled state (service off)', () => {
   });
 });
 
-describe('buildClaudiumView funded state (service on)', () => {
+describe('buildCreditsView funded state (service on)', () => {
   it('maps the SKU ladder verbatim into buy rows', () => {
-    const view = buildClaudiumView(funded);
+    const view = buildCreditsView(funded);
     expect(view.disabled).toBe(false);
     expect(view.hasBalance).toBe(true);
     expect(view.balance).toBe(1250);
@@ -81,7 +81,7 @@ describe('buildClaudiumView funded state (service on)', () => {
       {
         sku: 's1',
         usd: 1,
-        claudium: 100,
+        credits: 100,
         stripeConfigured: true,
         solAffordable: true,
         usdcAffordable: true,
@@ -93,7 +93,7 @@ describe('buildClaudiumView funded state (service on)', () => {
       {
         sku: 's10',
         usd: 10,
-        claudium: 1000,
+        credits: 1000,
         stripeConfigured: true,
         solAffordable: true,
         usdcAffordable: true,
@@ -105,7 +105,7 @@ describe('buildClaudiumView funded state (service on)', () => {
       {
         sku: 's100',
         usd: 100,
-        claudium: 10000,
+        credits: 10000,
         stripeConfigured: true,
         solAffordable: false,
         usdcAffordable: false,
@@ -118,24 +118,24 @@ describe('buildClaudiumView funded state (service on)', () => {
   });
 
   it('enables all native rails when the service exposes priced SKU quotes', () => {
-    const view = buildClaudiumView(funded);
+    const view = buildCreditsView(funded);
     expect(view.rails).toEqual({ stripe: true, sol: true, usdc: true, woc: true });
     expect(view.buyDisabled).toBe(false);
   });
 
   it('keeps unconfigured Stripe SKU rows visible but unavailable on the Stripe rail', () => {
-    const view = buildClaudiumView({
+    const view = buildCreditsView({
       ...funded,
       skus: [
-        { sku: 's1', usd: 1, claudium: 100, stripeConfigured: false },
-        { sku: 's10', usd: 10, claudium: 1000, stripeConfigured: false },
+        { sku: 's1', usd: 1, credits: 100, stripeConfigured: false },
+        { sku: 's10', usd: 10, credits: 1000, stripeConfigured: false },
       ],
     });
     expect(view.buyRows).toEqual([
       {
         sku: 's1',
         usd: 1,
-        claudium: 100,
+        credits: 100,
         stripeConfigured: false,
         solAffordable: true,
         usdcAffordable: true,
@@ -147,7 +147,7 @@ describe('buildClaudiumView funded state (service on)', () => {
       {
         sku: 's10',
         usd: 10,
-        claudium: 1000,
+        credits: 1000,
         stripeConfigured: false,
         solAffordable: true,
         usdcAffordable: true,
@@ -162,7 +162,7 @@ describe('buildClaudiumView funded state (service on)', () => {
   });
 
   it('marks native SKU rows unaffordable when the connected wallet balance is too low', () => {
-    const view = buildClaudiumView({
+    const view = buildCreditsView({
       ...funded,
       walletBalances: {
         solLamports: '9999999',
@@ -176,7 +176,7 @@ describe('buildClaudiumView funded state (service on)', () => {
   });
 
   it('disables native rails when the service reports them unavailable', () => {
-    const view = buildClaudiumView({
+    const view = buildCreditsView({
       ...funded,
       nativeRails: { sol: false, usdc: false, woc: false },
     });
@@ -186,38 +186,38 @@ describe('buildClaudiumView funded state (service on)', () => {
   });
 
   it('disables every rail when there are no skus', () => {
-    const view = buildClaudiumView({ ...funded, skus: [] });
+    const view = buildCreditsView({ ...funded, skus: [] });
     expect(view.rails).toEqual({ stripe: false, sol: false, usdc: false, woc: false });
     expect(view.buyDisabled).toBe(true);
     // A zero balance is still a funded (known) state, distinct from the null/off state.
   });
 
   it('treats a zero balance as a known funded state, not the disabled state', () => {
-    const view = buildClaudiumView({ ...funded, balance: 0 });
+    const view = buildCreditsView({ ...funded, balance: 0 });
     expect(view.disabled).toBe(false);
     expect(view.hasBalance).toBe(true);
     expect(view.balance).toBe(0);
   });
 });
 
-describe('buildClaudiumView is a pure projection', () => {
+describe('buildCreditsView is a pure projection', () => {
   it('returns identical structure for identical input (no hidden state)', () => {
-    expect(buildClaudiumView(funded)).toEqual(buildClaudiumView(funded));
+    expect(buildCreditsView(funded)).toEqual(buildCreditsView(funded));
   });
 });
 
-describe('claudiumBalanceAddress (which wallet funds the affordability reads)', () => {
+describe('creditsBalanceAddress (which wallet funds the affordability reads)', () => {
   it('prefers the actively connected session wallet over the linked wallet', () => {
-    expect(claudiumBalanceAddress('SessionPubkey111', 'LinkedPubkey222')).toBe('SessionPubkey111');
+    expect(creditsBalanceAddress('SessionPubkey111', 'LinkedPubkey222')).toBe('SessionPubkey111');
   });
 
   it('falls back to the server-verified linked wallet when nothing is connected', () => {
     // A linked-but-disconnected player still gets live buy buttons off the
     // linked balance; the buy click surfaces the connect prompt to sign.
-    expect(claudiumBalanceAddress(null, 'LinkedPubkey222')).toBe('LinkedPubkey222');
+    expect(creditsBalanceAddress(null, 'LinkedPubkey222')).toBe('LinkedPubkey222');
   });
 
   it('returns null with neither wallet, so the caller performs no balance read', () => {
-    expect(claudiumBalanceAddress(null, null)).toBeNull();
+    expect(creditsBalanceAddress(null, null)).toBeNull();
   });
 });

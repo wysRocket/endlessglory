@@ -101,14 +101,14 @@ export interface DailyRewardsWindowDeps {
   spendStoreItem?(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item',
-    expectedCostClaudium: number,
+    expectedCostCredits: number,
   ): Promise<{
     granted: boolean;
     balance: number | null;
-    costClaudium: number | null;
+    costCredits: number | null;
     reason: string | null;
   }>;
-  openClaudium?(): void;
+  openCredits?(): void;
   confirmDialog?(
     title: string,
     body: string,
@@ -383,12 +383,12 @@ export class DailyRewardsWindow {
       : '';
     const markup =
       `<div class="woc-store-hero"><div><span>${esc(t('hudChrome.wocStore.armoryEyebrow'))}</span><h2>${esc(t('hudChrome.wocStore.armoryTitle'))}</h2><p>${esc(t('hudChrome.wocStore.armoryBody'))}</p></div>` +
-      `<div class="woc-store-balance"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-claudium>${esc(t('hudChrome.wocStore.buyClaudium'))}</button></div></div>` +
+      `<div class="woc-store-balance"><img src="/credits/icons/credits_coin_64.webp" alt=""><span>${esc(t('hudChrome.wocStore.balance'))}</span><strong>${balance}</strong><button type="button" data-buy-credits>${esc(t('hudChrome.wocStore.buyCredits'))}</button></div></div>` +
       notice +
       armory;
     if (!this.replaceStoreBody(body, markup)) return;
-    body.querySelector<HTMLButtonElement>('[data-buy-claudium]')?.addEventListener('click', () => {
-      this.openClaudiumFromStore();
+    body.querySelector<HTMLButtonElement>('[data-buy-credits]')?.addEventListener('click', () => {
+      this.openCreditsFromStore();
     });
     body.querySelectorAll<HTMLButtonElement>('[data-armory-skin]').forEach((button) => {
       button.addEventListener('click', () => {
@@ -400,7 +400,7 @@ export class DailyRewardsWindow {
 
   /** Keep background polling data-fresh without rebuilding an identical store
    *  subtree. Replacing the covered window's DOM invalidates the overlapping
-   *  Claudium compositor layer in some browsers and exposes the game canvas for
+   *  Credits compositor layer in some browsers and exposes the game canvas for
    *  a frame. A changed balance, catalog, ownership, equipment, or locale still
    *  produces different markup and repaints normally. */
   private replaceStoreBody(body: HTMLElement, markup: string): boolean {
@@ -413,11 +413,11 @@ export class DailyRewardsWindow {
 
   private armorySectionHtml(section: ArmorySection): string {
     const servicePrice =
-      section.rows.find((row) => row.costClaudium !== null)?.costClaudium ?? null;
+      section.rows.find((row) => row.costCredits !== null)?.costCredits ?? null;
     const price =
       servicePrice === null
         ? `<span class="armory-section-price unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
-        : `<span class="armory-section-price"><img src="/claudium/icons/claudium_coin_64.webp" alt="">${formatNumber(servicePrice, { maximumFractionDigits: 0 })}</span>`;
+        : `<span class="armory-section-price"><img src="/credits/icons/credits_coin_64.webp" alt="">${formatNumber(servicePrice, { maximumFractionDigits: 0 })}</span>`;
     const cards = section.rows.map((row) => this.armoryCardHtml(row)).join('');
     return (
       `<section class="armory-section rarity-${esc(section.rarity)}">` +
@@ -433,9 +433,9 @@ export class DailyRewardsWindow {
       ? `<span class="armory-state applied">${esc(t('hudChrome.wocStore.applied'))}</span>`
       : row.owned
         ? `<span class="armory-state">${esc(t('hudChrome.wocStore.owned'))}</span>`
-        : row.costClaudium === null
+        : row.costCredits === null
           ? `<span class="armory-state unavailable">${esc(t('hudChrome.wocStore.unavailable'))}</span>`
-          : `<span class="armory-cost"><img src="/claudium/icons/claudium_coin_64.webp" alt=""><strong>${formatNumber(row.costClaudium, { maximumFractionDigits: 0 })}</strong></span>`;
+          : `<span class="armory-cost"><img src="/credits/icons/credits_coin_64.webp" alt=""><strong>${formatNumber(row.costCredits, { maximumFractionDigits: 0 })}</strong></span>`;
     const badge = row.skin.badge
       ? `<span class="armory-badge">${esc(badgeLabel(row.skin.badge))}</span>`
       : '';
@@ -501,11 +501,11 @@ export class DailyRewardsWindow {
   }
 
   private requestArmoryPurchase(row: ArmorySkinRow): void {
-    if (row.owned || !row.purchasable || row.costClaudium === null) return;
+    if (row.owned || !row.purchasable || row.costCredits === null) return;
     const copy = localizeWeaponSkin(row.skin);
-    const cost = formatNumber(row.costClaudium, { maximumFractionDigits: 0 });
+    const cost = formatNumber(row.costCredits, { maximumFractionDigits: 0 });
     if (!row.affordable) {
-      this.openNeedMoreDialog(row, row.costClaudium, this.storeBalance);
+      this.openNeedMoreDialog(row, row.costCredits, this.storeBalance);
       return;
     }
     this.deps.confirmDialog?.(
@@ -518,10 +518,10 @@ export class DailyRewardsWindow {
   }
 
   private async purchaseArmorySkin(row: ArmorySkinRow): Promise<void> {
-    const expectedCostClaudium = row.costClaudium;
-    if (expectedCostClaudium === null) return;
+    const expectedCostCredits = row.costCredits;
+    if (expectedCostCredits === null) return;
     this.storePriceChanged = false;
-    const result = await this.deps.spendStoreItem?.(row.skin.id, 'skin', expectedCostClaudium);
+    const result = await this.deps.spendStoreItem?.(row.skin.id, 'skin', expectedCostCredits);
     if (result?.reason === 'price_changed') {
       this.storePriceChanged = true;
       if (result.balance !== null) this.storeBalance = result.balance;
@@ -529,8 +529,8 @@ export class DailyRewardsWindow {
       const current = this.armoryRowById(row.skin.id);
       if (
         current &&
-        current.costClaudium !== null &&
-        current.costClaudium !== expectedCostClaudium
+        current.costCredits !== null &&
+        current.costCredits !== expectedCostCredits
       ) {
         this.requestArmoryPurchase(current);
       }
@@ -544,11 +544,11 @@ export class DailyRewardsWindow {
         if (body) this.paintStore(body);
       }
       const authoritativeCost =
-        result.costClaudium !== null &&
-        Number.isFinite(result.costClaudium) &&
-        result.costClaudium > 0
-          ? result.costClaudium
-          : row.costClaudium;
+        result.costCredits !== null &&
+        Number.isFinite(result.costCredits) &&
+        result.costCredits > 0
+          ? result.costCredits
+          : row.costCredits;
       if (authoritativeCost !== null) {
         this.openNeedMoreDialog(row, authoritativeCost, result.balance);
       }
@@ -574,26 +574,26 @@ export class DailyRewardsWindow {
 
   private openNeedMoreDialog(
     row: ArmorySkinRow,
-    costClaudium: number,
+    costCredits: number,
     balance: number | null,
   ): void {
     const knownBalance = balance ?? this.storeBalance;
     const copy = localizeWeaponSkin(row.skin);
-    const shortfall = formatNumber(Math.max(0, costClaudium - (knownBalance ?? 0)), {
+    const shortfall = formatNumber(Math.max(0, costCredits - (knownBalance ?? 0)), {
       maximumFractionDigits: 0,
     });
     this.deps.confirmDialog?.(
       t('hudChrome.wocStore.needMoreTitle'),
       t('hudChrome.wocStore.needMoreBody', { item: copy.name, shortfall }),
-      t('hudChrome.wocStore.buyClaudium'),
+      t('hudChrome.wocStore.buyCredits'),
       t('hudChrome.wocStore.cancel'),
-      () => this.openClaudiumFromStore(),
+      () => this.openCreditsFromStore(),
     );
   }
 
-  private openClaudiumFromStore(): void {
+  private openCreditsFromStore(): void {
     this.armoryInspect?.close();
-    this.deps.openClaudium?.();
+    this.deps.openCredits?.();
   }
 
   private paint(view: DailyRewardsView): void {

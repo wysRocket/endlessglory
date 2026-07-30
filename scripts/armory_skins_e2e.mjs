@@ -1,6 +1,6 @@
-// Season 1 Armory end-to-end integration: register, credit Claudium (direct
+// Season 1 Armory end-to-end integration: register, credit Credits (direct
 // dev-DB ledger insert; there is deliberately no free-grant API), buy a skin
-// through the real /api/claudium/spend proxy, apply/detach it with the
+// through the real /api/credits/spend proxy, apply/detach it with the
 // change_weapon_skin command, and verify a SECOND client sees the skin on the
 // wire (terse wsk identity field), ownership is enforced server-side, the
 // equipped-weapon-type gate holds, and everything survives a reconnect.
@@ -153,7 +153,7 @@ async function main() {
   );
   check('create characters', c1.status === 200 && c2.status === 200);
 
-  // Dev-only Claudium credit: append a positive ledger row directly (the
+  // Dev-only Credits credit: append a positive ledger row directly (the
   // service computes balance as SUM(delta); there is no free-grant endpoint).
   const accountA = r1.body.accountId ?? r1.body.account?.id ?? null;
   const db = new pg.Client({ connectionString: process.env.DATABASE_URL });
@@ -165,23 +165,23 @@ async function main() {
   }
   check('resolved account id', Number.isInteger(accId), String(accId));
   await db.query(
-    `INSERT INTO claudium_ledger (account_id, delta, reason, ref, idempotency_key, at_ms)
+    `INSERT INTO credits_ledger (account_id, delta, reason, ref, idempotency_key, at_ms)
      VALUES ($1, 10000, 'purchase', 'e2e-credit', $2, $3)`,
     [accId, `e2e-credit-${uniq}`, Date.now()],
   );
 
   // Store + balance through the game proxy.
-  const bal = await api('/api/claudium/balance', {}, t1);
+  const bal = await api('/api/credits/balance', {}, t1);
   check('balance shows the credit', bal.body.balance === 10000, JSON.stringify(bal.body));
-  const store = await api('/api/claudium/store', {}, t1);
+  const store = await api('/api/credits/store', {}, t1);
   const items = store.body.items ?? [];
   check('store lists 39 SKUs', items.length === 39, `got ${items.length}`);
   const ice = items.find((i) => i.itemId === 'ice_fang_sword');
-  check('Ice Fang SKU (skin, 3000)', ice?.kind === 'skin' && ice?.costClaudium === 3000);
+  check('Ice Fang SKU (skin, 3000)', ice?.kind === 'skin' && ice?.costCredits === 3000);
 
   // Buy two skins: a sword (matches the warrior's worn_sword) and an axe.
   const spend1 = await api(
-    '/api/claudium/spend',
+    '/api/credits/spend',
     {
       method: 'POST',
       body: JSON.stringify({
@@ -194,7 +194,7 @@ async function main() {
   );
   check('buy ice_fang_sword', spend1.body.granted === true, JSON.stringify(spend1.body));
   const replay = await api(
-    '/api/claudium/spend',
+    '/api/credits/spend',
     {
       method: 'POST',
       body: JSON.stringify({
@@ -211,7 +211,7 @@ async function main() {
     JSON.stringify(replay.body),
   );
   const spend2 = await api(
-    '/api/claudium/spend',
+    '/api/credits/spend',
     {
       method: 'POST',
       body: JSON.stringify({
@@ -223,7 +223,7 @@ async function main() {
     t1,
   );
   check('buy glaciersplit_axe', spend2.body.granted === true, JSON.stringify(spend2.body));
-  const store2 = await api('/api/claudium/store', {}, t1);
+  const store2 = await api('/api/credits/store', {}, t1);
   check(
     'store marks both owned',
     ['ice_fang_sword', 'glaciersplit_axe'].every(

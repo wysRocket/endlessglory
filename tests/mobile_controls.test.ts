@@ -451,7 +451,6 @@ function installMobileControlDom(): {
   moreModal: FakeElement;
   emoteButton: FakeElement;
   discordButton: FakeElement;
-  donateButton: FakeElement;
   windowTarget: EventTarget;
 } {
   const autorunTarget = new FakeElement();
@@ -475,7 +474,6 @@ function installMobileControlDom(): {
     ['mobile-extra-controls', new FakeElement()],
     ['mobile-emote', new FakeElement()],
     ['mobile-discord', new FakeElement()],
-    ['mobile-donate', new FakeElement()],
     // The chat composer, so exitChatReply (value clear + blur) is exercised in the
     // fake DOM: the setActive draft-survival test reads its .value.
     ['chat-input', new FakeElement()],
@@ -513,7 +511,6 @@ function installMobileControlDom(): {
     moreModal: elements.get('mobile-extra-controls')!,
     emoteButton: elements.get('mobile-emote')!,
     discordButton: elements.get('mobile-discord')!,
-    donateButton: elements.get('mobile-donate')!,
     windowTarget,
   };
 }
@@ -544,7 +541,6 @@ function mobileCallbacks() {
     onMenu: noop,
     onSocial: noop,
     onDiscord: noop,
-    onDonate: noop,
     onEmotes: noop,
     onArena: noop,
     onDungeonFinder: noop,
@@ -1194,29 +1190,6 @@ describe('MobileControls pointer lifecycle', () => {
     discordButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
 
     expect(discord).toBe(1);
-  });
-
-  it('fires the Donate callback when the on-screen Donate button is tapped', () => {
-    const { donateButton } = installMobileControlDom();
-    const input = {
-      setTouchMove: () => {},
-      clearTouchMove: () => {},
-      setTouchLook: () => {},
-      setTouchLookVector: () => {},
-    } as unknown as Input;
-
-    let donate = 0;
-    const callbacks = {
-      ...mobileCallbacks(),
-      onDonate: () => {
-        donate += 1;
-      },
-    };
-    new MobileControls(input, callbacks).start();
-
-    donateButton.dispatchEvent(new Event('click', { bubbles: true, cancelable: true }));
-
-    expect(donate).toBe(1);
   });
 
   it('closes the open More modal when tapping outside it', () => {

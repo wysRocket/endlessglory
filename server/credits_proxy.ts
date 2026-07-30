@@ -1,6 +1,6 @@
-// Typed game-server client for the external CLAUDIUM economy service.
+// Typed game-server client for the external CREDITS economy service.
 //
-// CLAUDIUM is a server-authoritative soft currency: ALL peg/price/balance logic
+// CREDITS is a server-authoritative soft currency: ALL peg/price/balance logic
 // and verification live in the economy service (a separate repo). The game NEVER
 // computes any of it; this module is the game server's proxy to that service. The
 // browser hits the game server, the game server hits the service over a
@@ -14,66 +14,88 @@
 //
 // The functions mirror the service SDK v1 surface; they do NOT recompute any
 // value, they only pass through what the service returns.
+//
+// WIRE BOUNDARY (read this before renaming anything in this file): the currency
+// was called "Claudium" until the Endless Glory rebrand; it now presents to
+// players and to the rest of this repo as "Credits". The EXTERNAL economy
+// service is a separate repo this project does not control, and it still emits
+// and expects the literal JSON field name `claudium` (confirmed by reading its
+// actual request/response shapes below). Every type or property access
+// commented "WIRE:" reflects that service's byte-for-byte contract and must
+// stay `claudium`, never `credits`, or this proxy silently stops parsing real
+// responses. Everything else in this file - exported type/function names, and
+// the field name this proxy hands to ITS OWN caller (server/credits.ts, and
+// from there the browser) - is this repo's own naming and is renamed to
+// `credits` throughout, mapped explicitly at each wire boundary below.
 
 import { DESKTOP_WALLET_HANDOFF_TTL_MS, desktopWalletHandoffs } from './desktop_wallet_handoff';
 
 const SERVICE_TIMEOUT_MS = 5000;
 const NATIVE_CONFIRM_TIMEOUT_MS = 60_000;
 
-/** Integer Claudium balance for an account, or null when the service is off. */
-export interface ClaudiumBalanceResult {
+/** Integer Credits balance for an account, or null when the service is off. */
+export interface CreditsBalanceResult {
   available: boolean;
   balance: number | null;
 }
 
 /**
- * Per-rail price. usdPerClaudium fixes the display peg (1 Claudium = 0.01 USD);
- * wocBaseUnitsPerClaudium is null when the WOC oracle is down (buy disabled on
+ * Per-rail price. usdPerCredit fixes the display peg (1 Credit = 0.01 USD);
+ * wocBaseUnitsPerCredit is null when the WOC oracle is down (buy disabled on
  * the woc rail). Both fields null when the service is off.
  */
-export interface ClaudiumPriceResult {
+export interface CreditsPriceResult {
   rail: string;
-  usdPerClaudium: number | null;
-  wocBaseUnitsPerClaudium: string | null;
+  usdPerCredit: number | null;
+  wocBaseUnitsPerCredit: string | null;
 }
 
-export interface ClaudiumNativePriceResult {
-  rail: ClaudiumNativeRail;
-  claudium: number | null;
+export interface CreditsNativePriceResult {
+  rail: CreditsNativeRail;
+  credits: number | null;
   amountBase: string | null;
   reason?: string;
 }
 
-export interface ClaudiumSolBalanceResult {
+export interface CreditsSolBalanceResult {
   owner: string;
   lamports: string | null;
 }
 
-export interface ClaudiumUsdcBalanceResult {
+export interface CreditsUsdcBalanceResult {
   owner: string;
   amountBase: string | null;
 }
 
-/** One rung of the SKU ladder. usd/claudium both come from the service. */
-export interface ClaudiumSku {
+/** The raw /skus wire row. WIRE: `claudium` is the external service's own field
+ *  name for the credited amount; kept literal here, mapped to `credits` below. */
+interface EconomySkuWire {
   sku: string;
   usd: number;
   claudium: number;
   stripeConfigured?: boolean;
 }
 
-/** The SKU ladder, empty when the service is off. */
-export interface ClaudiumSkusResult {
-  available: boolean;
-  skus: ClaudiumSku[];
+/** One rung of the SKU ladder, as this repo exposes it downstream. */
+export interface CreditsSku {
+  sku: string;
+  usd: number;
+  credits: number;
+  stripeConfigured?: boolean;
 }
 
-export type ClaudiumRail = 'stripe' | 'sol' | 'usdc' | 'woc';
-export type ClaudiumPriceRail = 'stripe' | 'woc';
-export type ClaudiumNativeRail = 'sol' | 'usdc' | 'woc';
+/** The SKU ladder, empty when the service is off. */
+export interface CreditsSkusResult {
+  available: boolean;
+  skus: CreditsSku[];
+}
+
+export type CreditsRail = 'stripe' | 'sol' | 'usdc' | 'woc';
+export type CreditsPriceRail = 'stripe' | 'woc';
+export type CreditsNativeRail = 'sol' | 'usdc' | 'woc';
 
 /** The stripe-rail purchase-intent leg (client uses clientSecret with Stripe.js). */
-export interface ClaudiumStripeIntent {
+export interface CreditsStripeIntent {
   clientSecret: string;
   publishableKey: string;
 }
@@ -82,7 +104,7 @@ export interface ClaudiumStripeIntent {
  * The woc-rail purchase-intent leg: the split-transfer the client must build and
  * sign via the Wallet Standard path, then confirm by posting the signature.
  */
-export interface ClaudiumWocIntent {
+export interface CreditsWocIntent {
   amountBase: string;
   burnBase: string;
   treasuryBase: string;
@@ -91,26 +113,26 @@ export interface ClaudiumWocIntent {
   expiresAtMs: number;
 }
 
-export interface ClaudiumPurchaseResult {
+export interface CreditsPurchaseResult {
   ok: boolean;
   purchaseId: string | null;
-  rail: ClaudiumRail | null;
-  claudium: number | null;
-  stripe: ClaudiumStripeIntent | null;
-  woc: ClaudiumWocIntent | null;
+  rail: CreditsRail | null;
+  credits: number | null;
+  stripe: CreditsStripeIntent | null;
+  woc: CreditsWocIntent | null;
   reason: string | null;
 }
 
-export interface ClaudiumNativeRailsResult {
+export interface CreditsNativeRailsResult {
   available: boolean;
-  rails: Record<ClaudiumNativeRail, boolean>;
+  rails: Record<CreditsNativeRail, boolean>;
 }
 
-export interface ClaudiumNativeQuoteResult {
+export interface CreditsNativeQuoteResult {
   ok: boolean;
   reference: string | null;
-  rail: ClaudiumNativeRail | null;
-  claudium: number | null;
+  rail: CreditsNativeRail | null;
+  credits: number | null;
   amountBase: string | null;
   destination: string | null;
   mint: string | null;
@@ -121,20 +143,20 @@ export interface ClaudiumNativeQuoteResult {
   reason: string | null;
 }
 
-export interface ClaudiumNativeConfirmResult {
+export interface CreditsNativeConfirmResult {
   settled: boolean;
   balance: number | null;
   reason: string | null;
 }
 
-export interface ClaudiumSpendResult {
+export interface CreditsSpendResult {
   granted: boolean;
   balance: number | null;
-  costClaudium: number | null;
+  costCredits: number | null;
   reason: string | null;
 }
 
-export interface ClaudiumHistoryEntry {
+export interface CreditsHistoryEntry {
   entryId: string;
   accountId: number;
   delta: number;
@@ -143,26 +165,26 @@ export interface ClaudiumHistoryEntry {
   atMs: number;
 }
 
-export interface ClaudiumHistoryResult {
-  entries: ClaudiumHistoryEntry[];
+export interface CreditsHistoryResult {
+  entries: CreditsHistoryEntry[];
 }
 
-/** One cosmetic-store row: the item and its Claudium cost, both from the service. */
-export interface ClaudiumStoreItem {
+/** One cosmetic-store row: the item and its Credits cost, both from the service. */
+export interface CreditsStoreItem {
   itemId: string;
   name: string;
   kind: 'cosmetic' | 'skin' | 'item';
-  costClaudium: number;
+  costCredits: number;
   owned: boolean;
 }
 
 /** The cosmetic store catalog, empty when the service is off. */
-export interface ClaudiumStoreResult {
+export interface CreditsStoreResult {
   available: boolean;
-  items: ClaudiumStoreItem[];
+  items: CreditsStoreItem[];
 }
 
-export interface ClaudiumStripeWebhookResult {
+export interface CreditsStripeWebhookResult {
   received: boolean;
 }
 
@@ -175,7 +197,7 @@ function serviceSecret(): string {
 }
 
 /** The service is reachable only when BOTH the URL and the secret are set. */
-export function claudiumServiceConfigured(): boolean {
+export function creditsServiceConfigured(): boolean {
   return serviceUrl() !== '' && serviceSecret() !== '';
 }
 
@@ -186,7 +208,7 @@ function logFailure(err: unknown): void {
   if (loggedOnce) return;
   loggedOnce = true;
   const message = err instanceof Error ? err.message : String(err);
-  console.warn(`[claudium] economy service unavailable: ${message}`);
+  console.warn(`[credits] economy service unavailable: ${message}`);
 }
 
 interface ServiceRequest {
@@ -227,10 +249,10 @@ async function callService<T>(req: ServiceRequest): Promise<T | null> {
   }
 }
 
-export async function claudiumStripeWebhook(
+export async function creditsStripeWebhook(
   rawBody: Buffer,
   signatureHeader: string,
-): Promise<ClaudiumStripeWebhookResult> {
+): Promise<CreditsStripeWebhookResult> {
   const base = serviceUrl();
   if (base === '') return { received: false };
   try {
@@ -255,7 +277,7 @@ export async function claudiumStripeWebhook(
 }
 
 /** GET balance/:accountId. Balance null when the service is off. */
-export async function claudiumBalance(accountId: number): Promise<ClaudiumBalanceResult> {
+export async function creditsBalance(accountId: number): Promise<CreditsBalanceResult> {
   const data = await callService<{ balance: number }>({
     method: 'GET',
     path: `balance/${encodeURIComponent(String(accountId))}`,
@@ -265,18 +287,20 @@ export async function claudiumBalance(accountId: number): Promise<ClaudiumBalanc
 }
 
 /** GET price/:rail. Prices null when the service is off (buy disabled). */
-export async function claudiumPrice(rail: ClaudiumPriceRail): Promise<ClaudiumPriceResult> {
+export async function creditsPrice(rail: CreditsPriceRail): Promise<CreditsPriceResult> {
+  // WIRE: usdPerClaudium / wocBaseUnitsPerClaudium are the external service's own
+  // field names.
   const data = await callService<{
     rail: string;
     usdPerClaudium: number;
     wocBaseUnitsPerClaudium: string | number | null;
   }>({ method: 'GET', path: `price/${encodeURIComponent(rail)}` });
-  if (!data) return { rail, usdPerClaudium: null, wocBaseUnitsPerClaudium: null };
+  if (!data) return { rail, usdPerCredit: null, wocBaseUnitsPerCredit: null };
   const wocBaseUnits = data.wocBaseUnitsPerClaudium;
   return {
     rail: data.rail,
-    usdPerClaudium: typeof data.usdPerClaudium === 'number' ? data.usdPerClaudium : null,
-    wocBaseUnitsPerClaudium:
+    usdPerCredit: typeof data.usdPerClaudium === 'number' ? data.usdPerClaudium : null,
+    wocBaseUnitsPerCredit:
       typeof wocBaseUnits === 'string'
         ? wocBaseUnits
         : typeof wocBaseUnits === 'number'
@@ -285,12 +309,14 @@ export async function claudiumPrice(rail: ClaudiumPriceRail): Promise<ClaudiumPr
   };
 }
 
-export async function claudiumNativePrice(
-  rail: ClaudiumNativeRail,
+export async function creditsNativePrice(
+  rail: CreditsNativeRail,
   sku: string,
-): Promise<ClaudiumNativePriceResult> {
+): Promise<CreditsNativePriceResult> {
+  // WIRE: `claudium` is the external service's own field name for the credited
+  // amount; read literally, exposed downstream as `credits`.
   const data = await callService<{
-    rail?: ClaudiumNativeRail;
+    rail?: CreditsNativeRail;
     claudium?: number;
     amountBase?: string | null;
     reason?: string;
@@ -300,7 +326,7 @@ export async function claudiumNativePrice(
   });
   return {
     rail: data?.rail ?? rail,
-    claudium:
+    credits:
       typeof data?.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
         ? data.claudium
         : null,
@@ -309,7 +335,7 @@ export async function claudiumNativePrice(
   };
 }
 
-export async function claudiumSolBalance(owner: string): Promise<ClaudiumSolBalanceResult> {
+export async function creditsSolBalance(owner: string): Promise<CreditsSolBalanceResult> {
   const data = await callService<{ owner?: string; lamports?: string | null }>({
     method: 'GET',
     path: `native/balance/sol/${encodeURIComponent(owner)}`,
@@ -320,7 +346,7 @@ export async function claudiumSolBalance(owner: string): Promise<ClaudiumSolBala
   };
 }
 
-export async function claudiumUsdcBalance(owner: string): Promise<ClaudiumUsdcBalanceResult> {
+export async function creditsUsdcBalance(owner: string): Promise<CreditsUsdcBalanceResult> {
   const data = await callService<{ owner?: string; amountBase?: string | null }>({
     method: 'GET',
     path: `native/balance/usdc/${encodeURIComponent(owner)}`,
@@ -331,8 +357,8 @@ export async function claudiumUsdcBalance(owner: string): Promise<ClaudiumUsdcBa
   };
 }
 
-export async function claudiumNativeRails(): Promise<ClaudiumNativeRailsResult> {
-  const data = await callService<{ rails?: Partial<Record<ClaudiumNativeRail, boolean>> }>({
+export async function creditsNativeRails(): Promise<CreditsNativeRailsResult> {
+  const data = await callService<{ rails?: Partial<Record<CreditsNativeRail, boolean>> }>({
     method: 'GET',
     path: 'native/rails',
   });
@@ -348,18 +374,18 @@ export async function claudiumNativeRails(): Promise<ClaudiumNativeRailsResult> 
 }
 
 /** GET skus. Empty ladder when the service is off (stripe rail disabled). */
-export async function claudiumSkus(): Promise<ClaudiumSkusResult> {
-  const data = await callService<ClaudiumSku[]>({ method: 'GET', path: 'skus' });
+export async function creditsSkus(): Promise<CreditsSkusResult> {
+  const data = await callService<EconomySkuWire[]>({ method: 'GET', path: 'skus' });
   if (!Array.isArray(data)) return { available: false, skus: [] };
   const skus = data
     .filter(
-      (s): s is ClaudiumSku =>
+      (s): s is EconomySkuWire =>
         typeof s?.sku === 'string' && typeof s.usd === 'number' && typeof s.claudium === 'number',
     )
     .map((s) => ({
       sku: s.sku,
       usd: s.usd,
-      claudium: s.claudium,
+      credits: s.claudium,
       stripeConfigured:
         typeof (s as { stripeConfigured?: unknown }).stripeConfigured === 'boolean'
           ? (s as { stripeConfigured: boolean }).stripeConfigured
@@ -369,18 +395,20 @@ export async function claudiumSkus(): Promise<ClaudiumSkusResult> {
 }
 
 /** POST purchase. Returns ok:false with a reason when the service is off. */
-export async function claudiumPurchase(input: {
+export async function creditsPurchase(input: {
   accountId: number;
   rail: 'stripe';
   sku: string;
   idempotencyKey: string;
-}): Promise<ClaudiumPurchaseResult> {
+}): Promise<CreditsPurchaseResult> {
+  // WIRE: `claudium`/`woc` are the external service's own request/response field
+  // names; read literally, exposed downstream as `credits`.
   const data = await callService<{
     purchaseId?: string;
-    rail?: ClaudiumRail;
+    rail?: CreditsRail;
     claudium?: number;
-    stripe?: ClaudiumStripeIntent;
-    woc?: ClaudiumWocIntent;
+    stripe?: CreditsStripeIntent;
+    woc?: CreditsWocIntent;
     reason?: string;
   }>({ method: 'POST', path: 'purchase', body: input });
   if (!data) {
@@ -388,7 +416,7 @@ export async function claudiumPurchase(input: {
       ok: false,
       purchaseId: null,
       rail: null,
-      claudium: null,
+      credits: null,
       stripe: null,
       woc: null,
       reason: 'unavailable',
@@ -401,7 +429,7 @@ export async function claudiumPurchase(input: {
     data.rail === 'stripe' || data.rail === 'sol' || data.rail === 'usdc' || data.rail === 'woc'
       ? data.rail
       : null;
-  const claudium =
+  const credits =
     typeof data.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
       ? data.claudium
       : null;
@@ -419,14 +447,14 @@ export async function claudiumPurchase(input: {
     reason === null &&
     purchaseId !== null &&
     rail === input.rail &&
-    claudium !== null &&
+    credits !== null &&
     stripe !== null;
   if (!ok) {
     return {
       ok: false,
       purchaseId: null,
       rail: null,
-      claudium: null,
+      credits: null,
       stripe: null,
       woc: null,
       reason: reason ?? 'unavailable',
@@ -436,22 +464,24 @@ export async function claudiumPurchase(input: {
     ok: true,
     purchaseId,
     rail,
-    claudium,
+    credits,
     stripe,
     woc: null,
     reason: null,
   };
 }
 
-export async function claudiumNativeQuote(input: {
+export async function creditsNativeQuote(input: {
   accountId: number;
-  rail: ClaudiumNativeRail;
+  rail: CreditsNativeRail;
   sku: string;
   payer: string;
-}): Promise<ClaudiumNativeQuoteResult> {
+}): Promise<CreditsNativeQuoteResult> {
+  // WIRE: `claudium` is the external service's own field name for the credited
+  // amount; read literally, exposed downstream as `credits`.
   const data = await callService<{
     reference?: string;
-    rail?: ClaudiumNativeRail;
+    rail?: CreditsNativeRail;
     claudium?: number;
     amountBase?: string;
     destination?: string;
@@ -472,14 +502,14 @@ export async function claudiumNativeQuote(input: {
     },
   });
   const refusalReason = typeof data?.reason === 'string' ? data.reason : null;
-  const creditedClaudium =
+  const creditedCredits =
     typeof data?.claudium === 'number' && Number.isInteger(data.claudium) && data.claudium > 0
       ? data.claudium
       : null;
   if (
     !data?.reference ||
     !data.transactionBase64 ||
-    creditedClaudium === null ||
+    creditedCredits === null ||
     refusalReason !== null ||
     (data.rail !== undefined && data.rail !== input.rail)
   ) {
@@ -487,7 +517,7 @@ export async function claudiumNativeQuote(input: {
       ok: false,
       reference: null,
       rail: null,
-      claudium: null,
+      credits: null,
       amountBase: null,
       destination: null,
       mint: null,
@@ -517,7 +547,7 @@ export async function claudiumNativeQuote(input: {
       ok: false,
       reference: null,
       rail: null,
-      claudium: null,
+      credits: null,
       amountBase: null,
       destination: null,
       mint: null,
@@ -532,7 +562,7 @@ export async function claudiumNativeQuote(input: {
     ok: true,
     reference: data.reference,
     rail: data.rail ?? input.rail,
-    claudium: creditedClaudium,
+    credits: creditedCredits,
     amountBase: data.amountBase ?? null,
     destination: data.destination ?? null,
     mint: data.mint ?? null,
@@ -544,11 +574,11 @@ export async function claudiumNativeQuote(input: {
   };
 }
 
-export async function claudiumNativeConfirm(input: {
+export async function creditsNativeConfirm(input: {
   accountId: number;
   reference: string;
   signature: string;
-}): Promise<ClaudiumNativeConfirmResult> {
+}): Promise<CreditsNativeConfirmResult> {
   const data = await callService<{
     settled: boolean;
     reason?: string;
@@ -568,37 +598,50 @@ export async function claudiumNativeConfirm(input: {
 }
 
 /** POST spend. granted:false when the service is off. */
-export async function claudiumSpend(input: {
+export async function creditsSpend(input: {
   accountId: number;
   itemId: string;
   kind: 'cosmetic' | 'skin' | 'item';
-  expectedCostClaudium: number;
+  expectedCostCredits: number;
   idempotencyKey: string;
-}): Promise<ClaudiumSpendResult> {
+}): Promise<CreditsSpendResult> {
+  // WIRE: `costClaudium` is the external service's own request AND response field
+  // name; the outbound body remaps `expectedCostCredits` back to it below, and
+  // the response is read literally, exposed downstream as `costCredits`.
   const data = await callService<{
     granted: boolean;
     balance: number;
     costClaudium?: number;
     reason?: string;
-  }>({ method: 'POST', path: 'spend', body: input });
-  if (!data) return { granted: false, balance: null, costClaudium: null, reason: 'unavailable' };
+  }>({
+    method: 'POST',
+    path: 'spend',
+    body: {
+      accountId: input.accountId,
+      itemId: input.itemId,
+      kind: input.kind,
+      expectedCostClaudium: input.expectedCostCredits,
+      idempotencyKey: input.idempotencyKey,
+    },
+  });
+  if (!data) return { granted: false, balance: null, costCredits: null, reason: 'unavailable' };
   return {
     granted: Boolean(data.granted),
     balance: typeof data.balance === 'number' ? data.balance : null,
-    costClaudium: typeof data.costClaudium === 'number' ? data.costClaudium : null,
+    costCredits: typeof data.costClaudium === 'number' ? data.costClaudium : null,
     reason: data.reason ?? null,
   };
 }
 
 /** GET history/:accountId. Empty when the service is off. */
-export async function claudiumHistory(accountId: number): Promise<ClaudiumHistoryResult> {
-  const data = await callService<ClaudiumHistoryEntry[]>({
+export async function creditsHistory(accountId: number): Promise<CreditsHistoryResult> {
+  const data = await callService<CreditsHistoryEntry[]>({
     method: 'GET',
     path: `history/${encodeURIComponent(String(accountId))}`,
   });
   if (!Array.isArray(data)) return { entries: [] };
   const entries = data.filter(
-    (entry): entry is ClaudiumHistoryEntry =>
+    (entry): entry is CreditsHistoryEntry =>
       typeof entry?.entryId === 'string' &&
       entry.accountId === accountId &&
       typeof entry.delta === 'number' &&
@@ -609,20 +652,44 @@ export async function claudiumHistory(accountId: number): Promise<ClaudiumHistor
   return { entries };
 }
 
-/** GET store. The cosmetic catalog, priced in Claudium by the service. Empty when off. */
-export async function claudiumStore(accountId: number): Promise<ClaudiumStoreResult> {
-  const data = await callService<ClaudiumStoreItem[]>({
+/** GET store. The cosmetic catalog, priced in Credits by the service. Empty when off. */
+export async function creditsStore(accountId: number): Promise<CreditsStoreResult> {
+  // WIRE: `costClaudium` is the external service's own field name; read
+  // literally, exposed downstream as `costCredits`.
+  const data = await callService<
+    Array<{
+      itemId?: unknown;
+      name?: unknown;
+      kind?: unknown;
+      costClaudium?: unknown;
+      owned?: unknown;
+    }>
+  >({
     method: 'GET',
     path: `store/${encodeURIComponent(String(accountId))}`,
   });
   if (!Array.isArray(data)) return { available: false, items: [] };
-  const items = data.filter(
-    (i): i is ClaudiumStoreItem =>
-      typeof i?.itemId === 'string' &&
-      typeof i.name === 'string' &&
-      typeof i.costClaudium === 'number' &&
-      typeof i.owned === 'boolean' &&
-      (i.kind === 'cosmetic' || i.kind === 'skin' || i.kind === 'item'),
-  );
+  const items: CreditsStoreItem[] = data
+    .filter(
+      (i): i is {
+        itemId: string;
+        name: string;
+        kind: 'cosmetic' | 'skin' | 'item';
+        costClaudium: number;
+        owned: boolean;
+      } =>
+        typeof i?.itemId === 'string' &&
+        typeof i.name === 'string' &&
+        typeof i.costClaudium === 'number' &&
+        typeof i.owned === 'boolean' &&
+        (i.kind === 'cosmetic' || i.kind === 'skin' || i.kind === 'item'),
+    )
+    .map((i) => ({
+      itemId: i.itemId,
+      name: i.name,
+      kind: i.kind,
+      costCredits: i.costClaudium,
+      owned: i.owned,
+    }));
   return { available: true, items };
 }

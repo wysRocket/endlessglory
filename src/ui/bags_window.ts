@@ -114,9 +114,9 @@ export interface BagsWindowDeps extends PainterHostPresentation {
   world(): IWorld;
   /** Localized $WOC on-chain balance markup for the money footer. */
   wocBalanceHtml(): string;
-  /** Localized launcher for the Claudium store, empty when the feature is not available. */
-  claudiumLauncherHtml(): string;
-  openClaudium(): void;
+  /** Localized launcher for the Credits store, empty when the feature is not available. */
+  creditsLauncherHtml(): string;
+  openCredits(): void;
   openWallet(): void;
   hideTooltip(): void;
   /** True when this click is the release of a long-press tooltip peek, so the
@@ -253,10 +253,10 @@ export class BagsWindow {
     grid.scrollTop = prevScrollTop;
     const moneyRow = document.createElement('div');
     moneyRow.className = 'money';
-    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.claudiumLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
+    moneyRow.innerHTML = `${this.deps.wocBalanceHtml()}${this.deps.creditsLauncherHtml()}${this.deps.moneyHtml(world.copper)}`;
     el.appendChild(moneyRow);
-    moneyRow.querySelector('[data-claudium-launcher]')?.addEventListener('click', () => {
-      this.deps.openClaudium();
+    moneyRow.querySelector('[data-credits-launcher]')?.addEventListener('click', () => {
+      this.deps.openCredits();
     });
     moneyRow.querySelector('[data-wallet-action]')?.addEventListener('click', () => {
       this.deps.openWallet();

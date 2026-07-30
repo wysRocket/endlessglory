@@ -62,21 +62,21 @@ describe('mobile window layout CSS', () => {
     );
   });
 
-  it('places the Claudium wallet card beside the balance in mobile landscape', () => {
+  it('places the Credits wallet card beside the balance in mobile landscape', () => {
     expect(mobileCss).toContain(`@media (orientation: landscape) {
-    body.mobile-touch #claudium-window .cl-body:has(> .cl-wallet-connect) {
+    body.mobile-touch #credits-window .cl-body:has(> .cl-wallet-connect) {
       display: grid;
       grid-template-columns: repeat(2, minmax(0, 1fr));
       align-items: stretch;
       gap: 10px;
     }`);
     expect(mobileCss).toContain(`body.mobile-touch
-      #claudium-window
+      #credits-window
       .cl-body:has(> .cl-wallet-connect)
       > :not(.cl-balance, .cl-wallet-connect) {
       grid-column: 1 / -1;
     }`);
-    expect(mobileCss).toContain(`body.mobile-touch #claudium-window .cl-wallet-connect {
+    expect(mobileCss).toContain(`body.mobile-touch #credits-window .cl-wallet-connect {
       margin-top: 0;
     }`);
   });

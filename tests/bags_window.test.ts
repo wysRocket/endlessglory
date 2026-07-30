@@ -32,9 +32,9 @@ describe('bags_window: no magic values', () => {
 });
 
 describe('bags_window: load-bearing behaviors preserved', () => {
-  it('uses the branded Claudium icon and matching balance color', () => {
-    expect(hud).toContain('src="/claudium/icons/claudium_coin_64.webp"');
-    expect(components).toMatch(/\.claudium-launcher\s*\{[^}]*color:\s*#9eeeff;/s);
+  it('uses the branded Credits icon and matching balance color', () => {
+    expect(hud).toContain('src="/credits/icons/credits_coin_64.webp"');
+    expect(components).toMatch(/\.credits-launcher\s*\{[^}]*color:\s*#9eeeff;/s);
   });
 
   it('reuses bag_filter via buildBagGrid (does not re-derive the filter)', () => {

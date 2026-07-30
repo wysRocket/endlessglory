@@ -24,15 +24,15 @@ import {
   CARD_UPLOAD_MAX_PER_MINUTE,
   CHARACTER_MUTATION_MAX_PER_MINUTE,
   type CharacterMutationAction,
-  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
-  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
-  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
-  CLAUDIUM_SPEND_MAX_PER_MINUTE,
-  type ClaudiumMutationAction,
+  CREDITS_CONFIRM_MAX_PER_MINUTE,
+  CREDITS_PURCHASE_MAX_PER_MINUTE,
+  CREDITS_QUOTE_MAX_PER_MINUTE,
+  CREDITS_SPEND_MAX_PER_MINUTE,
+  type CreditsMutationAction,
   cardUploadRateLimited,
   characterMutationRateLimited,
-  claudiumMutationRateLimited,
-  claudiumPreAuthRateLimited,
+  creditsMutationRateLimited,
+  creditsPreAuthRateLimited,
   DISCORD_MAX_PER_MINUTE,
   discordRateLimited,
   MAP_MUTATION_MAX_PER_MINUTE,
@@ -232,9 +232,9 @@ export const WALLET_LINK_POLICY: RateLimitPolicy = {
   tier2: 'global',
 };
 
-function claudiumMutationPolicy(
+function creditsMutationPolicy(
   name: string,
-  action: ClaudiumMutationAction,
+  action: CreditsMutationAction,
   limit: number,
 ): RateLimitPolicy {
   return {
@@ -242,14 +242,14 @@ function claudiumMutationPolicy(
     keyClass: 'ip+account',
     limit,
     windowSeconds: WINDOW_SECONDS,
-    tier1: (ctx) => claudiumMutationRateLimited(ctx.req, ctxAccountId(ctx), action),
+    tier1: (ctx) => creditsMutationRateLimited(ctx.req, ctxAccountId(ctx), action),
     tier2: 'global',
   };
 }
 
-function claudiumPreAuthPolicy(
+function creditsPreAuthPolicy(
   name: string,
-  action: ClaudiumMutationAction,
+  action: CreditsMutationAction,
   limit: number,
 ): RateLimitPolicy {
   return {
@@ -257,51 +257,51 @@ function claudiumPreAuthPolicy(
     keyClass: 'ip',
     limit,
     windowSeconds: WINDOW_SECONDS,
-    tier1: (ctx) => claudiumPreAuthRateLimited(ctx.req, action),
+    tier1: (ctx) => creditsPreAuthRateLimited(ctx.req, action),
     tier2: 'global',
   };
 }
 
-export const CLAUDIUM_PURCHASE_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
-  'claudium_purchase_pre_auth',
+export const CREDITS_PURCHASE_PRE_AUTH_POLICY: RateLimitPolicy = creditsPreAuthPolicy(
+  'credits_purchase_pre_auth',
   'purchase',
-  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+  CREDITS_PURCHASE_MAX_PER_MINUTE,
 );
-export const CLAUDIUM_QUOTE_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
-  'claudium_quote_pre_auth',
+export const CREDITS_QUOTE_PRE_AUTH_POLICY: RateLimitPolicy = creditsPreAuthPolicy(
+  'credits_quote_pre_auth',
   'quote',
-  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+  CREDITS_QUOTE_MAX_PER_MINUTE,
 );
-export const CLAUDIUM_CONFIRM_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
-  'claudium_confirm_pre_auth',
+export const CREDITS_CONFIRM_PRE_AUTH_POLICY: RateLimitPolicy = creditsPreAuthPolicy(
+  'credits_confirm_pre_auth',
   'confirm',
-  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+  CREDITS_CONFIRM_MAX_PER_MINUTE,
 );
-export const CLAUDIUM_SPEND_PRE_AUTH_POLICY: RateLimitPolicy = claudiumPreAuthPolicy(
-  'claudium_spend_pre_auth',
+export const CREDITS_SPEND_PRE_AUTH_POLICY: RateLimitPolicy = creditsPreAuthPolicy(
+  'credits_spend_pre_auth',
   'spend',
-  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+  CREDITS_SPEND_MAX_PER_MINUTE,
 );
 
-export const CLAUDIUM_PURCHASE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
-  'claudium_purchase',
+export const CREDITS_PURCHASE_POLICY: RateLimitPolicy = creditsMutationPolicy(
+  'credits_purchase',
   'purchase',
-  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
+  CREDITS_PURCHASE_MAX_PER_MINUTE,
 );
-export const CLAUDIUM_QUOTE_POLICY: RateLimitPolicy = claudiumMutationPolicy(
-  'claudium_quote',
+export const CREDITS_QUOTE_POLICY: RateLimitPolicy = creditsMutationPolicy(
+  'credits_quote',
   'quote',
-  CLAUDIUM_QUOTE_MAX_PER_MINUTE,
+  CREDITS_QUOTE_MAX_PER_MINUTE,
 );
-export const CLAUDIUM_CONFIRM_POLICY: RateLimitPolicy = claudiumMutationPolicy(
-  'claudium_confirm',
+export const CREDITS_CONFIRM_POLICY: RateLimitPolicy = creditsMutationPolicy(
+  'credits_confirm',
   'confirm',
-  CLAUDIUM_CONFIRM_MAX_PER_MINUTE,
+  CREDITS_CONFIRM_MAX_PER_MINUTE,
 );
-export const CLAUDIUM_SPEND_POLICY: RateLimitPolicy = claudiumMutationPolicy(
-  'claudium_spend',
+export const CREDITS_SPEND_POLICY: RateLimitPolicy = creditsMutationPolicy(
+  'credits_spend',
   'spend',
-  CLAUDIUM_SPEND_MAX_PER_MINUTE,
+  CREDITS_SPEND_MAX_PER_MINUTE,
 );
 
 // The character-mutation policies. Each is 'ip+account' (so it must be

@@ -5,8 +5,8 @@ const storeWindow = readFileSync(
   new URL('../src/ui/daily_rewards_window.ts', import.meta.url),
   'utf8',
 );
-const claudiumWindow = readFileSync(
-  new URL('../src/ui/claudium_window.ts', import.meta.url),
+const creditsWindow = readFileSync(
+  new URL('../src/ui/credits_window.ts', import.meta.url),
   'utf8',
 );
 const hud = readFileSync(new URL('../src/ui/hud.ts', import.meta.url), 'utf8');
@@ -25,30 +25,30 @@ describe('WOC Store window contract', () => {
     expect(storeWindow).toContain('data-woc-store-tab="rewards"');
   });
 
-  it('offers a Claudium top-up when the selected skin is unaffordable', () => {
+  it('offers a Credits top-up when the selected skin is unaffordable', () => {
     const purchase = storeWindow.slice(storeWindow.indexOf('private requestArmoryPurchase'));
     expect(purchase).toContain('if (!row.affordable)');
     expect(purchase).toContain("t('hudChrome.wocStore.needMoreTitle')");
-    expect(purchase).toContain('this.openClaudiumFromStore()');
+    expect(purchase).toContain('this.openCreditsFromStore()');
   });
 
   it('uses the authoritative insufficient-balance response for the top-up flow', () => {
     const purchase = storeWindow.slice(storeWindow.indexOf('private async purchaseArmorySkin'));
     expect(purchase).toContain("result?.reason === 'insufficient_balance'");
-    expect(purchase).toContain('result.costClaudium');
+    expect(purchase).toContain('result.costCredits');
     expect(purchase).toContain('result.balance');
     expect(purchase).toContain('this.openNeedMoreDialog');
     expect(purchase.indexOf("result?.reason === 'insufficient_balance'")).toBeLessThan(
       purchase.indexOf('this.storeError = true'),
     );
-    expect(main).toContain('costClaudium: result.costClaudium');
+    expect(main).toContain('costCredits: result.costCredits');
     expect(main).toContain('reason: result.reason');
   });
 
   it('marks owned skins and prevents another purchase attempt', () => {
     expect(storeWindow).toContain('armory-state');
     expect(storeWindow).toContain(
-      'if (row.owned || !row.purchasable || row.costClaudium === null) return;',
+      'if (row.owned || !row.purchasable || row.costCredits === null) return;',
     );
   });
 
@@ -98,46 +98,46 @@ describe('WOC Store window contract', () => {
     );
   });
 
-  it('keeps the Claudium window focused on currency purchases', () => {
-    expect(claudiumWindow).not.toContain('private storeHtml(');
-    expect(claudiumWindow).not.toContain('data-item=');
-    expect(claudiumWindow).toContain('cl-pack-art');
-    expect(claudiumWindow).toContain('/claudium/icons/stack_');
+  it('keeps the Credits window focused on currency purchases', () => {
+    expect(creditsWindow).not.toContain('private storeHtml(');
+    expect(creditsWindow).not.toContain('data-item=');
+    expect(creditsWindow).toContain('cl-pack-art');
+    expect(creditsWindow).toContain('/credits/icons/stack_');
   });
 
-  it('keeps Claudium packs mounted while their snapshot refreshes', () => {
-    const render = claudiumWindow.slice(
-      claudiumWindow.indexOf('async render('),
-      claudiumWindow.indexOf('private ensureShell'),
+  it('keeps Credits packs mounted while their snapshot refreshes', () => {
+    const render = creditsWindow.slice(
+      creditsWindow.indexOf('async render('),
+      creditsWindow.indexOf('private ensureShell'),
     );
     expect(render).toContain('this.syncRefreshing(true);');
     expect(render).toContain('if (!this.hasRenderedSnapshot) this.paintLoading();');
     expect(render).toContain('snapshot.available === false) && this.currentView');
-    expect(render).toContain("this.announce(t('hudChrome.claudium.unavailable'))");
-    expect(claudiumWindow).toContain('data-refresh-status');
-    expect(claudiumWindow).toContain('data-cl-live-status');
-    expect(claudiumWindow).toContain("querySelector<HTMLElement>('.cl-body')");
-    expect(claudiumWindow).toContain("setAttribute('aria-busy', refreshing ? 'true' : 'false')");
-    expect(claudiumWindow).toContain("querySelectorAll<HTMLButtonElement>('[data-sku]')");
-    const refreshSync = claudiumWindow.slice(
-      claudiumWindow.indexOf('private syncRefreshing('),
-      claudiumWindow.indexOf('private announce('),
+    expect(render).toContain("this.announce(t('hudChrome.credits.unavailable'))");
+    expect(creditsWindow).toContain('data-refresh-status');
+    expect(creditsWindow).toContain('data-cl-live-status');
+    expect(creditsWindow).toContain("querySelector<HTMLElement>('.cl-body')");
+    expect(creditsWindow).toContain("setAttribute('aria-busy', refreshing ? 'true' : 'false')");
+    expect(creditsWindow).toContain("querySelectorAll<HTMLButtonElement>('[data-sku]')");
+    const refreshSync = creditsWindow.slice(
+      creditsWindow.indexOf('private syncRefreshing('),
+      creditsWindow.indexOf('private announce('),
     );
     expect(refreshSync).not.toContain('[data-rail]');
-    expect(claudiumWindow).toContain('cl-sku-buy-spinner');
-    expect(claudiumWindow).toContain('this.syncPendingPurchase(body, rail, sku);');
-    expect(claudiumWindow).toContain(
+    expect(creditsWindow).toContain('cl-sku-buy-spinner');
+    expect(creditsWindow).toContain('this.syncPendingPurchase(body, rail, sku);');
+    expect(creditsWindow).toContain(
       'const refreshFocus = restoreTarget ?? this.captureBodyFocus();',
     );
-    expect(claudiumWindow).toContain(
+    expect(creditsWindow).toContain(
       "const purchaseFocus = this.captureBodyFocus() ?? { kind: 'sku', value: sku };",
     );
-    expect(claudiumWindow).toContain('void this.render(null, purchaseFocus);');
-    expect(claudiumWindow).toContain('this.restoreBodyFocus(focused);');
-    expect(claudiumWindow).toContain('this.paint(this.currentView ?? view);');
+    expect(creditsWindow).toContain('void this.render(null, purchaseFocus);');
+    expect(creditsWindow).toContain('this.restoreBodyFocus(focused);');
+    expect(creditsWindow).toContain('this.paint(this.currentView ?? view);');
   });
 
-  it('keeps refresh-disabled Claudium packs visually stable', () => {
+  it('keeps refresh-disabled Credits packs visually stable', () => {
     expect(componentsCss).toContain(
       '.cl-body[aria-busy="true"] .cl-sku:disabled {\n    opacity: 1;',
     );
@@ -145,7 +145,7 @@ describe('WOC Store window contract', () => {
 
   it('keeps stacked opaque store windows out of the backdrop blur compositor', () => {
     const rule = componentsCss.match(
-      /body\.frosted-panels #daily-rewards-window,\s*body\.frosted-panels #claudium-window \{([^}]*)\}/,
+      /body\.frosted-panels #daily-rewards-window,\s*body\.frosted-panels #credits-window \{([^}]*)\}/,
     );
     expect(rule).not.toBeNull();
     expect(rule?.[1]).toMatch(/(?:^|\n)\s+-webkit-backdrop-filter: none;/);
@@ -154,7 +154,7 @@ describe('WOC Store window contract', () => {
 
   it('isolates stacked store paint and pauses decorative raster work during window drag', () => {
     const containment = componentsCss.match(
-      /#daily-rewards-window,\s*#claudium-window \{([^}]*)\}/,
+      /#daily-rewards-window,\s*#credits-window \{([^}]*)\}/,
     );
     expect(containment).not.toBeNull();
     expect(containment?.[1]).toContain('contain: paint;');
@@ -165,28 +165,28 @@ describe('WOC Store window contract', () => {
     );
     expect(stackSync).toContain('stackedWindowsVisible(');
     expect(stackSync).toContain('!!storeWindow && this.isWindowVisible(storeWindow)');
-    expect(stackSync).toContain('!!claudiumWindow && this.isWindowVisible(claudiumWindow)');
+    expect(stackSync).toContain('!!creditsWindow && this.isWindowVisible(creditsWindow)');
     expect(stackSync).toContain("document.body.classList.toggle('store-stack-open'");
     expect(stackSync).toContain('recordStoreStackSample(');
     expect(hud).toContain('isWindowDragPreviewMutation(m.attributeName, m.target)');
     const dailyRewardsDeps = hud.slice(
       hud.indexOf('private readonly dailyRewardsWindow = new DailyRewardsWindow({'),
-      hud.indexOf('// Claudium (server-authoritative soft currency) window.'),
+      hud.indexOf('// Credits (server-authoritative soft currency) window.'),
     );
     expect(dailyRewardsDeps).toContain("root: () => $('#daily-rewards-window')");
     expect(dailyRewardsDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
-    const claudiumDeps = hud.slice(
-      hud.indexOf('private readonly claudiumWindow = new ClaudiumWindow({'),
+    const creditsDeps = hud.slice(
+      hud.indexOf('private readonly creditsWindow = new CreditsWindow({'),
       hud.indexOf('// Spellbook window painter'),
     );
-    expect(claudiumDeps).toContain("root: () => $('#claudium-window')");
-    expect(claudiumDeps).toContain('walletState: () => walletConnectionView()');
-    expect(claudiumDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
+    expect(creditsDeps).toContain("root: () => $('#credits-window')");
+    expect(creditsDeps).toContain('walletState: () => walletConnectionView()');
+    expect(creditsDeps).toContain('onVisibilityChange: () => this.syncAnyWindowOpenState()');
     const walletUiSubscription = hud.slice(
       hud.indexOf('onWalletUiChange(() => {'),
       hud.indexOf("$('#pf-name').textContent"),
     );
-    expect(walletUiSubscription).toContain('this.claudiumWindow.onWalletChanged();');
+    expect(walletUiSubscription).toContain('this.creditsWindow.onWalletChanged();');
     // No conditional GPU promotion on the store windows: the old
     // body.store-stack-open will-change rule dropped the promotion in the same
     // frame a window's inline display flipped, racing Chromium's layer
@@ -195,7 +195,7 @@ describe('WOC Store window contract', () => {
     // report). contain: paint + isolation: isolate above stay; promotion must
     // not come back conditionally or permanently.
     expect(componentsCss).not.toMatch(/store-stack-open[^{}]*\{[^}]*will-change/);
-    expect(componentsCss).not.toMatch(/#(?:daily-rewards|claudium)-window[^{}]*\{[^}]*will-change/);
+    expect(componentsCss).not.toMatch(/#(?:daily-rewards|credits)-window[^{}]*\{[^}]*will-change/);
     expect(componentsCss).toContain(
       'body.window-drag-active .armory-section.rarity-legendary .armory-card',
     );
@@ -216,8 +216,8 @@ describe('WOC Store window contract', () => {
   it('routes the Escape close of both store windows through their painters', () => {
     const dailyCase = hud.slice(hud.indexOf("case 'daily-rewards-window':"));
     expect(dailyCase.slice(0, 300)).toContain('this.dailyRewardsWindow.close();');
-    const claudiumCase = hud.slice(hud.indexOf("case 'claudium-window':"));
-    expect(claudiumCase.slice(0, 300)).toContain('this.claudiumWindow.close();');
+    const creditsCase = hud.slice(hud.indexOf("case 'credits-window':"));
+    expect(creditsCase.slice(0, 300)).toContain('this.creditsWindow.close();');
   });
 
   it('keeps storefront content mounted while a background refresh is loading', () => {
@@ -230,14 +230,14 @@ describe('WOC Store window contract', () => {
     expect(storeWindow).toContain('this.storeError = !this.storeReady;');
   });
 
-  it('keeps the store, Claudium, and Daily Rewards surfaces out of native builds', () => {
+  it('keeps the store, Credits, and Daily Rewards surfaces out of native builds', () => {
     expect(main).toContain('dailyRewardsEnabled: !NATIVE_APP');
     expect(main).toContain('devCommandsEnabled: import.meta.env.DEV');
     const economyWiring = main.slice(
-      main.indexOf('if (!NATIVE_APP) {', main.indexOf('const claudiumHooks')),
+      main.indexOf('if (!NATIVE_APP) {', main.indexOf('const creditsHooks')),
       main.indexOf('function interactKey'),
     );
-    expect(economyWiring).toContain('hud.attachClaudium(claudiumHooks);');
+    expect(economyWiring).toContain('hud.attachCredits(creditsHooks);');
     expect(economyWiring).toContain('shouldShowStorePromo({');
     expect(economyWiring).toContain('nativeApp: NATIVE_APP');
     expect(economyWiring).toContain('desktopApp: DESKTOP_APP');
@@ -246,7 +246,7 @@ describe('WOC Store window contract', () => {
     );
     expect(economyWiring).toContain('hud.attachStorePromoCard();');
     expect(hud).toContain("returnFocusTo: () => document.getElementById('daily-rewards-button')");
-    expect(hud).toContain('storeEnabled: () => this.claudiumHooks !== null');
+    expect(hud).toContain('storeEnabled: () => this.creditsHooks !== null');
     expect(hud).toContain(
       'private dailyRewardsEnabled(): boolean {\n    return this.features.dailyRewardsEnabled;',
     );
@@ -255,7 +255,7 @@ describe('WOC Store window contract', () => {
     );
     expect(hud).toContain("dailyRewardsButton?.setAttribute('hidden', '');");
     expect(hud).toContain("mobileDailyRewardsButton?.setAttribute('hidden', '');");
-    expect(hud).toContain('if (!this.claudiumHooks) return;');
+    expect(hud).toContain('if (!this.creditsHooks) return;');
     expect(hud).toContain("? 'hudChrome.wocStore.title'");
     expect(hud).toContain(": 'hudChrome.dailyRewards.title';");
     expect(hud).toContain('this.syncDailyRewardsSurfaceLabels();');
@@ -266,7 +266,7 @@ describe('WOC Store window contract', () => {
   it('refreshes only store balance and catalog while the WOC Store is open', () => {
     const storeWiring = hud.slice(hud.indexOf('storeSnapshot: async () =>'));
     expect(storeWiring.slice(0, storeWiring.indexOf('spendStoreItem:'))).toContain(
-      'this.claudiumHooks?.storeSnapshot()',
+      'this.creditsHooks?.storeSnapshot()',
     );
 
     const hook = main.slice(main.indexOf('storeSnapshot: async () =>'));
@@ -277,7 +277,7 @@ describe('WOC Store window contract', () => {
     expect(storeSnapshot).not.toContain('economy.nativePrice(');
   });
 
-  it('distinguishes a complete Claudium pack refresh from typed economy fallbacks', () => {
+  it('distinguishes a complete Credits pack refresh from typed economy fallbacks', () => {
     const hook = main.slice(main.indexOf('snapshot: async () =>'));
     const snapshot = hook.slice(0, hook.indexOf('buy: async'));
     expect(snapshot).toContain('economy.packSnapshot()');

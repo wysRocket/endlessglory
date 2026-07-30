@@ -12,13 +12,13 @@ import type { AttackSignalSink, AuthFailureKind } from '../../server/http/attack
 import { noopAttackSignalSink, setAttackSignalSink } from '../../server/http/attack_signals';
 import {
   authThrottled,
-  CLAUDIUM_PURCHASE_MAX_PER_MINUTE,
-  claudiumMutationRateLimited,
+  CREDITS_PURCHASE_MAX_PER_MINUTE,
+  creditsMutationRateLimited,
   clearAuthFailures,
   rateLimited,
   recordAuthFailure,
   resetAuthFailures,
-  resetClaudiumMutationRateLimits,
+  resetCreditsMutationRateLimits,
   resetRateLimitClock,
   resetRateLimits,
   resetWalletLinkRateLimits,
@@ -46,7 +46,7 @@ function pinClock(start: number) {
 
 function resetAll() {
   resetRateLimits();
-  resetClaudiumMutationRateLimits();
+  resetCreditsMutationRateLimits();
   resetWalletLinkRateLimits();
   resetAuthFailures();
   resetRateLimitClock();
@@ -153,28 +153,28 @@ describe('walletLinkRateLimited: fused IP-AND-account merge', () => {
   });
 });
 
-describe('claudiumMutationRateLimited: monetary mutation isolation', () => {
+describe('creditsMutationRateLimited: monetary mutation isolation', () => {
   it('caps both account and IP purchase floods without sharing the spend bucket', () => {
     pinClock(5_500_000);
 
-    for (let i = 0; i < CLAUDIUM_PURCHASE_MAX_PER_MINUTE; i++) {
-      expect(claudiumMutationRateLimited(reqFrom(`10.4.0.${i + 1}`), 42, 'purchase').allowed).toBe(
+    for (let i = 0; i < CREDITS_PURCHASE_MAX_PER_MINUTE; i++) {
+      expect(creditsMutationRateLimited(reqFrom(`10.4.0.${i + 1}`), 42, 'purchase').allowed).toBe(
         true,
       );
     }
-    expect(claudiumMutationRateLimited(reqFrom('10.4.0.250'), 42, 'purchase').allowed).toBe(false);
+    expect(creditsMutationRateLimited(reqFrom('10.4.0.250'), 42, 'purchase').allowed).toBe(false);
 
     // A throttled checkout bucket must not prevent the same account from spending
-    // already-owned Claudium: each monetary action has its own fused bucket.
-    expect(claudiumMutationRateLimited(reqFrom('10.4.0.250'), 42, 'spend').allowed).toBe(true);
+    // already-owned Credits: each monetary action has its own fused bucket.
+    expect(creditsMutationRateLimited(reqFrom('10.4.0.250'), 42, 'spend').allowed).toBe(true);
 
-    resetClaudiumMutationRateLimits();
-    for (let i = 0; i < CLAUDIUM_PURCHASE_MAX_PER_MINUTE; i++) {
-      expect(claudiumMutationRateLimited(reqFrom('10.4.9.9'), 1000 + i, 'purchase').allowed).toBe(
+    resetCreditsMutationRateLimits();
+    for (let i = 0; i < CREDITS_PURCHASE_MAX_PER_MINUTE; i++) {
+      expect(creditsMutationRateLimited(reqFrom('10.4.9.9'), 1000 + i, 'purchase').allowed).toBe(
         true,
       );
     }
-    expect(claudiumMutationRateLimited(reqFrom('10.4.9.9'), 9999, 'purchase').allowed).toBe(false);
+    expect(creditsMutationRateLimited(reqFrom('10.4.9.9'), 9999, 'purchase').allowed).toBe(false);
   });
 });
 

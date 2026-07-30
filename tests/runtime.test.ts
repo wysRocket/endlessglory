@@ -16,15 +16,13 @@ describe('desktop runtime helpers', () => {
     expect(normalizeOrigin('https://worldofclaudecraft.com/')).toBe(
       'https://worldofclaudecraft.com',
     );
-    expect(() => normalizeOrigin('app://endlessglory')).toThrow(
-      'unsupported origin protocol',
-    );
+    expect(() => normalizeOrigin('app://endlessglory')).toThrow('unsupported origin protocol');
   });
 
   it('builds websocket URLs from desktop API origins', () => {
-    expect(
-      runtimeWebSocketUrl('app:', 'endlessglory', 'https://worldofclaudecraft.com'),
-    ).toBe('wss://worldofclaudecraft.com/ws');
+    expect(runtimeWebSocketUrl('app:', 'endlessglory', 'https://worldofclaudecraft.com')).toBe(
+      'wss://worldofclaudecraft.com/ws',
+    );
     expect(runtimeWebSocketUrl('http:', '127.0.0.1:5173', '')).toBe('ws://127.0.0.1:5173/ws');
   });
 

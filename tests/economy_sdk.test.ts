@@ -1,9 +1,9 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  type ClaudiumNativeConfirm,
+  type CreditsNativeConfirm,
   confirmNativeSettlement,
   EconomyClient,
-  startClaudiumPurchase,
+  startCreditsPurchase,
 } from '../src/net/economy_sdk';
 
 vi.mock('../src/net/wallet', () => ({
@@ -20,10 +20,10 @@ describe('EconomyClient store snapshot', () => {
       'fetch',
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input);
-        if (url.endsWith('/api/claudium/balance')) {
+        if (url.endsWith('/api/credits/balance')) {
           return new Response(JSON.stringify({ balance: 750 }), { status: 200 });
         }
-        if (url.endsWith('/api/claudium/store')) {
+        if (url.endsWith('/api/credits/store')) {
           return new Response(
             JSON.stringify({
               items: [
@@ -31,7 +31,7 @@ describe('EconomyClient store snapshot', () => {
                   itemId: 'ice_fang_sword',
                   name: 'Ice Fang',
                   kind: 'skin',
-                  costClaudium: 3000,
+                  costCredits: 3000,
                   owned: false,
                 },
               ],
@@ -56,7 +56,7 @@ describe('EconomyClient store snapshot', () => {
           itemId: 'ice_fang_sword',
           name: 'Ice Fang',
           kind: 'skin',
-          costClaudium: 3000,
+          costCredits: 3000,
           owned: false,
         },
       ],
@@ -68,7 +68,7 @@ describe('EconomyClient store snapshot', () => {
       'fetch',
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input);
-        if (url.endsWith('/api/claudium/balance')) {
+        if (url.endsWith('/api/credits/balance')) {
           return new Response(JSON.stringify({ balance: 250 }), { status: 200 });
         }
         return new Response(null, { status: 503 });
@@ -88,10 +88,10 @@ describe('EconomyClient store snapshot', () => {
       'fetch',
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input);
-        if (url.endsWith('/api/claudium/balance')) {
+        if (url.endsWith('/api/credits/balance')) {
           return new Response(JSON.stringify({ balance: 250 }), { status: 200 });
         }
-        if (url.endsWith('/api/claudium/store')) {
+        if (url.endsWith('/api/credits/store')) {
           return new Response(JSON.stringify({ available: false, items: [] }), { status: 200 });
         }
         return new Response(null, { status: 404 });
@@ -113,19 +113,19 @@ describe('EconomyClient pack snapshot', () => {
       'fetch',
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input);
-        if (url.endsWith('/api/claudium/balance')) {
+        if (url.endsWith('/api/credits/balance')) {
           return new Response(JSON.stringify({ available: true, balance: 250 }), { status: 200 });
         }
-        if (url.endsWith('/api/claudium/skus')) {
+        if (url.endsWith('/api/credits/skus')) {
           return new Response(
             JSON.stringify({
               available: true,
-              skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+              skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
             }),
             { status: 200 },
           );
         }
-        if (url.endsWith('/api/claudium/native/rails')) {
+        if (url.endsWith('/api/credits/native/rails')) {
           return new Response(
             JSON.stringify({ available: true, rails: { sol: true, usdc: true, woc: true } }),
             { status: 200 },
@@ -143,7 +143,7 @@ describe('EconomyClient pack snapshot', () => {
     expect(snapshot).toEqual({
       available: true,
       balance: 250,
-      skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+      skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
       nativeRails: { sol: true, usdc: true, woc: true },
     });
   });
@@ -153,19 +153,19 @@ describe('EconomyClient pack snapshot', () => {
       'fetch',
       vi.fn(async (input: string | URL | Request) => {
         const url = String(input);
-        if (url.endsWith('/api/claudium/balance')) {
+        if (url.endsWith('/api/credits/balance')) {
           return new Response(JSON.stringify({ available: true, balance: 250 }), { status: 200 });
         }
-        if (url.endsWith('/api/claudium/skus')) {
+        if (url.endsWith('/api/credits/skus')) {
           return new Response(
             JSON.stringify({
               available: true,
-              skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+              skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
             }),
             { status: 200 },
           );
         }
-        if (url.endsWith('/api/claudium/native/rails')) {
+        if (url.endsWith('/api/credits/native/rails')) {
           return new Response(
             JSON.stringify({
               available: false,
@@ -186,7 +186,7 @@ describe('EconomyClient pack snapshot', () => {
     expect(snapshot).toEqual({
       available: false,
       balance: 250,
-      skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+      skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
       nativeRails: { sol: false, usdc: false, woc: false },
     });
   });
@@ -207,19 +207,19 @@ describe('EconomyClient pack snapshot', () => {
 
     expect(balance).toEqual({ owner: 'wallet-owner', amountBase: '12345678' });
     expect(String(fetchMock.mock.calls[0]?.[0])).toContain(
-      '/api/claudium/native/balance/usdc/wallet-owner',
+      '/api/credits/native/balance/usdc/wallet-owner',
     );
   });
 });
 
-describe('startClaudiumPurchase', () => {
+describe('startCreditsPurchase', () => {
   it('signs and confirms a service-built USDC transaction through Wallet Standard', async () => {
     const client = new EconomyClient({ token: () => 'token', base: 'https://game.example' });
     const quote = vi.spyOn(client, 'nativeQuote').mockResolvedValue({
       ok: true,
       reference: 'CLM_usdc',
       rail: 'usdc',
-      claudium: 500,
+      credits: 500,
       amountBase: '4990000',
       destination: 'usdc-token-account',
       mint: 'usdc-mint',
@@ -235,13 +235,13 @@ describe('startClaudiumPurchase', () => {
     });
     const signer = vi.fn(async () => 'usdc-signature');
 
-    const result = await startClaudiumPurchase(client, 'usdc', 'claudium_500', {
+    const result = await startCreditsPurchase(client, 'usdc', 'credits_500', {
       nativeSignAndSend: signer,
     });
 
     expect(quote).toHaveBeenCalledWith({
       rail: 'usdc',
-      sku: 'claudium_500',
+      sku: 'credits_500',
       payer: 'wallet-owner',
     });
     expect(signer).toHaveBeenCalledWith('AQID', 'usdc', 'CLM_usdc');
@@ -258,7 +258,7 @@ describe('startClaudiumPurchase', () => {
       ok: true,
       reference: 'CLM_desktop',
       rail: 'sol',
-      claudium: 500,
+      credits: 500,
       amountBase: '123',
       destination: 'treasury',
       mint: null,
@@ -273,14 +273,14 @@ describe('startClaudiumPurchase', () => {
       reason: null,
     });
 
-    await startClaudiumPurchase(client, 'sol', 'claudium_500', {
+    await startCreditsPurchase(client, 'sol', 'credits_500', {
       nativePayer: 'linked-desktop-wallet',
       nativeSignAndSend: async () => 'signature',
     });
 
     expect(quote).toHaveBeenCalledWith({
       rail: 'sol',
-      sku: 'claudium_500',
+      sku: 'credits_500',
       payer: 'linked-desktop-wallet',
     });
   });
@@ -288,7 +288,7 @@ describe('startClaudiumPurchase', () => {
 
 describe('confirmNativeSettlement', () => {
   it('retries while a native payment is not finalized yet', async () => {
-    const results: ClaudiumNativeConfirm[] = [
+    const results: CreditsNativeConfirm[] = [
       { settled: false, balance: null, reason: 'not_found_onchain' },
       { settled: false, balance: null, reason: 'not_finalized' },
       { settled: false, balance: null, reason: 'unavailable' },
@@ -335,7 +335,7 @@ describe('confirmNativeSettlement', () => {
   });
 
   it('retries settlement work that another service worker can finish', async () => {
-    const results: ClaudiumNativeConfirm[] = [
+    const results: CreditsNativeConfirm[] = [
       { settled: false, balance: null, reason: 'processing' },
       { settled: false, balance: null, reason: 'post_verify_failed' },
       { settled: false, balance: null, reason: 'fulfillment_failed' },

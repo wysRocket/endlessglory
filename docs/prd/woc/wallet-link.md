@@ -35,7 +35,7 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
   WalletConnect QR inside Electron. Create, claim, complete, and result requests
   therefore stay off a separately selected realm origin.
   Chrome, Safari, or the chosen default browser can see its installed Solana
-  wallet extensions. For a purchase, the renderer sends only the Claudium quote
+  wallet extensions. For a purchase, the renderer sends only the Credits quote
   reference. The game server resolves the exact economy-service transaction it
   authorized for that account and linked wallet before the browser signs it. The
   browser returns only the result to the desktop app through the registered
@@ -64,5 +64,5 @@ Foundational rather than a flywheel itself: every other $WOC mechanic needs a ve
 
 ## Out of scope
 Custody, arbitrary transactions, staking, and gameplay power remain out of scope.
-The only transaction handoff is a server-built Claudium purchase that is already
+The only transaction handoff is a server-built Credits purchase that is already
 bound to the linked wallet and existing purchase intent.

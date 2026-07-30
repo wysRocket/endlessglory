@@ -16,7 +16,7 @@ import {
   targetFrameNonSelfIntervalMs,
 } from '../game/ui_tier_knobs';
 import { voice, voiceDistanceGain } from '../game/voice';
-import type { ClaudiumStoreItem } from '../net/economy_sdk';
+import type { CreditsStoreItem } from '../net/economy_sdk';
 import { castBarState, consumeBarState } from '../render/cast_bar';
 import { CharacterPreview } from '../render/characters';
 import { preloadMechAssets } from '../render/characters/assets';
@@ -142,8 +142,8 @@ import {
   resolvePlayerSocialFlags,
   serializeIgnoreList,
 } from './chat_ignore_core';
-import type { ClaudiumRail, ClaudiumSnapshot } from './claudium_window';
-import { ClaudiumWindow } from './claudium_window';
+import type { CreditsRail, CreditsSnapshot } from './credits_window';
+import { CreditsWindow } from './credits_window';
 import { formatClockTime } from './clock';
 import { CombatAnnouncer } from './combat_announcer';
 import {
@@ -547,28 +547,28 @@ export interface ReportHooks {
 }
 
 /**
- * Online-only glue that backs the Claudium store window. main.ts wires this from
- * the client economy SDK (which hits the game server's /api/claudium/* routes).
+ * Online-only glue that backs the Credits store window. main.ts wires this from
+ * the client economy SDK (which hits the game server's /api/credits/* routes).
  * snapshot() reads the current service state; buy()/spend() begin the client-signed
  * purchase / cosmetic-redeem flows. All values originate in the economy service.
  */
-export interface ClaudiumHooks {
+export interface CreditsHooks {
   balance(): Promise<number | null>;
   storeSnapshot(): Promise<{
     available: boolean;
     balance: number | null;
-    storeItems: readonly ClaudiumStoreItem[];
+    storeItems: readonly CreditsStoreItem[];
   }>;
-  snapshot(): Promise<ClaudiumSnapshot>;
-  buy(rail: ClaudiumRail, sku: string): Promise<void>;
+  snapshot(): Promise<CreditsSnapshot>;
+  buy(rail: CreditsRail, sku: string): Promise<void>;
   spend(
     itemId: string,
     kind: 'cosmetic' | 'skin' | 'item',
-    expectedCostClaudium: number,
+    expectedCostCredits: number,
   ): Promise<{
     granted: boolean;
     balance: number | null;
-    costClaudium: number | null;
+    costCredits: number | null;
     reason: string | null;
   }>;
 }
@@ -1654,7 +1654,7 @@ export class Hud {
     onWalletUiChange(() => {
       if ($('#bags').style.display !== 'none') this.renderBags();
       this.playerCard.refresh();
-      this.claudiumWindow.onWalletChanged();
+      this.creditsWindow.onWalletChanged();
     });
     $('#pf-name').textContent = sim.player.name;
     this.drawPlayerFramePortrait();
@@ -2297,12 +2297,12 @@ export class Hud {
       .some((win) => this.isWindowVisible(win));
     document.body.classList.toggle('mobile-window-open', anyOpen);
     const storeWindow = document.getElementById('daily-rewards-window') as HTMLElement | null;
-    const claudiumWindow = document.getElementById('claudium-window') as HTMLElement | null;
+    const creditsWindow = document.getElementById('credits-window') as HTMLElement | null;
     const storeVisible = !!storeWindow && this.isWindowVisible(storeWindow);
-    const claudiumVisible = !!claudiumWindow && this.isWindowVisible(claudiumWindow);
-    const storeStacked = stackedWindowsVisible(storeVisible, claudiumVisible);
+    const creditsVisible = !!creditsWindow && this.isWindowVisible(creditsWindow);
+    const storeStacked = stackedWindowsVisible(storeVisible, creditsVisible);
     document.body.classList.toggle('store-stack-open', storeStacked);
-    recordStoreStackSample(storeVisible, claudiumVisible, storeStacked);
+    recordStoreStackSample(storeVisible, creditsVisible, storeStacked);
     const mapWindow = document.getElementById('map-window');
     const questLogWindow = document.getElementById('quest-log-window');
     document.body.classList.toggle(
@@ -2614,10 +2614,10 @@ export class Hud {
       case 'daily-rewards-window':
         this.dailyRewardsWindow.close();
         break;
-      case 'claudium-window':
+      case 'credits-window':
         // Route through the painter so focus returns to the opener (WCAG 2.2 AA)
         // and the refresh state resets, consistent with the toggle / X close path.
-        this.claudiumWindow.close();
+        this.creditsWindow.close();
         break;
       case 'emote-editor':
         this.closeEmoteEditor();
@@ -3468,8 +3468,8 @@ export class Hud {
     root: () => $('#bags'),
     world: () => this.sim,
     wocBalanceHtml: () => this.wocBalanceHtml(),
-    claudiumLauncherHtml: () => this.claudiumLauncherHtml(),
-    openClaudium: () => this.toggleClaudium(),
+    creditsLauncherHtml: () => this.creditsLauncherHtml(),
+    openCredits: () => this.toggleCredits(),
     openWallet: () => window.dispatchEvent(new CustomEvent('woc:wallet-verify')),
     hideTooltip: () => this.hideTooltip(),
     consumePeek: () => this.peekGuard.consume(),
@@ -3834,66 +3834,66 @@ export class Hud {
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
-    storeEnabled: () => this.claudiumHooks !== null,
+    storeEnabled: () => this.creditsHooks !== null,
     storeSnapshot: async () => {
-      const snapshot = await this.claudiumHooks?.storeSnapshot();
+      const snapshot = await this.creditsHooks?.storeSnapshot();
       if (!snapshot) return { available: false, balance: null, items: [] };
-      this.setClaudiumLauncherBalance(snapshot.balance);
+      this.setCreditsLauncherBalance(snapshot.balance);
       return {
         available: snapshot.available,
         balance: snapshot.balance,
         items: [...snapshot.storeItems],
       };
     },
-    spendStoreItem: async (itemId, kind, expectedCostClaudium) => {
-      const result = await this.claudiumHooks?.spend(itemId, kind, expectedCostClaudium);
+    spendStoreItem: async (itemId, kind, expectedCostCredits) => {
+      const result = await this.creditsHooks?.spend(itemId, kind, expectedCostCredits);
       if (result?.balance !== null && result?.balance !== undefined) {
-        this.setClaudiumLauncherBalance(result.balance);
+        this.setCreditsLauncherBalance(result.balance);
       }
       return (
         result ?? {
           granted: false,
           balance: null,
-          costClaudium: null,
+          costCredits: null,
           reason: 'unavailable',
         }
       );
     },
-    openClaudium: () => this.toggleClaudium(),
+    openCredits: () => this.toggleCredits(),
     confirmDialog: (title, body, okText, cancelText, onOk) =>
       this.confirmDialog(title, body, okText, cancelText, onOk),
     ...this.windowFocus('#daily-rewards-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
-  // Claudium (server-authoritative soft currency) window. main.ts injects the
-  // economy hooks when online via attachClaudium; until then (and offline) the
+  // Credits (server-authoritative soft currency) window. main.ts injects the
+  // economy hooks when online via attachCredits; until then (and offline) the
   // hooks are null and the window renders its clean disabled/empty state. The
   // window computes NOTHING; every number rides in through these hooks.
-  private claudiumHooks: ClaudiumHooks | null = null;
-  private claudiumLauncherBalance: number | null = null;
-  private claudiumLauncherBalancePending = false;
-  private claudiumLauncherBalanceLastMs = 0;
-  private claudiumLauncherBalanceSeq = 0;
-  private readonly claudiumWindow = new ClaudiumWindow({
-    root: () => $('#claudium-window'),
-    closeOthers: () => this.closeOtherWindows('#claudium-window'),
+  private creditsHooks: CreditsHooks | null = null;
+  private creditsLauncherBalance: number | null = null;
+  private creditsLauncherBalancePending = false;
+  private creditsLauncherBalanceLastMs = 0;
+  private creditsLauncherBalanceSeq = 0;
+  private readonly creditsWindow = new CreditsWindow({
+    root: () => $('#credits-window'),
+    closeOthers: () => this.closeOtherWindows('#credits-window'),
     snapshot: async () => {
       const snapshot =
-        (await this.claudiumHooks?.snapshot()) ??
+        (await this.creditsHooks?.snapshot()) ??
         ({
           balance: null,
           skus: [],
           nativeRails: { sol: false, usdc: false, woc: false },
-        } satisfies ClaudiumSnapshot);
-      this.setClaudiumLauncherBalance(snapshot.balance);
+        } satisfies CreditsSnapshot);
+      this.setCreditsLauncherBalance(snapshot.balance);
       return snapshot;
     },
-    buy: (rail, sku) => this.claudiumHooks?.buy(rail, sku) ?? Promise.resolve(),
+    buy: (rail, sku) => this.creditsHooks?.buy(rail, sku) ?? Promise.resolve(),
     onWalletConnect: () => {
       window.dispatchEvent(new CustomEvent('woc:wallet-verify'));
     },
     walletState: () => walletConnectionView(),
-    ...this.windowFocus('#claudium-window'),
+    ...this.windowFocus('#credits-window'),
     onVisibilityChange: () => this.syncAnyWindowOpenState(),
   });
   // Spellbook window painter (spellbook_view.ts core + spellbook_window.ts painter).
@@ -4061,42 +4061,42 @@ export class Hud {
     return `<${tag} class="woc-balance ${verified ? 'is-verified' : 'is-preview'}" title="${esc(title)}" aria-label="${esc(aria)}"><span class="woc-coin" aria-hidden="true"></span>${esc(balance)}</${verified ? 'span' : 'button'}>`;
   }
 
-  private claudiumLauncherHtml(): string {
-    if (!this.claudiumHooks) return '';
-    this.refreshClaudiumLauncherBalance();
+  private creditsLauncherHtml(): string {
+    if (!this.creditsHooks) return '';
+    this.refreshCreditsLauncherBalance();
     const label =
-      this.claudiumLauncherBalance === null
+      this.creditsLauncherBalance === null
         ? '--'
-        : formatNumber(this.claudiumLauncherBalance, { maximumFractionDigits: 0 });
-    const aria = t('hudChrome.claudium.open');
-    return `<button type="button" class="claudium-launcher" data-claudium-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="claudium-coin" src="/claudium/icons/claudium_coin_64.webp" alt=""><span class="claudium-launcher-balance">${esc(label)}</span></button>`;
+        : formatNumber(this.creditsLauncherBalance, { maximumFractionDigits: 0 });
+    const aria = t('hudChrome.credits.open');
+    return `<button type="button" class="credits-launcher" data-credits-launcher title="${esc(aria)}" aria-label="${esc(aria)}"><img class="credits-coin" src="/credits/icons/credits_coin_64.webp" alt=""><span class="credits-launcher-balance">${esc(label)}</span></button>`;
   }
 
-  private setClaudiumLauncherBalance(balance: number | null): void {
-    this.claudiumLauncherBalance = balance;
-    this.claudiumLauncherBalanceLastMs = Date.now();
+  private setCreditsLauncherBalance(balance: number | null): void {
+    this.creditsLauncherBalance = balance;
+    this.creditsLauncherBalanceLastMs = Date.now();
   }
 
-  private refreshClaudiumLauncherBalance(force = false): void {
-    if (!this.claudiumHooks || this.claudiumLauncherBalancePending) return;
+  private refreshCreditsLauncherBalance(force = false): void {
+    if (!this.creditsHooks || this.creditsLauncherBalancePending) return;
     const now = Date.now();
-    if (!force && now - this.claudiumLauncherBalanceLastMs < 30_000) return;
-    this.claudiumLauncherBalancePending = true;
-    const seq = ++this.claudiumLauncherBalanceSeq;
-    void this.claudiumHooks
+    if (!force && now - this.creditsLauncherBalanceLastMs < 30_000) return;
+    this.creditsLauncherBalancePending = true;
+    const seq = ++this.creditsLauncherBalanceSeq;
+    void this.creditsHooks
       .balance()
       .then((balance) => {
-        if (seq !== this.claudiumLauncherBalanceSeq) return;
-        this.setClaudiumLauncherBalance(balance);
+        if (seq !== this.creditsLauncherBalanceSeq) return;
+        this.setCreditsLauncherBalance(balance);
         if ($('#bags').style.display !== 'none') this.renderBags();
       })
       .catch(() => {
-        if (seq !== this.claudiumLauncherBalanceSeq) return;
-        this.setClaudiumLauncherBalance(null);
+        if (seq !== this.creditsLauncherBalanceSeq) return;
+        this.setCreditsLauncherBalance(null);
       })
       .finally(() => {
-        if (seq === this.claudiumLauncherBalanceSeq) {
-          this.claudiumLauncherBalancePending = false;
+        if (seq === this.creditsLauncherBalanceSeq) {
+          this.creditsLauncherBalancePending = false;
         }
       });
   }
@@ -6701,7 +6701,7 @@ export class Hud {
   }
 
   private syncDailyRewardsSurfaceLabels(): void {
-    const storeEnabled = this.claudiumHooks !== null;
+    const storeEnabled = this.creditsHooks !== null;
     const titleKey = storeEnabled ? 'hudChrome.wocStore.title' : 'hudChrome.dailyRewards.title';
     const labelKey = storeEnabled ? 'hudChrome.wocStore.storeTab' : 'hudChrome.dailyRewards.title';
     const title = t(titleKey);
@@ -11787,19 +11787,19 @@ export class Hud {
     this.refreshDailyRewardsLauncher(true);
   }
 
-  /** Inject the online economy hooks that back the Claudium window (main.ts, online only). */
-  attachClaudium(hooks: ClaudiumHooks): void {
-    this.claudiumHooks = hooks;
+  /** Inject the online economy hooks that back the Credits window (main.ts, online only). */
+  attachCredits(hooks: CreditsHooks): void {
+    this.creditsHooks = hooks;
     this.syncDailyRewardsSurfaceLabels();
-    this.claudiumLauncherBalance = null;
-    this.claudiumLauncherBalanceLastMs = 0;
-    this.claudiumLauncherBalanceSeq++;
-    this.claudiumLauncherBalancePending = false;
-    this.refreshClaudiumLauncherBalance(true);
+    this.creditsLauncherBalance = null;
+    this.creditsLauncherBalanceLastMs = 0;
+    this.creditsLauncherBalanceSeq++;
+    this.creditsLauncherBalancePending = false;
+    this.refreshCreditsLauncherBalance(true);
   }
 
   attachStorePromoCard(): void {
-    if (this.storePromoCard || !this.claudiumHooks) return;
+    if (this.storePromoCard || !this.creditsHooks) return;
     const host = document.getElementById('chatlog-wrap');
     if (!host) return;
     this.storePromoCard = mountStorePromoCard(host, {
@@ -11820,18 +11820,18 @@ export class Hud {
   }
 
   /**
-   * Open or close the Claudium store. Always renders: with no hooks (offline or the
+   * Open or close the Credits store. Always renders: with no hooks (offline or the
    * service off) the window shows its clean disabled state, never a boot crash.
    */
-  toggleClaudium(): void {
-    if (!this.claudiumHooks) return;
-    this.claudiumWindow.toggle();
+  toggleCredits(): void {
+    if (!this.creditsHooks) return;
+    this.creditsWindow.toggle();
   }
 
-  async refreshClaudium(): Promise<void> {
-    this.refreshClaudiumLauncherBalance(true);
-    if (!this.claudiumWindow.isOpen) return;
-    await this.claudiumWindow.render();
+  async refreshCredits(): Promise<void> {
+    this.refreshCreditsLauncherBalance(true);
+    if (!this.creditsWindow.isOpen) return;
+    await this.creditsWindow.render();
   }
 
   // -------------------------------------------------------------------------

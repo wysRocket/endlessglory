@@ -589,8 +589,8 @@ notification badge top-right when a spin or task reward is claimable.
 - Claimed / idle: standard surface, no glow; the card remains the entry point to the store
   surfaces.
 - Clicking opens the existing Daily Rewards window (`src/ui/daily_rewards_window.ts`); the
-  store entries (WOC Store / Season 1 Armory via `Hud.openWocStore`, Claudium via
-  `src/ui/claudium_window.ts`) hang off it unchanged. The card must read as a
+  store entries (WOC Store / Season 1 Armory via `Hud.openWocStore`, Credits via
+  `src/ui/credits_window.ts`) hang off it unchanged. The card must read as a
   first-party game panel, not an advertisement.
 - The gates to preserve: the `dailyRewardsEnabled` flag in the HUD features wiring (set
   from the native-app check in `src/main.ts`) and the `showDailyRewardsChest` setting,
@@ -783,7 +783,7 @@ Every window adopts the grammar; these carry specific intent:
   circular map-button style (section 10.1); pins stay on the `--color-map-*` tokens with
   quest pins vivid; the numbered quest badges keep matching the tracker.
 - **Store surfaces** (`daily_rewards_window.ts`, `woc_store_view.ts`,
-  `claudium_window.ts`): product art provides the color; cards stay restrained blue-black
+  `credits_window.ts`): product art provides the color; cards stay restrained blue-black
   with gold edges; rarity chips reuse the weapon-skin rarity colors; price and balance
   rows use `formatNumber` / `formatMoney` and the wallet components. Claim buttons are the
   one sanctioned gold-fill button (section 10.1).

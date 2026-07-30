@@ -1,11 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
-  type ClaudiumSnapshot,
-  ClaudiumWindow,
-  type ClaudiumWindowDeps,
-} from '../src/ui/claudium_window';
+  type CreditsSnapshot,
+  CreditsWindow,
+  type CreditsWindowDeps,
+} from '../src/ui/credits_window';
 
-// ClaudiumWindow is DOM-touching HUD wiring, so this suite stays in the default
+// CreditsWindow is DOM-touching HUD wiring, so this suite stays in the default
 // Node environment and models only the small element surface the window uses.
 // Setting the root shell HTML creates stable fake nodes for the body, close
 // button, refresh indicator, and assistive live status. Body HTML remains opaque:
@@ -104,8 +104,8 @@ class FakeBody extends FakeElement {
     super.innerHTML = value;
     this.rails = [];
     this.skus = [];
-    this.walletButton = value.includes('data-claudium-wallet') ? new FakeElement() : null;
-    if (this.walletButton) this.walletButton.dataset.claudiumWallet = '';
+    this.walletButton = value.includes('data-credits-wallet') ? new FakeElement() : null;
+    if (this.walletButton) this.walletButton.dataset.creditsWallet = '';
     const buttons = value.matchAll(
       /<button\b([^>]*)data-(rail|sku)="([^"]+)"([^>]*)>([\s\S]*?)<\/button>/g,
     );
@@ -144,7 +144,7 @@ class FakeBody extends FakeElement {
   }
 
   override querySelector(selector: string): FakeElement | null {
-    if (selector === '[data-claudium-wallet]') return this.walletButton;
+    if (selector === '[data-credits-wallet]') return this.walletButton;
     if (selector === '[data-rail][aria-pressed="true"]:not(:disabled)') {
       return (
         this.rails.find(
@@ -168,7 +168,7 @@ class FakeBody extends FakeElement {
     return rail;
   }
 
-  sku(value = 'claudium_500'): FakeElement {
+  sku(value = 'credits_500'): FakeElement {
     const sku = this.skus.find((button) => button.dataset.sku === value);
     if (!sku) throw new Error(`missing fake sku: ${value}`);
     return sku;
@@ -229,17 +229,17 @@ function deferred<T>(): {
   return { promise, resolve, reject };
 }
 
-function snapshot(balance: number): ClaudiumSnapshot {
+function snapshot(balance: number): CreditsSnapshot {
   return {
     balance,
-    skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+    skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
   };
 }
 
-function nativeSnapshot(): ClaudiumSnapshot {
+function nativeSnapshot(): CreditsSnapshot {
   return {
     balance: 500,
-    skus: [{ sku: 'claudium_500', usd: 4.99, claudium: 500 }],
+    skus: [{ sku: 'credits_500', usd: 4.99, credits: 500 }],
     nativeRails: { sol: true, usdc: true, woc: true },
     walletBalances: {
       solLamports: '1000000000',
@@ -248,7 +248,7 @@ function nativeSnapshot(): ClaudiumSnapshot {
     },
     nativePrices: [
       {
-        sku: 'claudium_500',
+        sku: 'credits_500',
         solAmountBase: '10000000',
         usdcAmountBase: '4990000',
         wocAmountBase: '4000000',
@@ -268,14 +268,14 @@ afterEach(() => {
   vi.unstubAllGlobals();
 });
 
-describe('ClaudiumWindow refresh stability', () => {
+describe('CreditsWindow refresh stability', () => {
   it('renders Card, WOC, USDC, and SOL in order and purchases USDC with its wallet balance', async () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
     const purchase = deferred<void>();
     const buys: Array<{ rail: string; sku: string }> = [];
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -286,7 +286,7 @@ describe('ClaudiumWindow refresh stability', () => {
         return purchase.promise;
       },
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     await window.render();
 
@@ -295,8 +295,8 @@ describe('ClaudiumWindow refresh stability', () => {
       html.indexOf(`data-rail="${rail}"`),
     );
     expect(railOrder).toEqual([...railOrder].sort((left, right) => left - right));
-    expect(html).toContain('src="/claudium/icons/solana-icon.webp"');
-    expect(html).toContain('src="/claudium/icons/usdc-icon.webp"');
+    expect(html).toContain('src="/credits/icons/solana-icon.webp"');
+    expect(html).toContain('src="/credits/icons/usdc-icon.webp"');
     expect(html).toContain('USDC: 12.35');
 
     root.body.rail('usdc').click();
@@ -305,15 +305,15 @@ describe('ClaudiumWindow refresh stability', () => {
 
     root.body.sku().click();
     await flushMicrotasks();
-    expect(buys).toEqual([{ rail: 'usdc', sku: 'claudium_500' }]);
+    expect(buys).toEqual([{ rail: 'usdc', sku: 'credits_500' }]);
   });
 
-  it('renders the wallet connection card and routes its action from the Claudium panel', async () => {
+  it('renders the wallet connection card and routes its action from the Credits panel', async () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
     const onWalletConnect = vi.fn();
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -331,23 +331,23 @@ describe('ClaudiumWindow refresh stability', () => {
         action: 'connect',
       }),
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     await window.render();
 
     expect(root.body.innerHTML).toContain('Connect wallet');
     expect(root.body.innerHTML).toContain('recovery phrase or private key');
-    root.body.querySelector('[data-claudium-wallet]')?.click();
+    root.body.querySelector('[data-credits-wallet]')?.click();
     expect(onWalletConnect).toHaveBeenCalledOnce();
   });
 
-  it('repaints an open Claudium panel when the connected wallet disconnects', async () => {
+  it('repaints an open Credits panel when the connected wallet disconnects', async () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
     let connected = true;
     const onWalletConnect = vi.fn();
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -365,19 +365,19 @@ describe('ClaudiumWindow refresh stability', () => {
         action: connected ? 'manage' : 'reconnect',
       }),
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     await window.render();
     expect(root.body.innerHTML).toContain('Manage wallet');
-    root.body.querySelector('[data-claudium-wallet]')?.focus();
+    root.body.querySelector('[data-credits-wallet]')?.focus();
 
     connected = false;
     window.onWalletChanged();
 
     expect(root.body.innerHTML).toContain('Reconnect wallet');
     expect(root.body.innerHTML).not.toContain('Manage wallet');
-    expect(fakeDocument.activeElement).toBe(root.body.querySelector('[data-claudium-wallet]'));
-    root.body.querySelector('[data-claudium-wallet]')?.click();
+    expect(fakeDocument.activeElement).toBe(root.body.querySelector('[data-credits-wallet]'));
+    root.body.querySelector('[data-credits-wallet]')?.click();
     expect(onWalletConnect).toHaveBeenCalledOnce();
 
     const settledWrites = root.body.htmlWrites;
@@ -410,7 +410,7 @@ describe('ClaudiumWindow refresh stability', () => {
             },
       ),
     );
-    const window = new ClaudiumWindow({
+    const window = new CreditsWindow({
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -447,16 +447,16 @@ describe('ClaudiumWindow refresh stability', () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
-    let resolveInitial!: (value: ClaudiumSnapshot) => void;
-    const initial = new Promise<ClaudiumSnapshot>((resolve) => {
+    let resolveInitial!: (value: CreditsSnapshot) => void;
+    const initial = new Promise<CreditsSnapshot>((resolve) => {
       resolveInitial = resolve;
     });
     let connected = false;
     const snapshotRead = vi
-      .fn<() => Promise<ClaudiumSnapshot>>()
+      .fn<() => Promise<CreditsSnapshot>>()
       .mockImplementationOnce(() => initial)
       .mockImplementation(() => Promise.resolve(nativeSnapshot()));
-    const window = new ClaudiumWindow({
+    const window = new CreditsWindow({
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -492,7 +492,7 @@ describe('ClaudiumWindow refresh stability', () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -509,12 +509,12 @@ describe('ClaudiumWindow refresh stability', () => {
         action: 'connect',
       }),
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     await window.render();
 
     expect(root.body.innerHTML).not.toContain('cl-wallet-connect');
-    expect(root.body.innerHTML).not.toContain('data-claudium-wallet');
+    expect(root.body.innerHTML).not.toContain('data-credits-wallet');
   });
 
   it('does not rebuild pack nodes for an unchanged successful refresh', async () => {
@@ -522,7 +522,7 @@ describe('ClaudiumWindow refresh stability', () => {
     const root = new FakeRoot();
     root.style.display = 'block';
     const reads = [Promise.resolve(snapshot(500)), Promise.resolve(snapshot(500))];
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -530,7 +530,7 @@ describe('ClaudiumWindow refresh stability', () => {
       snapshot: () => reads.shift() ?? Promise.reject(new Error('unexpected snapshot read')),
       buy: () => Promise.resolve(),
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     await window.render();
     const settledWrites = root.body.htmlWrites;
@@ -547,11 +547,11 @@ describe('ClaudiumWindow refresh stability', () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
-    const first = deferred<ClaudiumSnapshot>();
-    const unavailableRefresh = deferred<ClaudiumSnapshot>();
-    const recovered = deferred<ClaudiumSnapshot>();
+    const first = deferred<CreditsSnapshot>();
+    const unavailableRefresh = deferred<CreditsSnapshot>();
+    const recovered = deferred<CreditsSnapshot>();
     const reads = [first.promise, unavailableRefresh.promise, recovered.promise];
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -559,7 +559,7 @@ describe('ClaudiumWindow refresh stability', () => {
       snapshot: () => reads.shift() ?? Promise.reject(new Error('unexpected snapshot read')),
       buy: () => Promise.resolve(),
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     const initialRender = window.render();
     expect(root.body.innerHTML).toContain('cl-loading');
@@ -568,7 +568,7 @@ describe('ClaudiumWindow refresh stability', () => {
 
     const settledHtml = root.body.innerHTML;
     const settledWrites = root.body.htmlWrites;
-    expect(settledHtml).toContain('data-sku="claudium_500"');
+    expect(settledHtml).toContain('data-sku="credits_500"');
 
     const refresh = window.render();
     expect(root.body.innerHTML).toBe(settledHtml);
@@ -602,11 +602,11 @@ describe('ClaudiumWindow refresh stability', () => {
     vi.stubGlobal('document', fakeDocument);
     const root = new FakeRoot();
     root.style.display = 'block';
-    const unavailableRefresh = deferred<ClaudiumSnapshot>();
+    const unavailableRefresh = deferred<CreditsSnapshot>();
     const purchase = deferred<void>();
-    const authoritativeRefresh = deferred<ClaudiumSnapshot>();
+    const authoritativeRefresh = deferred<CreditsSnapshot>();
     let snapshotCalls = 0;
-    const reads: Array<Promise<ClaudiumSnapshot>> = [
+    const reads: Array<Promise<CreditsSnapshot>> = [
       Promise.resolve(snapshot(500)),
       unavailableRefresh.promise,
       Promise.resolve(snapshot(750)),
@@ -614,7 +614,7 @@ describe('ClaudiumWindow refresh stability', () => {
       Promise.resolve(snapshot(1_250)),
     ];
     const buys: Array<{ rail: string; sku: string }> = [];
-    const deps: ClaudiumWindowDeps = {
+    const deps: CreditsWindowDeps = {
       root: () => asHtml(root),
       closeOthers: () => {},
       captureFocus: () => null,
@@ -628,7 +628,7 @@ describe('ClaudiumWindow refresh stability', () => {
         return purchase.promise;
       },
     };
-    const window = new ClaudiumWindow(deps);
+    const window = new CreditsWindow(deps);
 
     await window.render();
     const settledRail = root.body.rail();
@@ -667,7 +667,7 @@ describe('ClaudiumWindow refresh stability', () => {
     recoveredSku.click();
     await flushMicrotasks();
     const pendingBuyHtml = recoveredSku.querySelector('.cl-sku-buy')?.innerHTML;
-    expect(buys).toEqual([{ rail: 'stripe', sku: 'claudium_500' }]);
+    expect(buys).toEqual([{ rail: 'stripe', sku: 'credits_500' }]);
     expect(recoveredRail.disabled).toBe(true);
     expect(recoveredSku.disabled).toBe(true);
     expect(recoveredSku.classList.contains('pending')).toBe(true);

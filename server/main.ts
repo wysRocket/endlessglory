@@ -70,11 +70,11 @@ import { BUG_DESCRIPTION_MAX, BugReportRateLimitError, createBugReport } from '.
 import { characterSheet, SHEET_RECENT_DEEDS, type SheetRank } from './character_sheet';
 import { configureCharactersRuntime } from './characters';
 import {
-  claudiumPreAuthMutationRateLimited,
-  configureClaudiumRuntime,
-  handleClaudiumApi,
-  handleClaudiumStripeWebhook,
-} from './claudium';
+  creditsPreAuthMutationRateLimited,
+  configureCreditsRuntime,
+  handleCreditsApi,
+  handleCreditsStripeWebhook,
+} from './credits';
 import { handleDailyRewardApi, handleDailyRewardInternalApi } from './daily_rewards';
 import {
   accountAndScopeForToken,
@@ -2053,17 +2053,17 @@ async function handleApi(req: http.IncomingMessage, res: http.ServerResponse): P
       if (accountId === null) return;
       return handleDailyRewardApi(req, res, accountId);
     }
-    if (req.method === 'POST' && url === '/api/claudium/stripe/webhook') {
-      return handleClaudiumStripeWebhook(req, res);
+    if (req.method === 'POST' && url === '/api/credits/stripe/webhook') {
+      return handleCreditsStripeWebhook(req, res);
     }
-    if (url.startsWith('/api/claudium')) {
-      const preAuthLimit = claudiumPreAuthMutationRateLimited(req);
+    if (url.startsWith('/api/credits')) {
+      const preAuthLimit = creditsPreAuthMutationRateLimited(req);
       if (preAuthLimit && !preAuthLimit.allowed) {
         return json(res, 429, { error: 'rate_limited' });
       }
       const accountId = await bearerActiveAccount(req, res);
       if (accountId === null) return;
-      return handleClaudiumApi(req, res, accountId);
+      return handleCreditsApi(req, res, accountId);
     }
     // Shareable player card: publish (PNG body) + referral stats for the card.
     if (req.method === 'POST' && url === '/api/card') {
@@ -2331,9 +2331,9 @@ configureDiscordRuntime({
   grantCosmetic: (accountId, chromaId) => liveGame().grantMechChromaToAccount(accountId, chromaId),
 });
 
-// Claudium routes mirror weapon-skin purchases into account cosmetics live (the
+// Credits routes mirror weapon-skin purchases into account cosmetics live (the
 // same deferred liveGame() closure pattern as the Discord hooks above).
-configureClaudiumRuntime({
+configureCreditsRuntime({
   grantWeaponSkins: (accountId, skinIds) =>
     liveGame().grantWeaponSkinsToAccount(accountId, skinIds),
 });

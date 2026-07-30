@@ -176,12 +176,12 @@ describe('resolveDesktopOrigins (the packaged-build VITE_DESKTOP_* hatch closure
 
   it('falls back to the production origin, and login falls back to the api origin', () => {
     expect(resolveDesktopOrigins({})).toEqual({
-      apiOrigin: 'https://worldofclaudecraft.com',
-      loginOrigin: 'https://worldofclaudecraft.com',
+      apiOrigin: 'https://endless-glory.vercel.app',
+      loginOrigin: 'https://endless-glory.vercel.app',
     });
     expect(resolveDesktopOrigins()).toEqual({
-      apiOrigin: 'https://worldofclaudecraft.com',
-      loginOrigin: 'https://worldofclaudecraft.com',
+      apiOrigin: 'https://endless-glory.vercel.app',
+      loginOrigin: 'https://endless-glory.vercel.app',
     });
     expect(
       resolveDesktopOrigins({
@@ -193,8 +193,8 @@ describe('resolveDesktopOrigins (the packaged-build VITE_DESKTOP_* hatch closure
 });
 
 const defaultOrigins = {
-  apiOrigin: 'https://worldofclaudecraft.com',
-  loginOrigin: 'https://worldofclaudecraft.com',
+  apiOrigin: 'https://endless-glory.vercel.app',
+  loginOrigin: 'https://endless-glory.vercel.app',
 };
 
 describe('resolveDesktopConfig', () => {

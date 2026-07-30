@@ -15,7 +15,7 @@ import {
 
 describe('PRODUCTION_API_ORIGIN', () => {
   it('is the production site', () => {
-    expect(PRODUCTION_API_ORIGIN).toBe('https://worldofclaudecraft.com');
+    expect(PRODUCTION_API_ORIGIN).toBe('https://endless-glory.vercel.app');
   });
 });
 
@@ -39,8 +39,8 @@ describe('apiOriginKey', () => {
 
 describe('isProductionApiOrigin', () => {
   it('accepts only the production origin (slash and case tolerant)', () => {
-    expect(isProductionApiOrigin('https://worldofclaudecraft.com')).toBe(true);
-    expect(isProductionApiOrigin('https://worldofclaudecraft.com/')).toBe(true);
+    expect(isProductionApiOrigin('https://endless-glory.vercel.app')).toBe(true);
+    expect(isProductionApiOrigin('https://endless-glory.vercel.app/')).toBe(true);
   });
 
   it('rejects dev, staging, localhost, http, subdomains, and garbage', () => {
@@ -55,8 +55,8 @@ describe('isProductionApiOrigin', () => {
 
 describe('updateChannelForOrigin (the track split)', () => {
   it('production origin publishes and reads the latest channel', () => {
-    expect(updateChannelForOrigin('https://worldofclaudecraft.com')).toBe('latest');
-    expect(updateChannelForOrigin('https://worldofclaudecraft.com/')).toBe('latest');
+    expect(updateChannelForOrigin('https://endless-glory.vercel.app')).toBe('latest');
+    expect(updateChannelForOrigin('https://endless-glory.vercel.app/')).toBe('latest');
   });
 
   it('every non-production origin fails safe onto the dev channel', () => {

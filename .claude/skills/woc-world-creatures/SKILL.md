@@ -38,7 +38,7 @@ tracing the actual files:
   could be neither confirmed nor ruled out from the repo alone. Treat it as unverified.
 
 **Licensing:** `github.com/Julian-adv/OpenMMO` is **PolyForm Noncommercial 1.0.0**
-(confirmed by fetching its LICENSE). This game is commercial (Claudium currency, a
+(confirmed by fetching its LICENSE). This game is commercial (Credits currency, a
 paid store). Anything sourced from that repo needs the owner's explicit permission
 before it ships; do not assume prior use establishes a precedent. Record what you
 actually verified in `CREDITS.md`, including "unverified" when that is the truth.
