@@ -988,7 +988,6 @@ export const cs_CZ: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 Endless Glory',
   'footer.discordLabel': 'Připojit se na Discord',
   'footer.githubLabel': 'Open-source projekt',
-  'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.privacy': 'Zásady ochrany soukromí',
   'footer.terms': 'Podmínky služby',
   'footer.whitepaper': 'Whitepaper',

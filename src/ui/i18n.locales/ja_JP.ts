@@ -1129,7 +1129,6 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'stats.playersOnline': 'オンラインプレイヤー数',
   'stats.realmName': 'ワールド名',
   'footer.copyright': '2026 Endless Glory',
-  'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': 'オープンソースプロジェクト',
   'footer.whitepaper': 'ホワイトペーパー',
   'footer.terms': '利用規約',

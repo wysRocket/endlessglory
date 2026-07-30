@@ -2954,7 +2954,6 @@ export type TranslationKeyFlat =
   | 'footer.copyright'
   | 'footer.discordLabel'
   | 'footer.githubLabel'
-  | 'footer.githubLink'
   | 'footer.privacy'
   | 'footer.terms'
   | 'footer.whitepaper'

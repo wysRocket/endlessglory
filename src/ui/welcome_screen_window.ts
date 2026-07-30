@@ -30,7 +30,7 @@ import {
 } from './welcome_screen_view';
 
 const LAST_SEEN_RELEASE_KEY = 'woc.welcome.lastSeenReleaseId';
-const GITHUB_RELEASES_URL = 'https://github.com/levy-street/world-of-claudecraft/releases';
+const GITHUB_RELEASES_URL = 'https://github.com/wysRocket/world-of-claudecraft/releases';
 
 // Shared trap for this one dialog root (same "dedicated FocusManager instance
 // for a non-Hud dialog" pattern as src/ui/camera_prompt.ts): the Welcome Screen

@@ -51,10 +51,7 @@ function readBytes(path: string): Buffer {
 function withoutCompatibilityIdentifiers(path: string, source: string): string {
   let scrubbed = source;
   if (path === 'index.html') {
-    scrubbed = scrubbed.replaceAll(
-      /https:\/\/updates\.worldofclaudecraft\.com\/desktop\/world-of-claudecraft-[^"\s]+/g,
-      '',
-    );
+    // The desktop download URLs are gone; only the whitepaper filename remains.
     scrubbed = scrubbed.replace('/World-of-ClaudeCraft-Whitepaper-v1.0.pdf', '');
   }
   if (path === 'src/wallet_handoff.ts') {
@@ -99,13 +96,25 @@ describe('Endless Glory emitted surfaces', () => {
     ]) {
       expect(read(path), path).not.toContain('worldofclaudecraft.com');
     }
+
+    // The release-news feed and the contributor-badge system default to a repo
+    // slug; an upstream slug here served the ORIGINAL game's release notes to
+    // this game's Welcome Screen and credited its contributor list.
+    for (const path of ['server/http/config.ts', 'server/github_contributors.ts']) {
+      expect(read(path), path).not.toContain('levy-street');
+    }
   });
 
-  it('uses only the two verified legacy compatibility endpoints', () => {
+  // ONE legacy carve-out remains, down from two. The desktop download surface was
+  // removed outright (it served upstream-hosted binaries), so index.html no longer
+  // needs the updates.worldofclaudecraft.com exception. The wallet-handoff scheme
+  // stays: it is registered with the OS on existing installs, so renaming it would
+  // break deep links for anyone who already installed the app.
+  it('keeps only the registered protocol scheme as a legacy carve-out', () => {
     const index = read('index.html');
     const handoff = read('src/wallet_handoff.ts');
-    expect(index).toContain('https://updates.worldofclaudecraft.com/desktop/');
-    expect(index).not.toContain('updates.endlessglory.vercel.app');
+    expect(index).not.toContain('updates.worldofclaudecraft.com');
+    expect(index).not.toContain('world-of-claudecraft-');
     expect(handoff).toContain('worldofclaudecraft://wallet-handoff');
     expect(handoff).not.toContain('endlessglory://wallet-handoff');
   });

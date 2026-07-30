@@ -3890,7 +3890,6 @@ export const tr_TR: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 Endless Glory',
   'footer.discordLabel': "Discord'a Katıl",
   'footer.githubLabel': 'Açık Kaynak Proje',
-  'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Teknik Doküman',
   'footer.privacy': 'Gizlilik Politikası',
   'footer.terms': 'Hizmet Koşulları',

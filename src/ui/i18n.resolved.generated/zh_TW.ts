@@ -4114,7 +4114,6 @@ export const zh_TW: EnTranslations = {
   },
   "footer": {
     "copyright": "2026 Endless Glory",
-    "githubLink": "https://github.com/levy-street/world-of-claudecraft",
     "githubLabel": "開源專案",
     "whitepaper": "白皮書",
     "terms": "服務條款",

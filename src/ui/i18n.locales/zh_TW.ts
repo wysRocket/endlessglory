@@ -1095,7 +1095,6 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'stats.playersOnline': '線上玩家數',
   'stats.realmName': '世界名稱',
   'footer.copyright': '2026 Endless Glory',
-  'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': '開源專案',
   'footer.whitepaper': '白皮書',
   'footer.terms': '服務條款',

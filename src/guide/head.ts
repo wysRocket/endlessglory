@@ -25,8 +25,7 @@ import { type GuideRoute, hrefFor } from './routes';
 // The site origin. Matches index.html's canonical/og:url host exactly.
 const ORIGIN = 'https://endlessglory.vercel.app';
 const LOGO = `${ORIGIN}/endless-glory-square.png`;
-const GITHUB_URL = 'https://github.com/levy-street/world-of-claudecraft';
-const DISCORD_URL = 'https://discord.com/invite/worldofclaudecraft';
+const GITHUB_URL = 'https://github.com/wysRocket/world-of-claudecraft';
 
 // The newcomer FAQ on /guide/faq, kept in lockstep with pages/faq.ts so the FAQPage
 // JSON-LD answers the same questions the visible page does. cap rows splice the level
@@ -228,7 +227,7 @@ function videoGameNode(description: string, inLanguage: string): Record<string, 
     image: LOGO,
     description,
     inLanguage,
-    sameAs: [GITHUB_URL, DISCORD_URL],
+    sameAs: [GITHUB_URL],
   };
 }
 

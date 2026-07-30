@@ -3837,7 +3837,6 @@ export const sv_SE: Partial<Record<TranslationKey, string>> = {
   'footer.copyright': '2026 Endless Glory',
   'footer.discordLabel': 'Gå med i Discord',
   'footer.githubLabel': 'Projekt med öppen källkod',
-  'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.whitepaper': 'Whitepaper',
   'footer.privacy': 'Integritetspolicy',
   'footer.terms': 'Användarvillkor',

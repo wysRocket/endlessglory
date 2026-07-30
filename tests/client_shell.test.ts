@@ -712,9 +712,15 @@ describe('client HTML shell', () => {
     expect(html).toContain('<link rel="canonical" href="https://endlessglory.vercel.app/" />');
     expect(html).toContain('<meta property="og:site_name" content="Endless Glory" />');
     expect(html).not.toContain('"alternateName": "World of Claudecraft"');
-    expect(html).toContain('"https://github.com/levy-street/world-of-claudecraft"');
+    // The sameAs block is gone: it listed the UPSTREAM project's Discord, X,
+    // YouTube, Instagram, TikTok, Reddit and repo, so it was telling search
+    // engines this site was that project. There are no Endless Glory equivalents
+    // to swap in, and an empty sameAs is meaningless structured data.
+    expect(html).not.toContain('levy-street');
+    expect(html).not.toContain('"sameAs"');
     expect(mainTs).not.toContain("alternateName: 'World of Claudecraft'");
-    expect(mainTs).toContain("'https://github.com/levy-street/world-of-claudecraft'");
+    expect(mainTs).not.toContain('levy-street');
+    expect(mainTs).not.toContain('sameAs');
     expect(robotsTxt.trim()).toBe(
       'User-agent: *\nAllow: /\n\nSitemap: https://endlessglory.vercel.app/sitemap.xml\nSitemap: https://endlessglory.vercel.app/sitemap-characters.xml',
     );
@@ -907,7 +913,10 @@ describe('client HTML shell', () => {
     // The tap target: the account panel, with the invite as the logged-out /
     // offline fallback (discordInviteUrl() itself falls back to
     // DEFAULT_DISCORD_INVITE_URL in discord_status.ts).
-    expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
+    // The invite is server-fed with no hardcoded fallback, so the open is guarded:
+    // an unconfigured invite must do nothing rather than open a blank tab.
+    expect(mainTs).toContain('const invite = discordInviteUrl();');
+    expect(mainTs).toContain("if (invite) window.open(invite, '_blank', 'noopener,noreferrer');");
     // No donation wiring survives in the client entry either: the URL constant
     // and the drawer handler went with the buttons.
     expect(mainTs).not.toContain('ko-fi.com');

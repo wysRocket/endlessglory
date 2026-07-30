@@ -72,10 +72,11 @@ const NO_PRESENCE: DiscordPresenceState = {
   voice: [],
 };
 
-// The public, static invite: used until the server-fetched inviteUrl (below)
-// resolves, and whenever it never does (offline entry, or a click that races
-// the fetch). A community link is meant to fail open, never open blank.
-export const DEFAULT_DISCORD_INVITE_URL = 'https://discord.com/invite/worldofclaudecraft';
+// The invite is SERVER-FED only (setDiscordInviteUrl below); there is no
+// hardcoded fallback. There used to be one, and it pointed at the upstream
+// project's Discord, so a logged-out or offline click sent this game's players
+// into a different game's community. With no invite configured the surface now
+// fails CLOSED: callers check for an empty string and do nothing.
 
 let enabled = false;
 let status: DiscordAccountStatus = UNLINKED;
@@ -97,7 +98,7 @@ export function discordPresence(): DiscordPresenceState {
 }
 
 export function discordInviteUrl(): string {
-  return inviteUrl || DEFAULT_DISCORD_INVITE_URL;
+  return inviteUrl;
 }
 
 export function setDiscordUiEnabled(value: boolean): void {

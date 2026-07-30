@@ -25,7 +25,6 @@ import {
 import { clientEnvBits, installPageStateTracking, pageStateBits } from './game/client_env';
 import { getClientSeed } from './game/client_seed';
 import { shouldClearAutorunOnDeath } from './game/death_input_reset';
-import { initDesktopDownload } from './game/desktop_download';
 import { initDesktopShellIntegration } from './game/desktop_shell_integration';
 import { takeEditorPlaytestRequest } from './game/editor_playtest';
 import {
@@ -3628,7 +3627,7 @@ const hoverTimeouts: Record<string, number | null> = {
 };
 
 function switchMainView(targetId: string): void {
-  const views = ['#hero-view', '#highscores-view', '#news-view', '#download-view', '#account-view'];
+  const views = ['#hero-view', '#highscores-view', '#news-view', '#account-view'];
   const currentViewId = views.find((id) => {
     const el = $(id);
     return el && !el.hasAttribute('hidden');
@@ -3640,7 +3639,6 @@ function switchMainView(targetId: string): void {
     '#hero-view': 'nav-btn-play',
     '#highscores-view': 'nav-btn-highscores',
     '#news-view': 'nav-btn-news',
-    '#download-view': 'nav-btn-download',
     '#account-view': 'nav-btn-account',
   };
 
@@ -5296,15 +5294,6 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
 
   const jsonLd = document.getElementById('structured-data') as HTMLScriptElement | null;
   if (jsonLd) {
-    const sameAs = [
-      'https://github.com/levy-street/world-of-claudecraft',
-      'https://discord.com/invite/worldofclaudecraft',
-      'https://www.youtube.com/@WoClaudeCraft',
-      'https://x.com/WoClaudecraft',
-      'https://www.instagram.com/worldofclaudecraft/',
-      'https://www.tiktok.com/@worldofclaudecraft',
-      'https://www.reddit.com/r/WorldofClaudecraft/',
-    ];
     jsonLd.textContent = JSON.stringify(
       {
         '@context': 'https://schema.org',
@@ -5324,7 +5313,6 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
             name: 'Endless Glory',
             url: 'https://endlessglory.vercel.app/',
             logo: 'https://endlessglory.vercel.app/endless-glory-square.png',
-            sameAs,
           },
           {
             '@type': 'VideoGame',
@@ -5339,7 +5327,6 @@ function updateSeoMetadata(lang: SupportedLanguage): void {
             description: t('seo.description'),
             inLanguage: languageTag(lang),
             publisher: { '@id': 'https://endlessglory.vercel.app/#organization' },
-            sameAs,
           },
         ],
       },
@@ -6272,10 +6259,8 @@ function flashWalletError(message: string): void {
 // ── Discord login/onboarding ─────────────────────────────────────────────────
 // Discord UI is available on web and native unless explicitly disabled at build time.
 const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? '').trim() !== '1';
-// Community links for the mobile More tray. discordInviteUrl() itself now
-// falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
-// server-fed value is not known yet (logged out, offline), so every caller
-// gets the fail-open behavior for free.
+// Community links for the mobile More tray. discordInviteUrl() is server-fed with
+// no hardcoded fallback, so it can be empty; callers must check before opening.
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 
@@ -6640,7 +6625,9 @@ function openDiscordEntry(): void {
     toggleDiscordPanel(true);
     return;
   }
-  window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');
+  const invite = discordInviteUrl();
+  // No invite configured: do nothing rather than open a blank tab.
+  if (invite) window.open(invite, '_blank', 'noopener,noreferrer');
 }
 
 function wireDiscordCtaBanner(): void {
@@ -8292,7 +8279,6 @@ function wireStartScreens(): void {
   const navBtnHighscores = $('#nav-btn-highscores');
   const navBtnWiki = $('#nav-btn-wiki');
   const navBtnNews = $('#nav-btn-news');
-  const navBtnDownload = $('#nav-btn-download');
   const navBtnLogin = $('#nav-btn-login');
 
   const deleteConfirmInput = $('#delete-character-confirm') as HTMLInputElement;
@@ -8387,8 +8373,6 @@ function wireStartScreens(): void {
     switchMainView('#news-view');
     void loadNews();
   });
-  setupNavBtn(navBtnDownload, '#download-view');
-  initDesktopDownload();
   setupNavBtn(navBtnLogin, '#hero-view', () => {
     show('#login-panel');
   });

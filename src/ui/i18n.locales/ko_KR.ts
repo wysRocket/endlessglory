@@ -1130,7 +1130,6 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'stats.playersOnline': '현재 접속자 수',
   'stats.realmName': '월드 이름',
   'footer.copyright': '2026 Endless Glory',
-  'footer.githubLink': 'https://github.com/levy-street/world-of-claudecraft',
   'footer.githubLabel': '오픈 소스 프로젝트',
   'footer.whitepaper': '백서',
   'footer.terms': '서비스 이용약관',

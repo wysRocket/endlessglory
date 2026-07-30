@@ -4114,7 +4114,6 @@ export const en_XA: EnTranslations = {
   },
   "footer": {
     "copyright": "[2026 Éñðļéšš Ĝļóŕý]",
-    "githubLink": "[ĥţţþš://ĝíţĥúƀ.çóɱ/ļéʋý-šţŕééţ/ŵóŕļð-óƒ-çļáúðéçŕáƒţ]",
     "githubLabel": "[Óþéñ Šóúŕçé Þŕóĵéçţ]",
     "whitepaper": "[Ŵĥíţéþáþéŕ]",
     "terms": "[Ţéŕɱš óƒ Šéŕʋíçé]",
