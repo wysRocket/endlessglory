@@ -126,8 +126,6 @@ export interface MobileControlCallbacks {
   onSocial(): void;
   /** Open the Discord entry (account panel when available, else the community invite). */
   onDiscord(): void;
-  /** Open the project donation page (external link). */
-  onDonate(): void;
   onEmotes(): void;
   onArena(): void;
   onDungeonFinder(): void;
@@ -479,7 +477,6 @@ export class MobileControls {
     this.bindButton('mobile-menu', () => this.callbacks.onMenu());
     this.bindButton('mobile-social', () => this.callbacks.onSocial());
     this.bindButton('mobile-discord', () => this.callbacks.onDiscord());
-    this.bindButton('mobile-donate', () => this.callbacks.onDonate());
     this.bindButton('mobile-emote', () => this.callbacks.onEmotes());
     this.bindButton('mobile-arena', () => this.callbacks.onArena());
     this.bindButton('mobile-dfinder', () => this.callbacks.onDungeonFinder());

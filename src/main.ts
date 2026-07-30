@@ -1416,7 +1416,6 @@ async function startGame(
     onMenu: () => hud.toggleOptionsMenu(),
     onSocial: () => hud.toggleSocial(),
     onDiscord: () => openDiscordEntry(),
-    onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),
     onEmotes: () => hud.toggleEmoteWheel(),
     onArena: () => hud.toggleArena(),
     onDungeonFinder: () => hud.toggleDungeonFinder(),
@@ -6349,7 +6348,6 @@ const DISCORD_BUILD_ENABLED = String(import.meta.env.VITE_DISCORD_DISABLED ?? ''
 // falls back to DEFAULT_DISCORD_INVITE_URL (discord_status.ts) when the
 // server-fed value is not known yet (logged out, offline), so every caller
 // gets the fail-open behavior for free.
-const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';
 const DISCORD_ONBOARD_KEY = 'woc_discord_onboard';
 let discordPopup: Window | null = null;
 

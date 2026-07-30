@@ -890,11 +890,10 @@ describe('client HTML shell', () => {
     expect(html).toContain('aria-label="Quest Log"');
   });
 
-  it('offers Discord and Donate entries in the mobile drawer of BOTH entries', () => {
+  it('offers a Discord entry in the mobile drawer, and no donation entry at all', () => {
     // Mobile has no keyboard, so the U-key Discord panel toggle is unreachable;
     // this drawer button is the touch path to Discord (the account panel when
-    // available, else the community invite). Donate mirrors the desktop shell's
-    // Ko-fi community link.
+    // available, else the community invite).
     for (const [name, entry] of [['index.html', html]] as const) {
       expect(entry, name).toContain('id="mobile-discord"');
       // Carries the icon hook (hydrateIcons swaps [data-icon] for the inline SVG).
@@ -902,29 +901,19 @@ describe('client HTML shell', () => {
       // Starts hidden; main.ts reveals it at boot on any build with Discord UI
       // enabled (it stays hidden in the native-app build).
       expect(entry, name).toMatch(/id="mobile-discord"\s+hidden/);
-      expect(entry, name).toContain('id="mobile-donate"');
-      expect(entry, name).toMatch(/id="mobile-donate"[^>]*data-icon="donate"/);
-      // Donate is never gated on the web: no hidden attribute on it.
-      expect(entry, name).not.toMatch(/id="mobile-donate"\s+hidden/);
+      // The donation entry is gone with the rest of the donate surface below.
+      expect(entry, name).not.toContain('id="mobile-donate"');
     }
-    // The native-app build strips every donation link (store payment-steering
-    // policy); the tray entry joins the same suppression block as the desktop
-    // .donate links in hud.css.
-    expect(hudCss).toContain('body.native-app #mobile-donate,');
-    // The tap targets: the account panel with the invite as the logged-out /
+    // The tap target: the account panel, with the invite as the logged-out /
     // offline fallback (discordInviteUrl() itself falls back to
-    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts), and the Ko-fi page,
-    // pinned to the shells' URLs.
-    expect(mainTs).toContain("const DONATE_URL = 'https://ko-fi.com/worldofclaudecraft';");
+    // DEFAULT_DISCORD_INVITE_URL in discord_status.ts).
     expect(mainTs).toContain("window.open(discordInviteUrl(), '_blank', 'noopener,noreferrer');");
-    expect(mainTs).toContain(
-      "onDonate: () => window.open(DONATE_URL, '_blank', 'noopener,noreferrer'),",
-    );
+    // No donation wiring survives in the client entry either: the URL constant
+    // and the drawer handler went with the buttons.
+    expect(mainTs).not.toContain('ko-fi.com');
+    expect(mainTs).not.toContain('DONATE_URL');
+    expect(mainTs).not.toContain('onDonate');
     for (const [name, entry] of [['index.html', html]] as const) {
-      // Two Ko-fi donate links remain (the #mobile-donate tray entry and the
-      // homepage donate-cta); the community-tray's donate link was removed with
-      // the community-links rail (emberwood landing-page pass).
-      expect(entry.match(/href="https:\/\/ko-fi\.com\/worldofclaudecraft"/g), name).toHaveLength(2);
       expect(entry, name).not.toContain('https://github.com/sponsors/levy-street');
     }
   });
@@ -1134,10 +1123,17 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('still ships the homepage donate CTA after the community rail was removed', () => {
-    // The community-links rail was removed (emberwood landing-page pass); the
-    // standalone homepage donate CTA is the surviving support link.
-    expect(html).toContain('<a class="donate-cta"');
+  it('ships no donation surface, and no link to the upstream project Ko-fi', () => {
+    // Every donate entry point is gone: the header CTA, the footer social link,
+    // and the mobile drawer button. The Ko-fi target belonged to the UPSTREAM
+    // project, so any survivor would route this game's players into donating to
+    // a different game. Asserted on the raw URL too, so re-adding a button under
+    // any new markup still fails here.
+    expect(html).not.toContain('ko-fi.com');
+    expect(html).not.toContain('<a class="donate-cta"');
+    expect(html).not.toContain('class="social-link donate"');
+    expect(html).not.toContain('id="mobile-donate"');
+    // The community-links rail stays removed (emberwood landing-page pass).
     expect(html).not.toContain('<details id="community-menu">');
     expect(html).not.toContain('<div class="community-tray">');
     expect(html).not.toContain('<a class="community-link');
