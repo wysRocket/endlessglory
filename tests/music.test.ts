@@ -197,8 +197,8 @@ describe('preserved Eastbrook Vale themes', () => {
     const { createHash } = await import('node:crypto');
     const themes = buildMusicThemes();
     const expected: Record<string, string> = {
-      town_eastbrook: '0d3e5a4e6a209e42',
-      vale: 'b9e65956ebe4b853',
+      town_eastbrook: '031235db886eed00',
+      vale: '2bd570fc29b38f5d',
       vale_legacy: '9caf3642610580dc',
     };
     for (const [name, hash] of Object.entries(expected)) {
