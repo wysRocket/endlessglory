@@ -251,6 +251,52 @@ export function flowerBoxTexture(): THREE.CanvasTexture {
   });
 }
 
+// Eastbrook plaza centerpiece: an inlaid compass-star pattern in lighter
+// stone over the same dark base as cobblestonePavingTexture(), for a bolder
+// plaza focal point instead of a single flat paving color. Purely geometric
+// (no rnd() calls), so it can't perturb any other texture function's shared
+// deterministic RNG stream.
+export function plazaEmblemTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (ctx, s) => {
+    ctx.fillStyle = '#3c3630';
+    ctx.fillRect(0, 0, s, s);
+    const cx = s / 2;
+    const cy = s / 2;
+    const outerR = s * 0.46;
+    const innerR = s * 0.18;
+    ctx.strokeStyle = '#cf9d33';
+    ctx.lineWidth = s * 0.012;
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#cf9d33';
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const tipR = i % 2 === 0 ? outerR : outerR * 0.7;
+      const baseHalf = s * 0.02;
+      const nx = Math.cos(a);
+      const ny = Math.sin(a);
+      const px = -ny;
+      const py = nx;
+      const tipX = cx + nx * tipR;
+      const tipY = cy + ny * tipR;
+      const baseX1 = cx + nx * innerR + px * baseHalf;
+      const baseY1 = cy + ny * innerR + py * baseHalf;
+      const baseX2 = cx + nx * innerR - px * baseHalf;
+      const baseY2 = cy + ny * innerR - py * baseHalf;
+      ctx.beginPath();
+      ctx.moveTo(tipX, tipY);
+      ctx.lineTo(baseX1, baseY1);
+      ctx.lineTo(baseX2, baseY2);
+      ctx.closePath();
+      ctx.fill();
+    }
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';
@@ -984,7 +1030,7 @@ export function foliageCardTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 240; i++) {
     // leaves cluster densely at the centre, thin toward the rim
     const a = rnd() * Math.PI * 2;
-    const d = Math.pow(rnd(), 0.6) * 56;
+    const d = rnd() ** 0.6 * 56;
     const x = cx + Math.cos(a) * d,
       y = cy + Math.sin(a) * d;
     const fade = 1 - d / 64;
