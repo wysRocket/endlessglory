@@ -217,7 +217,34 @@ per this addendum, same as the original spec deferred it):
 Both pieces are new, additive, zone1-scoped code; neither touches `ZONE1_PROPS`, sim
 content, or any other zone's rendering.
 
-## 10. Approval record
+## 10. Post-gate addendum (2026-07-31): BIOME_SHAPE retune
+
+The first full `npm run gate` run against the `ZONE1_ZONE.biome: 'volcano'` flip (Section
+1) surfaced a regression the original spec did not anticipate: `src/sim/world.ts`'s
+`BIOME_SHAPE` table drives the actual deterministic heightfield, not just render color.
+Its `volcano` row (`hill: 42, base: 9, hubHeight: 6`) was authored only for the editor's
+small-area biome-paint brush, never as a whole zone's base biome, and is far more extreme
+than `vale`'s (`hill: 26, base: 0, hubHeight: 1.5`). Setting a whole zone's base biome to
+`'volcano'` reshaped Eastbrook's entire heightfield around zone1's fixed prop/camp/hub
+coordinates, breaking `tests/terrain_walls.test.ts` walkability and (via changed spawn
+heights) `tests/parity/`'s golden traces.
+
+Fix: retuned `BIOME_SHAPE.volcano` to `{ hill: 30, base: 2, hubHeight: 2 }`, close to
+vale's values (still a touch rougher, per the volcano ground's visual intent) rather than
+the original paint-brush extremes. `terrain_walls.test.ts` and the previously-failing
+`vale_cup_layout.test.ts`/`custom_map_parity.test.ts` assertions pass with this shape.
+`tests/parity/` goldens were regenerated (`UPDATE_PARITY=1`, this same commit): the diff
+is height/spawn-position values only (confirmed via unchanged RNG digests and draw counts
+at nearly every sampled frame; the few scenarios with a shifted draw count come from
+walkability-retry loops that legitimately draw a different number of times against the
+new terrain shape, not from any drift on a second run against the same code). None of the
+Section 9 render-only work (splat lean, lava-crack/pool decals) needed any change: they
+consume `terrainHeight` as an input, not `BIOME_SHAPE` directly.
+
+The `vale_cup_layout.test.ts` "Sowfield poi index" pin was also updated to "The
+Cinderfield," matching the intentional Section 1 POI rename it had not yet caught up to.
+
+## 11. Approval record
 
 Proposed via brainstorming dialogue after the town-dressing spec shipped;
 scope (existing-content handling, zone-boundary handling) confirmed by the

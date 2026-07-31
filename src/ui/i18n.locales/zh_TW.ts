@@ -4869,6 +4869,8 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
     '一片被霧氣與廢墟淹沒的國度。泥鰭成群湧入淺灘，更古老之物在水下蠢動，沼橋鎮的人們從橋上警戒注視著。',
   'guide.worldPage.peaksBlurb':
     '被狂風刮蝕的山脊與古老的礦坑，向上攀升至王國中最寒冷、最高處的險境，由高守哨站鎮守。',
+  'guide.worldPage.volcanoBlurb':
+    '焦土遍布、餘燼蔽空的荒原，東溪鎮仍在此屹立不搖。新英雄在此地的灰燼野狼與盜匪之間學會生存。',
   'guide.questsPage.heading': '任務',
   'guide.questsPage.intro': '任務是世界的核心，也是升級最快的途徑。以下說明它們的運作方式。',
   'guide.questsPage.acceptTitle': '尋找與接取',
@@ -5512,6 +5514,10 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeting': '把你的劍帶在身邊。谷地已不復昔日。',
   'guide.worldPage.valePlaceNotes':
     '東溪鎮是你的第一個主據點。狼徑與野豬草地是溫和的狩獵場；鏡湖是適合垂釣的水域，儘管淺灘處群聚著泥鰭魚；玄網林與銅礦坑藏著蜘蛛與貪礦的掘地者；強盜營地與倒塌禮拜堂另有更粗野的活計；聖物庫山丘向下通往崩塌的聖物庫，這個王國的第一座秘探；明木林地是北方一片靜謐、陽光灑落的林地；而母豬場則是東溪有圍牆的野豬球場，溪谷盃就在豐收休戰之下於此開賽。',
+  'guide.worldPage.volcanoGreeter': '雷德布魯克元帥，東溪鎮',
+  'guide.worldPage.volcanoGreeting': '把你的劍帶在身邊。傷痕之地已不復昔日。',
+  'guide.worldPage.volcanoPlaceNotes':
+    '東溪鎮是你的第一個主據點。狼徑與灰燼野豬灘是焦土狩獵場；玻璃水湖是礦泉溫熱的水源，儘管淺灘處群聚著泥鰭魚；玄網林與銅礦坑藏著蜘蛛與貪礦的掘地者；強盜營地與倒塌禮拜堂另有更粗野的活計；聖物庫山丘向下通往崩塌的聖物庫，這個王國的第一座秘探；餘燼林地是北方一片稀疏、映著餘燼紅光的林地；而灰燼場則是東溪有圍牆的野豬球場，溪谷盃就在豐收休戰之下於此開賽。',
   'guide.worldPage.gladeTitle': '寧靜一隅：碧木林地',
   'guide.worldPage.gladeBody':
     'Vale 裡的故事並不全都關於亡者。北方有一片陽光灑落的林地，名為 Brightwood Glade，保有自己較溫和的節奏：盡是安靜的小徑，以及枝葉下斑駁的光影。它是你所追循之路旁的一段柔和對照，當道路給你餘裕漫遊時，很值得前去一看。',

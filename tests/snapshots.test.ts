@@ -1632,8 +1632,8 @@ describe('/who command', () => {
 
     const text = eventTexts(fc.sent).join('\n');
     expect(text).toContain('Who: 2 players online on Endless Realm.');
-    expect(text).toContain('Aleph - level 1 warrior - Eastbrook Vale');
-    expect(text).toContain('Bet - level 7 mage - Eastbrook Vale');
+    expect(text).toContain('Aleph - level 1 warrior - Eastbrook Scar');
+    expect(text).toContain('Bet - level 7 mage - Eastbrook Scar');
   });
 
   it('hides ignored players and players who ignored the requester', () => {
@@ -1652,7 +1652,7 @@ describe('/who command', () => {
 
     const text = eventTexts(fc.sent).join('\n');
     expect(text).toContain('Who: 1 player online on Endless Realm.');
-    expect(text).toContain('Aleph - level 1 warrior - Eastbrook Vale');
+    expect(text).toContain('Aleph - level 1 warrior - Eastbrook Scar');
     expect(text).not.toContain('Bet');
     expect(text).not.toContain('Gimel');
   });
@@ -1684,7 +1684,7 @@ describe('/who command', () => {
 
     const text = eventTexts(fc.sent).join('\n');
     expect(text).toContain('Who: 1 player online on Endless Realm.');
-    expect(text).toContain('Aleph - level 1 warrior - Eastbrook Vale');
+    expect(text).toContain('Aleph - level 1 warrior - Eastbrook Scar');
     expect(text).not.toContain('Bet');
   });
 });

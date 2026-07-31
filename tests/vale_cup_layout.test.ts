@@ -205,10 +205,10 @@ describe('Sowfield terrain (the flatten arm)', () => {
   });
 });
 
-describe('the Sowfield poi index is pinned', () => {
-  it('zone 1 poi index 10 is The Sowfield (localizeZone + locale fills key off it)', async () => {
+describe('the Cinderfield poi index is pinned', () => {
+  it('zone 1 poi index 10 is The Cinderfield (localizeZone + locale fills key off it)', async () => {
     const { ZONES } = await import('../src/sim/data');
     const zone1 = ZONES.find((z) => z.id === 'eastbrook_vale');
-    expect(zone1?.pois[10]?.label).toBe('The Sowfield');
+    expect(zone1?.pois[10]?.label).toBe('The Cinderfield');
   });
 });

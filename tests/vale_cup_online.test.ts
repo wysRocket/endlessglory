@@ -278,7 +278,7 @@ describe('vale cup: online integration (GameServer)', () => {
 
     // presence: fighters on the pitch report the venue, not the vale
     expect((server as any).presenceOf(sb).zone).toBe('The Sowfield');
-    expect((server as any).presenceOf(sw).zone).toBe('Eastbrook Vale');
+    expect((server as any).presenceOf(sw).zone).toBe('Eastbrook Scar');
 
     // desertion: the leaver's loss is resolved BEFORE the leave save, so the
     // persisted state already carries it (and the pre-match return position,

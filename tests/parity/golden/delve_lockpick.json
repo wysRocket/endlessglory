@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 418,
-      "state": "6e5fa070",
+      "state": "346a799c",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -87,7 +87,7 @@
           "detonateTimer": "Infinity",
           "dodgeChance": 0.0625,
           "dualWielding": true,
-          "fallStartY": 1.5,
+          "fallStartY": 2,
           "fiveSecondRule": 99,
           "hp": 62,
           "id": 417,
@@ -109,7 +109,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "potionCooldownUntil": -1,
@@ -117,7 +117,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 6,
@@ -143,7 +143,7 @@
       "tick": 10,
       "time": 0.5,
       "nextId": 431,
-      "state": "63823c60",
+      "state": "68100724",
       "events": "5b33b73b",
       "rng": {
         "draws": 7,
@@ -154,7 +154,7 @@
       "tick": 20,
       "time": 1,
       "nextId": 431,
-      "state": "b5fa379c",
+      "state": "848ea978",
       "events": "ea02f49d",
       "rng": {
         "draws": 7,
@@ -165,7 +165,7 @@
       "tick": 30,
       "time": 1.5,
       "nextId": 431,
-      "state": "228d1365",
+      "state": "76376931",
       "events": "fdfda713",
       "rng": {
         "draws": 10,
@@ -176,7 +176,7 @@
       "tick": 38,
       "time": 1.9,
       "nextId": 433,
-      "state": "6c3f7c8f",
+      "state": "178350db",
       "events": "b1f80b3a",
       "rng": {
         "draws": 13,
@@ -324,7 +324,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 6,
@@ -485,7 +485,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 433,
-      "state": "ad8b8b75",
+      "state": "80ce3365",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -496,7 +496,7 @@
       "tick": 40,
       "time": 2,
       "nextId": 433,
-      "state": "ad8b8b75",
+      "state": "80ce3365",
       "events": "741638a5",
       "rng": {
         "draws": 13,
@@ -644,7 +644,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 6,

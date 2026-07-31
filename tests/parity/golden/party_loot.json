@@ -28,7 +28,7 @@
       "tick": 3,
       "time": 0.15,
       "nextId": 420,
-      "state": "80b245a5",
+      "state": "5dc5b742",
       "events": "d48f776c",
       "rng": {
         "draws": 2,
@@ -189,7 +189,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 0.860353,
+          "fallStartY": 2.008394,
           "fiveSecondRule": 99.15,
           "hp": 100,
           "id": 417,
@@ -205,14 +205,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 0.860353,
+            "y": 2.008394,
             "z": 20
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,
@@ -239,7 +239,7 @@
           "critChance": 0.056,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.056,
-          "fallStartY": 0.639595,
+          "fallStartY": 1.856173,
           "fiveSecondRule": 99.15,
           "hp": 54,
           "id": 418,
@@ -255,7 +255,7 @@
           "petMode": "defensive",
           "pos": {
             "x": 21,
-            "y": 0.639595,
+            "y": 1.856173,
             "z": 20
           },
           "potionCooldownUntil": -1,
@@ -263,7 +263,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 13,
@@ -291,7 +291,7 @@
           "dead": true,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.05,
-          "fallStartY": 1.031633,
+          "fallStartY": 2.339487,
           "fiveSecondRule": 99,
           "hostile": true,
           "hp": 54,
@@ -307,14 +307,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 20,
-            "y": 1.031633,
+            "y": 2.339487,
             "z": 22
           },
           "potionCooldownUntil": -1,
           "respawnTimer": -0.15,
           "spawnPos": {
             "x": 20,
-            "y": 1.031633,
+            "y": 2.339487,
             "z": 22
           },
           "stats": {

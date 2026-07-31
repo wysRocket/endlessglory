@@ -11,7 +11,7 @@ describe('questProgress event localization', () => {
         required: 8,
         text: 'this legacy fallback must not be parsed',
       }),
-    ).toBe('Forest Wolf slain: 3/8');
+    ).toBe('Ashfang Wolf slain: 3/8');
   });
 
   it('keeps the English-text parser only as compatibility for an older server payload', () => {

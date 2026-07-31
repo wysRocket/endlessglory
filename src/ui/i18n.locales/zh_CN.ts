@@ -4867,6 +4867,8 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
     '一片被洪水淹没、迷雾与废墟交织的国度。泥鳍涌入浅滩，水下有更古老之物蠢蠢欲动，由桥镇芬桥镇守望着。',
   'guide.worldPage.peaksBlurb':
     '风蚀的山脊与古老的矿坑向上攀升，通往这片王国中最寒冷、最高处的危险之地，由高守哨站镇守。',
+  'guide.worldPage.volcanoBlurb':
+    '焦土遍地、余烬蔽空的荒原，东溪镇仍在此地屹立不倒。新英雄在这里的灰烬野狼与盗匪之间学会生存。',
   'guide.questsPage.heading': '任务',
   'guide.questsPage.intro': '任务是这个世界的核心，也是升级最快的途径。下面介绍它们的运作方式。',
   'guide.questsPage.acceptTitle': '寻找与接受',
@@ -5513,6 +5515,10 @@ export const zh_CN: Partial<Record<TranslationKey, string>> = {
   'guide.worldPage.valeGreeting': '把你的刀剑带在身边。谷地已不复往日。',
   'guide.worldPage.valePlaceNotes':
     '东溪镇是你的第一个大本营。狼奔谷与野猪草甸是温和的狩猎场；镜湖是供垂钓的好水域，只是浅滩处泥鳍鱼成群；墨网林与铜矿坑藏着蜘蛛和贪婪掘矿的家伙；一处强盗营地与陷落礼拜堂里有更棘手的活儿；圣物库山丘向下通往坍塌的圣物库，这是王国的第一座探秘；明木林地是北方一片宁静、阳光普照的林地；而母猪场则是东溪镇有围墙的野猪球场，溪谷杯就在丰收休战的庇护下在那里开赛。',
+  'guide.worldPage.volcanoGreeter': '雷德布鲁克元帅，东溪',
+  'guide.worldPage.volcanoGreeting': '把你的刀剑带在身边。伤痕地已不复往日。',
+  'guide.worldPage.volcanoPlaceNotes':
+    '东溪镇是你的第一个大本营。狼奔谷与灰烬野猪滩是焦土狩猎场；玻璃水湖是矿泉温热的水源，只是浅滩处泥鳍鱼成群；墨网林与铜矿坑藏着蜘蛛和贪婪掘矿的家伙；一处强盗营地与陷落礼拜堂里有更棘手的活儿；圣物库山丘向下通往坍塌的圣物库，这是王国的第一座探秘；余烬林地是北方一片稀疏、映着余烬红光的林地；而灰烬场则是东溪镇有围墙的野猪球场，溪谷杯就在丰收休战的庇护下在那里开赛。',
   'guide.worldPage.gladeTitle': '宁静一隅：明木林地',
   'guide.worldPage.gladeBody':
     'the Vale 里的故事并不全都关于亡者。北方有一片阳光照耀的林地，名为 Brightwood Glade，自有它更为温和的节奏：尽是安静的小径，以及枝叶下斑驳的光影。它是你所追寻的踪迹之外一段柔和的对照，若道路给你余裕闲逛，很值得去看一看。',

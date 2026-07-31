@@ -84,7 +84,10 @@ const BIOME_SHAPE: Record<BiomeId, { hill: number; base: number; hubHeight: numb
   // built-in world, so these rows only shape painted cells on custom maps.
   beach: { hill: 5, base: -2.4, hubHeight: 0.8 },
   desert: { hill: 15, base: 2.5, hubHeight: 2 },
-  volcano: { hill: 42, base: 9, hubHeight: 6 },
+  // volcano is also zone1's own base biome (Eastbrook Scar), unlike the other
+  // paint-only rows below: kept close to vale's walkable shape (still a
+  // touch rougher) so the existing hub/camp/prop layout stays walkable.
+  volcano: { hill: 30, base: 2, hubHeight: 2 },
   cave: { hill: 9, base: 1, hubHeight: 1 },
 };
 

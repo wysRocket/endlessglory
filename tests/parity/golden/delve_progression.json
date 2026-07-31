@@ -16,7 +16,7 @@
       "tick": 0,
       "time": 0,
       "nextId": 418,
-      "state": "6716ec49",
+      "state": "0a8ca98d",
       "events": "741638a5",
       "rng": {
         "draws": 0,
@@ -100,7 +100,7 @@
           "critChance": 0.06,
           "detonateTimer": "Infinity",
           "dodgeChance": 0.06,
-          "fallStartY": 1.5,
+          "fallStartY": 2,
           "fiveSecondRule": 99,
           "hp": 100,
           "id": 417,
@@ -116,14 +116,14 @@
           "petMode": "defensive",
           "pos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "potionCooldownUntil": -1,
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,
@@ -148,7 +148,7 @@
       "tick": 5,
       "time": 0.25,
       "nextId": 439,
-      "state": "f3269237",
+      "state": "a5b5ed8b",
       "events": "2f4154ed",
       "rng": {
         "draws": 1,
@@ -159,7 +159,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 439,
-      "state": "1f3352e0",
+      "state": "29f16f70",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -276,7 +276,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,
@@ -301,7 +301,7 @@
       "tick": 7,
       "time": 0.35,
       "nextId": 439,
-      "state": "4cf894b7",
+      "state": "f93b9c07",
       "events": "281c8413",
       "rng": {
         "draws": 3,
@@ -426,7 +426,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,
@@ -451,7 +451,7 @@
       "tick": 9,
       "time": 0.45,
       "nextId": 439,
-      "state": "ec099c44",
+      "state": "c603b390",
       "events": "741638a5",
       "rng": {
         "draws": 3,
@@ -576,7 +576,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,

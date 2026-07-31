@@ -29,7 +29,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 419,
-      "state": "7bf154a7",
+      "state": "2e0f28ab",
       "events": "69a6ef56",
       "rng": {
         "draws": 0,
@@ -40,7 +40,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 419,
-      "state": "6a6d970c",
+      "state": "aed619ac",
       "events": "56bc4ae4",
       "rng": {
         "draws": 34,
@@ -51,7 +51,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 419,
-      "state": "5d5d6d88",
+      "state": "d8a1f66c",
       "events": "244cb158",
       "rng": {
         "draws": 134,
@@ -62,7 +62,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 419,
-      "state": "33e068a3",
+      "state": "46974fe7",
       "events": "7925d720",
       "rng": {
         "draws": 252,
@@ -73,7 +73,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 419,
-      "state": "e8ccb9ca",
+      "state": "5902e8c6",
       "events": "013165de",
       "rng": {
         "draws": 385,
@@ -84,7 +84,7 @@
       "tick": 142,
       "time": 7.1,
       "nextId": 419,
-      "state": "2bbd57b9",
+      "state": "8eeddf19",
       "events": "741638a5",
       "rng": {
         "draws": 486,
@@ -282,7 +282,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,
@@ -331,7 +331,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 13,

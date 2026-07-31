@@ -30,7 +30,7 @@
       "tick": 25,
       "time": 1.25,
       "nextId": 421,
-      "state": "38e1bbc5",
+      "state": "a36b9fe1",
       "events": "037f8201",
       "rng": {
         "draws": 0,
@@ -41,7 +41,7 @@
       "tick": 50,
       "time": 2.5,
       "nextId": 421,
-      "state": "a3b3c98c",
+      "state": "e5b84f60",
       "events": "d72fbd30",
       "rng": {
         "draws": 36,
@@ -52,7 +52,7 @@
       "tick": 75,
       "time": 3.75,
       "nextId": 421,
-      "state": "9776615e",
+      "state": "c25e8f7a",
       "events": "6fc821d8",
       "rng": {
         "draws": 119,
@@ -63,7 +63,7 @@
       "tick": 100,
       "time": 5,
       "nextId": 421,
-      "state": "fa253059",
+      "state": "5383e265",
       "events": "e1f53a64",
       "rng": {
         "draws": 234,
@@ -74,7 +74,7 @@
       "tick": 125,
       "time": 6.25,
       "nextId": 421,
-      "state": "0600ad6c",
+      "state": "730ac128",
       "events": "c62197c9",
       "rng": {
         "draws": 387,
@@ -85,7 +85,7 @@
       "tick": 150,
       "time": 7.5,
       "nextId": 421,
-      "state": "c25ffacf",
+      "state": "073768d3",
       "events": "741638a5",
       "rng": {
         "draws": 540,
@@ -96,7 +96,7 @@
       "tick": 163,
       "time": 8.15,
       "nextId": 421,
-      "state": "3516db18",
+      "state": "088e0c24",
       "events": "d75d82e8",
       "rng": {
         "draws": 612,
@@ -428,7 +428,7 @@
           "resourceType": "rage",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 5,
@@ -476,7 +476,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 41,
@@ -533,7 +533,7 @@
           "resourceType": "energy",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 6,
@@ -584,7 +584,7 @@
           "resourceType": "mana",
           "spawnPos": {
             "x": 2,
-            "y": 1.5,
+            "y": 2,
             "z": -2
           },
           "spellPower": 16,

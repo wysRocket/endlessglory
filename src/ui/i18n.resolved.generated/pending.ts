@@ -88,30 +88,10 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
-  "zh_CN": [
-    "guide.worldPage.volcanoBlurb",
-    "guide.worldPage.volcanoGreeter",
-    "guide.worldPage.volcanoGreeting",
-    "guide.worldPage.volcanoPlaceNotes"
-  ],
-  "zh_TW": [
-    "guide.worldPage.volcanoBlurb",
-    "guide.worldPage.volcanoGreeter",
-    "guide.worldPage.volcanoGreeting",
-    "guide.worldPage.volcanoPlaceNotes"
-  ],
-  "ko_KR": [
-    "guide.worldPage.volcanoBlurb",
-    "guide.worldPage.volcanoGreeter",
-    "guide.worldPage.volcanoGreeting",
-    "guide.worldPage.volcanoPlaceNotes"
-  ],
-  "ja_JP": [
-    "guide.worldPage.volcanoBlurb",
-    "guide.worldPage.volcanoGreeter",
-    "guide.worldPage.volcanoGreeting",
-    "guide.worldPage.volcanoPlaceNotes"
-  ],
+  "zh_CN": [],
+  "zh_TW": [],
+  "ko_KR": [],
+  "ja_JP": [],
   "pt_BR": [
     "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
@@ -125,12 +105,7 @@ export const pending: Record<string, readonly string[]> = {
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
-  "ru_RU": [
-    "guide.worldPage.volcanoBlurb",
-    "guide.worldPage.volcanoGreeter",
-    "guide.worldPage.volcanoGreeting",
-    "guide.worldPage.volcanoPlaceNotes"
-  ],
+  "ru_RU": [],
   "cs_CZ": [
     "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",

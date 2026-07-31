@@ -88,7 +88,7 @@ describe('/who name filter', () => {
 });
 
 describe('/who zone filter', () => {
-  // Freshly joined players all spawn in the overworld zone "Eastbrook Vale", so
+  // Freshly joined players all spawn in the overworld zone "Eastbrook Scar", so
   // a substring of that zone matches everyone, and a different zone matches no one.
   it('matches on zone name, not just player name', () => {
     const { server, viewer } = makeServer(ROSTER);
@@ -101,8 +101,8 @@ describe('/who zone filter', () => {
 
   it('matches a multi-word zone substring (spaces preserved)', () => {
     const { server, viewer } = makeServer(ROSTER);
-    const out = who(server, viewer, 'eastbrook vale');
-    expect(out[0]).toBe('Who: 3 players matching "eastbrook vale" on Endless Realm.');
+    const out = who(server, viewer, 'eastbrook scar');
+    expect(out[0]).toBe('Who: 3 players matching "eastbrook scar" on Endless Realm.');
     expect(out.filter((t) => t.includes(' - level ')).length).toBe(3);
   });
 

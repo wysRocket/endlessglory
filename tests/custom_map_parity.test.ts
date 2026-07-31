@@ -75,7 +75,7 @@ describe('custom-map terrain seam', () => {
   });
 
   it('biome paint overrides shape + biome lookup only inside painted cells', () => {
-    const baseBiome = biomeAt(40, 60); // built-in vale here
+    const baseBiome = biomeAt(40, 60); // built-in volcano here (Eastbrook Scar)
     const baseH = terrainHeight(40, 60, SEED);
     // Paint a 1-cell peaks patch covering (40,60); everywhere else unpainted.
     setActiveWorldContent({
@@ -93,7 +93,7 @@ describe('custom-map terrain seam', () => {
     expect(terrainHeight(40, 60, SEED)).not.toBeCloseTo(baseH, 3); // shape changed
     // A point outside the painted cell is unchanged.
     expect(biomeAt(200, 200)).toBe(zoneBiomeAt(200));
-    expect(baseBiome).toBe('vale');
+    expect(baseBiome).toBe('volcano');
   });
 
   it('a level stamp pulls the centre to an absolute height (flatten brush)', () => {
