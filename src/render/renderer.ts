@@ -37,6 +37,7 @@ import { ALL_CLASSES, type Entity, type SimEvent } from '../sim/types';
 import { groundHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
 import { attachAvatarFallback } from '../ui/avatar_fallback';
 import { tEntity } from '../ui/entity_i18n';
+import { ACTIVE_VISUAL_THEME } from '../visual_theme';
 import type { IWorld } from '../world_api';
 import { isVisuallyDead } from './anim_state';
 import { AOE_RING_LIFETIME, aoeRingAnim } from './aoe_ring';
@@ -77,6 +78,7 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
+import { lightingForTheme } from './emberwood/lighting';
 import { objectDisplayName } from './entity_labels';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
@@ -189,8 +191,6 @@ import { Weather } from './weather';
 import { buildWorldAmbientSources, crowdAmbienceAt, footstepSurfaceAt } from './world_audio';
 import { buildYumiMaze, type YumiMazeView } from './yumi_maze';
 import { YumiTeamMarkers } from './yumi_team_markers';
-import { ACTIVE_VISUAL_THEME } from '../visual_theme';
-import { lightingForTheme } from './emberwood/lighting';
 
 // Festival gold/white celebration palette, shared by the Vale Cup full-time
 // draw show and the Book of Deeds unlock burst (one palette, two sites).
@@ -1330,7 +1330,11 @@ export class Renderer {
       pmrem.dispose(); // prefiltered envRTs stay alive for the session
     }
 
-    const hemi = new THREE.HemisphereLight(themeLight.hemiColor, themeLight.hemiGround, LOW_GFX ? 0.98 : themeLight.hemiIntensity);
+    const hemi = new THREE.HemisphereLight(
+      themeLight.hemiColor,
+      themeLight.hemiGround,
+      LOW_GFX ? 0.98 : themeLight.hemiIntensity,
+    );
     this.scene.add(hemi);
     this.hemi = hemi;
     const sun = new THREE.DirectionalLight(
