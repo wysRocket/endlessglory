@@ -3,15 +3,15 @@ import { WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z, ZONES } from '../sim/data';
 import { fbm2 } from '../sim/rng';
 import type { BiomeId } from '../sim/types';
 import { biomeAt, roadDistance, terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { ACTIVE_VISUAL_THEME } from '../visual_theme';
 import { loadTexture } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { terrainPaletteForTheme } from './emberwood/palette';
 import { GFX } from './gfx';
 import { runIdleQueue } from './idle_queue';
 import { impactCraterTerrainBlend } from './impact_terrain';
 import { chunkIntersectsRegion, normalTexelBounds } from './terrain_region_core';
 import { groundDetailTexture, groundSplatMaps, macroNoiseTexture } from './textures';
-import { ACTIVE_VISUAL_THEME } from '../visual_theme';
-import { terrainPaletteForTheme } from './emberwood/palette';
 
 // Chunked terrain across the whole 360x1080 zone strip.
 //
