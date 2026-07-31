@@ -742,7 +742,449 @@ EOF
 
 ---
 
-### Task 6: Manual visual verification + screenshots
+### Task 6: Escalation — core extensions (bunting lines, path flower beds, more lanterns)
+
+Per the spec's Section 12 escalation addendum (2026-07-31, post-Task-5): the user asked to push
+the visual treatment further within the same agreed constraints. This task extends the pure
+planner only; Task 7 extends the painter to draw the new plan fields plus two painter-only
+additions (a plaza centerpiece texture swap, and a purely decorative skyline landmark).
+
+**Files:**
+- Modify: `src/render/town_dressing_core.ts`
+- Modify: `tests/town_dressing_core.test.ts`
+
+- [ ] **Step 1: Extend the core**
+
+In `src/render/town_dressing_core.ts`:
+
+1. Change `const LANTERN_COUNT = 8;` to `const LANTERN_COUNT = 12;` (more light, per the addendum).
+2. Add a new constant next to the other margin constants: `const FLOWERBED_OFFSET = 1.1;`
+3. Add two new exported interfaces, placed after `RingPlan`:
+
+```ts
+export interface BuntingLine {
+  from: Point2;
+  to: Point2;
+}
+
+export interface FlowerBedPlan {
+  x: number;
+  z: number;
+}
+```
+
+4. Add two new fields to `TownDressingPlan`:
+
+```ts
+export interface TownDressingPlan {
+  plaza: RingPlan;
+  paths: PlazaPathPlan[];
+  buildingDressing: BuildingDressingPlan[];
+  stallAwnings: StallAwningPlan[];
+  wellRings: RingPlan[];
+  campfireRings: RingPlan[];
+  lanterns: Point2[];
+  buntingLines: BuntingLine[];
+  pathFlowerBeds: FlowerBedPlan[];
+}
+```
+
+5. Right after the existing `paths` computation loop (after the `for (const anchor of anchors) { ... }` block that builds `paths`, before the `obstacles`/`lanterns` block), add the flower-bed computation — one pair per path, straddling its midpoint:
+
+```ts
+  const pathFlowerBeds: FlowerBedPlan[] = paths.map((path) => {
+    const dx = path.to.x - path.from.x;
+    const dz = path.to.z - path.from.z;
+    const len = Math.hypot(dx, dz);
+    const ux = dx / len;
+    const uz = dz / len;
+    const px = -uz;
+    const pz = ux;
+    const mx = (path.from.x + path.to.x) / 2;
+    const mz = (path.from.z + path.to.z) / 2;
+    return { x: mx + px * FLOWERBED_OFFSET, z: mz + pz * FLOWERBED_OFFSET };
+  });
+```
+
+Note this produces ONE flower bed per path (on one side); to get a pair per path (both sides,
+matching the addendum's "planter flower beds along each path"), use `flatMap` instead of `map`
+so each path yields two beds:
+
+```ts
+  const pathFlowerBeds: FlowerBedPlan[] = paths.flatMap((path) => {
+    const dx = path.to.x - path.from.x;
+    const dz = path.to.z - path.from.z;
+    const len = Math.hypot(dx, dz);
+    const ux = dx / len;
+    const uz = dz / len;
+    const px = -uz;
+    const pz = ux;
+    const mx = (path.from.x + path.to.x) / 2;
+    const mz = (path.from.z + path.to.z) / 2;
+    return [
+      { x: mx + px * FLOWERBED_OFFSET, z: mz + pz * FLOWERBED_OFFSET },
+      { x: mx - px * FLOWERBED_OFFSET, z: mz - pz * FLOWERBED_OFFSET },
+    ];
+  });
+```
+
+Use the `flatMap` version (two beds per path).
+
+6. Right after the existing `lanterns` computation loop (after the `for (let i = 0; i < LANTERN_COUNT; i++) { ... }` block), add the bunting computation — chain consecutive surviving lanterns, and close the loop only if the closing gap isn't obviously spanning a skipped obstacle:
+
+```ts
+  const buntingLines: BuntingLine[] = [];
+  for (let i = 0; i < lanterns.length - 1; i++) {
+    buntingLines.push({ from: lanterns[i], to: lanterns[i + 1] });
+  }
+  if (lanterns.length > 2) {
+    const first = lanterns[0];
+    const last = lanterns[lanterns.length - 1];
+    const closingGap = Math.hypot(last.x - first.x, last.z - first.z);
+    const ringSpacing = (2 * Math.PI * (plazaRadius + LANTERN_RING_MARGIN)) / LANTERN_COUNT;
+    if (closingGap <= ringSpacing * 1.5) {
+      buntingLines.push({ from: last, to: first });
+    }
+  }
+```
+
+7. Update the final `return` statement to include both new fields:
+
+```ts
+  return {
+    plaza,
+    paths,
+    buildingDressing,
+    stallAwnings,
+    wellRings,
+    campfireRings,
+    lanterns,
+    buntingLines,
+    pathFlowerBeds,
+  };
+```
+
+- [ ] **Step 2: Extend the test file**
+
+Add these three new `it(...)` cases to the existing `describe('planTownDressing', ...)` block in
+`tests/town_dressing_core.test.ts` (keep all 10 existing tests unchanged):
+
+```ts
+  it('produces a pair of flower beds straddling each path, not overlapping the path itself', () => {
+    const p = plan();
+    expect(p.pathFlowerBeds).toHaveLength(p.paths.length * 2);
+    for (const bed of p.pathFlowerBeds) {
+      expect(Number.isFinite(bed.x)).toBe(true);
+      expect(Number.isFinite(bed.z)).toBe(true);
+    }
+  });
+
+  it('only strings bunting between positions that are real lanterns in the plan', () => {
+    const p = plan();
+    const isLantern = (pt: { x: number; z: number }) =>
+      p.lanterns.some((l) => l.x === pt.x && l.z === pt.z);
+    for (const line of p.buntingLines) {
+      expect(isLantern(line.from)).toBe(true);
+      expect(isLantern(line.to)).toBe(true);
+    }
+  });
+
+  it('raises the lantern count while still respecting the 3-unit clearance', () => {
+    const p = plan();
+    expect(p.lanterns.length).toBeGreaterThan(8);
+    const obstacles = [
+      ...ZONE1_PROPS.buildings.map((b) => ({ x: b.x, z: b.z })),
+      ...ZONE1_PROPS.stalls.map((s) => ({ x: s.x, z: s.z })),
+    ];
+    for (const lantern of p.lanterns) {
+      for (const o of obstacles) {
+        expect(Math.hypot(o.x - lantern.x, o.z - lantern.z)).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
+```
+
+- [ ] **Step 3: Run the tests**
+
+Run: `npx vitest run tests/town_dressing_core.test.ts`
+Expected: PASS, 13 tests (10 existing + 3 new).
+
+- [ ] **Step 4: Typecheck**
+
+Run: `npx tsc --noEmit`
+Expected: no new errors. (`town_dressing.ts` will now fail to compile because it destructures a
+plan that's missing the two new fields it doesn't yet use — no wait, TypeScript structural typing
+means EXTRA fields on `TownDressingPlan` don't break `town_dressing.ts`, which only reads the
+fields it already knows about. Confirm this is actually the case by running `tsc` — it should
+still be clean, since `town_dressing.ts` never destructures `plan` positionally.)
+
+- [ ] **Step 5: Commit**
+
+```bash
+git add src/render/town_dressing_core.ts tests/town_dressing_core.test.ts
+git commit -m "$(cat <<'EOF'
+feat(render): extend the town-dressing plan for bunting/flowerbeds/more light
+
+Adds buntingLines (chained around the surviving lantern ring) and
+pathFlowerBeds (a pair per path) to the plan, and raises the lantern
+count from 8 to 12. Per the 2026-07-31 escalation addendum to the
+Eastbrook town-dressing spec; the painter that draws these new fields
+lands in the next commit.
+EOF
+)"
+```
+
+---
+
+### Task 7: Escalation — painter additions (plaza centerpiece, bunting, warmth, skyline landmark)
+
+**Files:**
+- Modify: `src/render/textures.ts`
+- Modify: `src/render/town_dressing.ts`
+
+- [ ] **Step 1: Add the plaza centerpiece texture**
+
+Append to `src/render/textures.ts`, after the three functions added in Task 3 (`flowerBoxTexture`)
+and before `waterNormalish()`:
+
+```ts
+// Eastbrook plaza centerpiece: an inlaid compass-star pattern in lighter
+// stone over the same dark base as cobblestonePavingTexture(), for a bolder
+// plaza focal point instead of a single flat paving color. Purely geometric
+// (no rnd() calls), so it can't perturb any other texture function's shared
+// deterministic RNG stream.
+export function plazaEmblemTexture(): THREE.CanvasTexture {
+  return makeCanvas(256, (ctx, s) => {
+    ctx.fillStyle = '#3c3630';
+    ctx.fillRect(0, 0, s, s);
+    const cx = s / 2;
+    const cy = s / 2;
+    const outerR = s * 0.46;
+    const innerR = s * 0.18;
+    ctx.strokeStyle = '#cf9d33';
+    ctx.lineWidth = s * 0.012;
+    ctx.beginPath();
+    ctx.arc(cx, cy, outerR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(cx, cy, innerR, 0, Math.PI * 2);
+    ctx.stroke();
+    ctx.fillStyle = '#cf9d33';
+    for (let i = 0; i < 8; i++) {
+      const a = (i / 8) * Math.PI * 2;
+      const tipR = i % 2 === 0 ? outerR : outerR * 0.7;
+      const baseHalf = s * 0.02;
+      const nx = Math.cos(a);
+      const ny = Math.sin(a);
+      const px = -ny;
+      const py = nx;
+      const tipX = cx + nx * tipR;
+      const tipY = cy + ny * tipR;
+      const baseX1 = cx + nx * innerR + px * baseHalf;
+      const baseY1 = cy + ny * innerR + py * baseHalf;
+      const baseX2 = cx + nx * innerR - px * baseHalf;
+      const baseY2 = cy + ny * innerR - py * baseHalf;
+      ctx.beginPath();
+      ctx.moveTo(tipX, tipY);
+      ctx.lineTo(baseX1, baseY1);
+      ctx.lineTo(baseX2, baseY2);
+      ctx.closePath();
+      ctx.fill();
+    }
+  });
+}
+```
+
+Run `npx tsc --noEmit` and `npx @biomejs/biome check --write src/render/textures.ts`, then commit
+this piece on its own first:
+
+```bash
+git add src/render/textures.ts
+git commit -m "$(cat <<'EOF'
+feat(render): add the plaza centerpiece emblem texture
+
+An inlaid compass-star pattern for the Eastbrook plaza disc, replacing
+plain cobblestone at the town's focal point. Not yet wired into the
+painter (next commit).
+EOF
+)"
+```
+
+- [ ] **Step 2: Wire the escalation into the painter**
+
+In `src/render/town_dressing.ts`, make these changes:
+
+1. Add `plazaEmblemTexture` to the existing `textures` import:
+
+```ts
+import {
+  bannerClothTexture,
+  cobblestonePavingTexture,
+  flowerBoxTexture,
+  plazaEmblemTexture,
+} from './textures';
+```
+
+2. Add one new material, built alongside the existing ones (near `const pavingMat = ...`):
+
+```ts
+  const emblemMat = surfaceMat({ map: plazaEmblemTexture(), roughness: 0.9 });
+  const glowMat = new THREE.SpriteMaterial({
+    map: radialGlowTexture(),
+    color: 0xffb066,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+```
+
+   This needs a new import too — add `radialGlowTexture` to the same `textures` import block from
+   step 1 above (final import list: `bannerClothTexture, cobblestonePavingTexture,
+   flowerBoxTexture, plazaEmblemTexture, radialGlowTexture`).
+
+3. In the existing plaza-disc block, change the material from `pavingMat` to `emblemMat` (the
+   plaza disc is the ONLY mesh that switches material — paths and rings keep `pavingMat`):
+
+```ts
+  // ---- plaza (flat paved disc, sampled at the hub's ground height) --------
+  {
+    const geo = new THREE.CircleGeometry(plan.plaza.radius, 40);
+    geo.rotateX(-Math.PI / 2);
+    const mesh = new THREE.Mesh(geo, emblemMat);
+    mesh.position.set(plan.plaza.x, ground(plan.plaza.x, plan.plaza.z) + 0.03, plan.plaza.z);
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+```
+
+4. Add a warm glow sprite at each lantern — extend the existing lantern loop (find the `for (const
+   lantern of plan.lanterns) { ... }` block, which currently adds `post`, `head`, and pushes a
+   `light`) by adding one more child right after the `head` mesh is added, before the `light` is
+   created:
+
+```ts
+    const glow = new THREE.Sprite(glowMat);
+    glow.scale.setScalar(1.6);
+    glow.position.set(lantern.x, y + LANTERN_POST_HEIGHT + 0.1, lantern.z);
+    group.add(glow);
+```
+
+5. Add flower beds along the paths — new block, placed after the existing "market stall awnings"
+   loop and before the "lantern ring" loop:
+
+```ts
+  // ---- path-side flower beds ------------------------------------------------
+  for (const bed of plan.pathFlowerBeds) {
+    const y = ground(bed.x, bed.z);
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.35, 0.6), boxMat);
+    box.position.set(bed.x, y + 0.18, bed.z);
+    box.castShadow = true;
+    group.add(box);
+    const cap = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.55), boxCapMat);
+    cap.rotation.x = -Math.PI / 2;
+    cap.position.set(bed.x, y + 0.36, bed.z);
+    group.add(cap);
+  }
+```
+
+6. Add the bunting garlands — new block, placed after the flower-bed block and before the lantern
+   ring loop:
+
+```ts
+  // ---- bunting garlands strung between surviving lantern posts -------------
+  const BUNTING_FLAGS_PER_LINE = 5;
+  const BUNTING_SAG = 0.35;
+  for (const line of plan.buntingLines) {
+    const y0 = ground(line.from.x, line.from.z) + LANTERN_POST_HEIGHT + 0.1;
+    const y1 = ground(line.to.x, line.to.z) + LANTERN_POST_HEIGHT + 0.1;
+    for (let i = 0; i < BUNTING_FLAGS_PER_LINE; i++) {
+      const t = (i + 0.5) / BUNTING_FLAGS_PER_LINE;
+      const x = line.from.x + (line.to.x - line.from.x) * t;
+      const z = line.from.z + (line.to.z - line.from.z) * t;
+      const y = y0 + (y1 - y0) * t - BUNTING_SAG * 4 * t * (1 - t);
+      const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.35), clothMat);
+      flag.position.set(x, y, z);
+      flag.rotation.y = Math.atan2(line.to.x - line.from.x, line.to.z - line.from.z);
+      group.add(flag);
+    }
+  }
+```
+
+7. Add the skyline landmark — a new standalone function, added after `buildTownDressing` (same
+   file), then called once from inside `buildTownDressing` right before the `return { group,
+   fireLights };` line:
+
+```ts
+function addSkylineLandmark(group: THREE.Group, hub: TownHub, seed: number): void {
+  const lx = hub.x + 10;
+  const lz = hub.z + 185; // well past every named POI in ZONE1_ZONE.pois; see the 2026-07-31 escalation addendum
+  const baseY = terrainHeight(lx, lz, seed);
+  const rockMat = surfaceMat({ color: 0x2b2420, roughness: 1 });
+  const craterMat = surfaceMat({ color: 0xff8040, emissive: 0xff5a1e, emissiveIntensity: 2.2, roughness: 0.5 });
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(24, 70, 8), rockMat);
+  cone.position.set(lx, baseY + 35, lz);
+  group.add(cone);
+  const crater = new THREE.Mesh(new THREE.ConeGeometry(9, 8, 8), craterMat);
+  crater.position.set(lx, baseY + 70, lz);
+  group.add(crater);
+  const glow = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: radialGlowTexture(),
+      color: 0xff6a2e,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  glow.scale.setScalar(30);
+  glow.position.set(lx, baseY + 74, lz);
+  group.add(glow);
+}
+```
+
+Call it right before the final return:
+
+```ts
+  addSkylineLandmark(group, hub, seed);
+
+  return { group, fireLights };
+```
+
+- [ ] **Step 3: Typecheck**
+
+Run: `npx tsc --noEmit`
+Expected: no new errors.
+
+- [ ] **Step 4: Format**
+
+Run: `npx @biomejs/biome check --write src/render/town_dressing.ts`
+
+- [ ] **Step 5: Run the test suites**
+
+Run: `npx vitest run tests/architecture.test.ts tests/town_dressing_core.test.ts`
+Expected: PASS (the painter isn't Vitest-covered directly, same as Task 4 — this just confirms
+nothing in the core/architecture suites regressed).
+
+- [ ] **Step 6: Commit**
+
+```bash
+git add src/render/town_dressing.ts
+git commit -m "$(cat <<'EOF'
+feat(render): paint the escalated Eastbrook dressing
+
+Plaza centerpiece emblem, warm lantern glow sprites, path-side flower
+beds, bunting garlands strung around the lantern ring, and a
+standalone volcanic skyline landmark well beyond the zone's gameplay
+area. Per the 2026-07-31 escalation addendum; no fireLights budget
+growth (glow sprites are not PointLights), no shared terrain/material
+edits, no other town affected.
+EOF
+)"
+```
+
+---
+
+### Task 8: Manual visual verification + screenshots
 
 **Files:**
 - Create: `docs/screenshots/eastbrook-town-dressing/before-desktop.png`
@@ -763,7 +1205,7 @@ git stash pop
 
 - [ ] **Step 2: Capture the AFTER shots**
 
-With the stash restored (all 5 commits from Tasks 1-5 back in place), reload the same dev server tab (Vite HMR picks up the change; if the renderer doesn't hot-swap cleanly, do a hard refresh) and screenshot:
+With the stash restored (all commits from Tasks 1-7 back in place), reload the same dev server tab (Vite HMR picks up the change; if the renderer doesn't hot-swap cleanly, do a hard refresh) and screenshot:
 - Desktop (1280x800): `docs/screenshots/eastbrook-town-dressing/after-desktop.png`
 - Mobile landscape (812x375, since the in-game HUD is landscape-only on mobile): `docs/screenshots/eastbrook-town-dressing/after-mobile.png`
 
@@ -771,8 +1213,11 @@ With the stash restored (all 5 commits from Tasks 1-5 back in place), reload the
 
 Check for:
 - The plaza/paths read as a coherent paved town square, not floating above or sunk into the terrain.
-- No banner, flower box, awning, or lantern clips through a building, stall, or the statue/bonfire.
-- No stutter walking around the hub compared to the BEFORE build (informal check; the perf-budget test in Task 7 is the real gate).
+- The plaza centerpiece emblem is visible and centered under the statue, distinct from the plain path/ring paving.
+- No banner, flower box, planter, awning, bunting flag, or lantern clips through a building, stall, or the statue/bonfire.
+- Bunting garlands sag believably between lantern posts and don't clip through the ground or a building.
+- The skyline landmark reads as a distant background feature north of town, not overlapping any nearby building/NPC and not floating obviously disconnected from the terrain.
+- No stutter walking around the hub compared to the BEFORE build (informal check; the perf-budget test in Task 9 is the real gate).
 - Fenbridge and Highwatch (the other two towns) look completely unchanged — spot-check one of them in the same session.
 
 If anything clips or looks wrong, adjust the constants in `town_dressing_core.ts` (offsets, `PLAZA_RADIUS_FRACTION`, `LANTERN_MIN_CLEARANCE`) or `town_dressing.ts` (mesh sizes/heights), re-run `npx vitest run tests/town_dressing_core.test.ts`, and re-screenshot.
@@ -792,7 +1237,7 @@ EOF
 
 ---
 
-### Task 7: Full gate + final check
+### Task 9: Full gate + final check
 
 - [ ] **Step 1: Run the full pre-merge gate**
 
@@ -814,10 +1259,10 @@ Expected: PASS.
 
 ```bash
 git status --short
-git log --oneline -8
+git log --oneline -12
 ```
 
-Expected: clean working tree, 6 commits on `main` (planner, architecture registration, textures, painter, renderer wiring, screenshots), each with the Conventional Commits body the repo requires.
+Expected: clean working tree, all commits from Tasks 1-8 present on `main` (planner, architecture registration, textures, painter, renderer wiring, escalation core/painter additions, screenshots), each with the Conventional Commits body the repo requires.
 
 ---
 
