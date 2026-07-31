@@ -186,3 +186,42 @@ sim-content fixture is a different, separately-scoped change.
 Design proposed via brainstorming dialogue (scope, asset strategy, layout-data
 constraints, and mood/palette each confirmed by the user in turn); user
 approved the full design as presented before this spec was written.
+
+## 12. Escalation addendum (2026-07-31, post-Task-5)
+
+After Tasks 1-5 shipped (the restrained first pass: single roofline banner
+per building, plain cobblestone plaza, an 8-post lantern ring), the user asked
+to push the visual treatment further. Re-confirmed explicitly: still scoped to
+Eastbrook only, still `ZONE1_PROPS` positions untouched, still no new GLB
+assets, still no shared `village:*` material edits. Four additions, all
+render-layer only, same architecture (extend `town_dressing_core.ts`'s plan,
+extend `town_dressing.ts`'s painter):
+
+1. **Bunting garlands.** Chain consecutive surviving lantern-ring posts with a
+   string of small hanging pennants (reusing the existing blue/gold banner
+   cloth texture/material), for a busier festive canopy over the plaza,
+   completing the "banners/bunting" line already named in Section 2's original
+   scope but only partially built in the first pass.
+2. **Grander centerpiece plaza floor.** The plaza disc gets a new inlaid
+   compass/star texture (a new `plazaEmblemTexture()` in `textures.ts`)
+   instead of plain cobblestone paving; paths and rings keep the plain paving
+   so the plaza itself reads as the focal centerpiece. Texture-only change,
+   zero new geometry.
+3. **More light and warmth.** Lantern count raised, small planter flower beds
+   added along each path at regular intervals (reusing the existing flower-box
+   texture/material), and a soft warm glow sprite added at each lantern
+   (billboard, not a new `PointLight`, so this does NOT grow the shared
+   `fireLights` point-light budget).
+4. **A landmark on the skyline.** A new, purely decorative, non-collidable
+   volcanic peak silhouette (dark rock cone + emissive lava-glow texture),
+   placed well north of the hub near the zone1/zone2 boundary ridge (around
+   `z = 185`, beyond every named POI in `ZONE1_ZONE.pois`), tall enough to read
+   above the existing shared mountain-wall terrain from the town square. It is
+   a standalone prop, not an edit to the shared terrain mesh/material (that
+   stays a zone-boundary feature every zone reuses), so it cannot affect any
+   other zone's terrain rendering. Placed beyond zone1's gameplay area (no POI,
+   camp, or quest content sits anywhere near `z = 185`), so it has no collision
+   or gameplay footprint; visibility naturally falls off with each graphics
+   tier's existing fog-far distance, the same as every other distant landmark
+   in the game (cosmetic-only, not gameplay information, so this is consistent
+   with the graphics-fairness invariant in root `CLAUDE.md`).
