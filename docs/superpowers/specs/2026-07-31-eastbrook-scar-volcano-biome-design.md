@@ -183,7 +183,41 @@ done — the render code is trusted but unproven in practice.
 | 2026-07-31 | Trust the existing zone1/zone2 cross-zone blend as-is | User's explicit choice; no new blend-tuning work. |
 | 2026-07-31 | Leave the town's blue/gold dressing palette unchanged | Deliberate "ordered outpost vs. transformed wasteland" contrast, not corrected as an inconsistency; open to revisiting if it reads badly in practice. |
 
-## 9. Approval record
+## 9. Escalation addendum (2026-07-31, post-content-pass): real lava ground
+
+Live verification after the content rename pass (Section 6) surfaced a real gap: the
+`'volcano'` `BiomeId`'s sky/backdrop assets are placeholders borrowed from other biomes
+(`sky.ts` points `volcano` at `marsh_overcast.hdr` and the `peaks` mountain backdrop; no
+fire/lava-toned environment map exists anywhere under `public/env/`), and the terrain's
+texture-blend system only leans away from the grass splat texture on steep slopes or
+near water/roads/hub-dirt — a flat starter-town zone stays mostly grass-textured (just
+recolored dark) everywhere else. The ground palette change (Section 2) is real and
+confirmed live, but on its own it reads as "darker vale," not "lava world."
+
+User confirmed (2026-07-31) wanting a genuine lava-ground look, scoped as two small,
+low-risk additions (explicitly NOT a sky/atmosphere rework, which stays out of scope
+per this addendum, same as the original spec deferred it):
+
+1. **Rock-leaning ground texture.** A single new `else if (biome === 'volcano')` branch
+   in `src/render/terrain.ts`'s `sampleVertex`, added strictly alongside the existing
+   `if (painted)` branch (never inside it), so it only ever fires for a zone whose OWN
+   base biome is volcano - currently only zone1. Vale/marsh/peaks/beach/desert/cave
+   zone-level behavior is provably untouched (the new branch's condition never matches
+   their biome). Existing slope/road/hub/shore layering still applies on top unchanged.
+2. **Scattered lava-crack ground decals.** A new pure-core + thin-painter pair
+   (`lava_crack_scatter_core.ts` + `lava_crack_scatter.ts`), following the same
+   module-first recipe as the town dressing: a deterministic grid-jittered scatter
+   (hash2, never `Math.random`) across zone1's ground, excluding the town hub (kept
+   clean, per the original spec's "ordered outpost" contrast) and the zone's lake. Each
+   decal is an instanced flat rock-and-crack textured quad (one draw call for every
+   instance) plus one small warm glow sprite per decal, reusing the exact
+   `radialGlowTexture()` + additive-sprite pattern already shipped for the town's
+   lanterns and skyline landmark - no new material capability, no shared-shader change.
+
+Both pieces are new, additive, zone1-scoped code; neither touches `ZONE1_PROPS`, sim
+content, or any other zone's rendering.
+
+## 10. Approval record
 
 Proposed via brainstorming dialogue after the town-dressing spec shipped;
 scope (existing-content handling, zone-boundary handling) confirmed by the
