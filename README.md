@@ -6,7 +6,7 @@
 
 **Official website: https://endlessglory.vercel.app/**
 
-[![CI](https://github.com/wysRocket/world-of-claudecraft/actions/workflows/ci.yml/badge.svg)](https://github.com/wysRocket/world-of-claudecraft/actions/workflows/ci.yml)
+[![CI](https://github.com/wysRocket/endlessglory/actions/workflows/ci.yml/badge.svg)](https://github.com/wysRocket/endlessglory/actions/workflows/ci.yml)
 [![TypeScript](https://img.shields.io/badge/TypeScript-7.0-3178C6?logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
 [![Three.js](https://img.shields.io/badge/Three.js-r185-000000?logo=threedotjs&logoColor=white)](https://threejs.org/)
 [![Vite](https://img.shields.io/badge/Vite-8-646CFF?logo=vite&logoColor=white)](https://vite.dev/)
@@ -349,7 +349,7 @@ Every player-visible string resolves through `t()`, and the game ships in **22 l
 
 ## Contributing
 
-Contributions of every kind are welcome: code, translations, bug reports, and documentation. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup, read the [Code of Conduct](CODE_OF_CONDUCT.md), and check [SECURITY.md](SECURITY.md) before reporting a vulnerability. New here? Look for issues labeled [`good first issue`](https://github.com/wysRocket/world-of-claudecraft/labels/good%20first%20issue), open an [issue](https://github.com/wysRocket/world-of-claudecraft/issues/new/choose).
+Contributions of every kind are welcome: code, translations, bug reports, and documentation. Start with [CONTRIBUTING.md](CONTRIBUTING.md) for setup, read the [Code of Conduct](CODE_OF_CONDUCT.md), and check [SECURITY.md](SECURITY.md) before reporting a vulnerability. New here? Look for issues labeled [`good first issue`](https://github.com/wysRocket/endlessglory/labels/good%20first%20issue), open an [issue](https://github.com/wysRocket/endlessglory/issues/new/choose).
 
 <div align="center">
 

@@ -25,7 +25,7 @@ import { type GuideRoute, hrefFor } from './routes';
 // The site origin. Matches index.html's canonical/og:url host exactly.
 const ORIGIN = 'https://endlessglory.vercel.app';
 const LOGO = `${ORIGIN}/endless-glory-square.png`;
-const GITHUB_URL = 'https://github.com/wysRocket/world-of-claudecraft';
+const GITHUB_URL = 'https://github.com/wysRocket/endlessglory';
 
 // The newcomer FAQ on /guide/faq, kept in lockstep with pages/faq.ts so the FAQPage
 // JSON-LD answers the same questions the visible page does. cap rows splice the level
