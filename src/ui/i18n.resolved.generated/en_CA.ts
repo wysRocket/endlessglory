@@ -3138,15 +3138,19 @@ export const en_CA: EnTranslations = {
       "valeBlurb": "The green starting valley, where new heroes cut their teeth on wolves and bandits around the town of Eastbrook.",
       "marshBlurb": "A drowned country of fog and ruins. Mudfins swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.",
       "peaksBlurb": "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
+      "volcanoBlurb": "A wasteland of scorched earth and ember skies where Eastbrook stands defiant. New heroes learn survival here, among ash wolves and bandits.",
       "valeGreeting": "Keep your blade close. The Vale is not what it was.",
       "valeGreeter": "Marshal Redbrook, Eastbrook",
       "marshGreeting": "Hold at the gate. Past those reeds, the fen does the killing for us.",
       "marshGreeter": "Warden Fenwick, Fenbridge",
       "peaksGreeting": "Two hundred years this wall has held. It will not break on my watch, but it groans.",
       "peaksGreeter": "Captain Thessaly, Highwatch",
+      "volcanoGreeting": "Keep your blade close. The Scar is not what it was.",
+      "volcanoGreeter": "Marshal Redbrook, Eastbrook",
       "valePlaceNotes": "Eastbrook is your first home base. Wolf Run and Boar Meadow are gentle hunting ground; Mirror Lake is fine fishing water, though mudfins swarm its shallows; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; Brightwood Glade is a quiet, sunlit grove to the north; and the Sowfield is Eastbrook's walled boarball ground, where the Vale Cup plays under a harvest truce.",
       "marshPlaceNotes": "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers, with The Drowned Litany, the marsh's own delve, opening just north of the mounds; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
       "peaksPlaceNotes": "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+      "volcanoPlaceNotes": "Eastbrook is your first home base. Wolf Run and Ashboar Flat are scorched hunting ground; Glasswater Lake is a mineral-hot water source, though mudfins swarm its shallows; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; Emberwood Glade is a sparse, ember-tinted grove to the north; and the Cinderfield is Eastbrook's walled boarball ground, where the Vale Cup plays under a harvest truce.",
       "gladeTitle": "A quiet corner: Brightwood Glade",
       "gladeBody": "Not every story in the Vale is about the dead. In the north, a sunlit grove called Brightwood Glade keeps its own gentler rhythm, all quiet paths and dappled light beneath the boughs. It is a soft counterpoint to the trail you are following, and worth seeing when the road gives you room to wander.",
       "worldBossTitle": "When the peak wakes: the world boss",
@@ -9197,7 +9201,7 @@ export const en_CA: EnTranslations = {
         "name": "Yumi"
       },
       "forest_wolf": {
-        "name": "Forest Wolf"
+        "name": "Ashfang Wolf"
       },
       "amber_heart_golem": {
         "name": "Amber-Heart Golem"
@@ -9206,7 +9210,7 @@ export const en_CA: EnTranslations = {
         "name": "Old Greyjaw"
       },
       "wild_boar": {
-        "name": "Wild Boar"
+        "name": "Ash Boar"
       },
       "webwood_spider": {
         "name": "Sableweb Lurker"
@@ -9218,7 +9222,7 @@ export const en_CA: EnTranslations = {
         "name": "Deeprock Digger"
       },
       "vale_bandit": {
-        "name": "Vale Bandit"
+        "name": "Scar Bandit"
       },
       "restless_bones": {
         "name": "Restless Bones"
@@ -9563,7 +9567,7 @@ export const en_CA: EnTranslations = {
       "marshal_redbrook": {
         "name": "Marshal Redbrook",
         "title": "Town Marshal",
-        "greeting": "Keep your blade close, {className}. The Vale is not what it was."
+        "greeting": "Keep your blade close, {className}. The Scar is not what it was."
       },
       "trader_wilkes": {
         "name": "Trader Wilkes",
@@ -9573,11 +9577,11 @@ export const en_CA: EnTranslations = {
       "apothecary_lin": {
         "name": "Apothecary Lin",
         "title": "Herbalist",
-        "greeting": "Careful where you step in the eastern woods, friend."
+        "greeting": "Careful where you step in the eastern ash scrub, friend."
       },
       "brother_aldric": {
         "name": "Brother Aldric",
-        "title": "Priest of the Vale",
+        "title": "Priest of the Scar",
         "greeting": "The Light keep you. Even the dead find no rest here of late."
       },
       "smith_haldren": {
@@ -9707,12 +9711,12 @@ export const en_CA: EnTranslations = {
       },
       "groundskeeper_bram": {
         "name": "Groundskeeper Bram",
-        "title": "Keeper of the Sowfield",
-        "greeting": "The truce holds at the Sowfield, {className}: boots and shoulders only. Care to play for the Copper Pail?"
+        "title": "Keeper of the Cinderfield",
+        "greeting": "The truce holds at the Cinderfield, {className}: boots and shoulders only. Care to play for the Copper Pail?"
       },
       "chronicler_saul": {
         "name": "Saul the Chronicler",
-        "title": "The Vale Chronicle",
+        "title": "The Scar Chronicle",
         "greeting": "Every deed worth doing is worth writing down twice, {playerName}: once for the ledger and once for the fireside."
       },
       "chronicler_osric_fenn": {
@@ -9774,17 +9778,17 @@ export const en_CA: EnTranslations = {
       },
       "q_wolves": {
         "title": "Wolves at the Door",
-        "text": "The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 8 Forest Wolves and Eastbrook will breathe easier.",
+        "text": "The ashfang wolves grow bold, snapping at travelers on the north road. Thin their numbers, {playerName}. Slay 8 Ashfang Wolves and Eastbrook will breathe easier.",
         "completion": "Fine work. The road feels safer already.",
         "objectives": {
           "0": {
-            "label": "Forest Wolf slain"
+            "label": "Ashfang Wolf slain"
           }
         }
       },
       "q_greyjaw": {
         "title": "The Old Wolf",
-        "text": "There is one wolf no trap has held: Old Greyjaw. He has taken three hounds and a stable boy's arm. He prowls the deep woods north of the wolf runs. Bring me his fang.",
+        "text": "There is one wolf no trap has held: Old Greyjaw. He has taken three hounds and a stable boy's arm. He prowls the scorched hills north of the wolf runs. Bring me his fang.",
         "completion": "So the old devil is dead at last. The stable boy will sleep easier - and so will I.",
         "objectives": {
           "0": {
@@ -9794,7 +9798,7 @@ export const en_CA: EnTranslations = {
       },
       "q_boars": {
         "title": "Bristly Boar Hides",
-        "text": "Boar hide makes the finest travel packs, and the meadows west of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.",
+        "text": "Boar hide makes the finest travel packs, and the ash flats west of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.",
         "completion": "Ah, fine bristly hides! These will fetch a good price.",
         "objectives": {
           "0": {
@@ -9804,7 +9808,7 @@ export const en_CA: EnTranslations = {
       },
       "q_spiders": {
         "title": "Sableweb Menace",
-        "text": "The lurkers in the eastern woods spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
+        "text": "The lurkers in the eastern ash scrub spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.",
         "completion": "Ugh, still twitching. Perfect. Here, you've earned this.",
         "objectives": {
           "0": {
@@ -9817,7 +9821,7 @@ export const en_CA: EnTranslations = {
       },
       "q_murlocs": {
         "title": "Trouble at the Lake",
-        "text": "Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back - slay 8 of them. And watch yourself: where there is one mudfin, there are five.",
+        "text": "Twenty years I have fished Glasswater Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back - slay 8 of them. And watch yourself: where there is one mudfin, there are five.",
         "completion": "Hah! That will teach them to mind their own mudholes.",
         "objectives": {
           "0": {
@@ -9900,8 +9904,8 @@ export const en_CA: EnTranslations = {
       },
       "q_hollow": {
         "title": "Into the Hollow",
-        "text": "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero - take four companions, no fewer. End him, and the Vale's dead will finally sleep.",
-        "completion": "The whispering has stopped. You have done what the whole Vale could not, {playerName} - the dead sleep, and Eastbrook owes you everything it has.",
+        "text": "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero - take four companions, no fewer. End him, and the Scar's dead will finally sleep.",
+        "completion": "The whispering has stopped. You have done what the whole Scar could not, {playerName} - the dead sleep, and Eastbrook owes you everything it has.",
         "objectives": {
           "0": {
             "label": "Morthen the Gravecaller slain"
@@ -9929,19 +9933,19 @@ export const en_CA: EnTranslations = {
         }
       },
       "q_bandits": {
-        "title": "Bandits of the Vale",
-        "text": "A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.",
+        "title": "Bandits of the Scar",
+        "text": "A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out - slay 10 Scar Bandits.",
         "completion": "Ten fewer knives in the dark. Take this - you have earned it.",
         "objectives": {
           "0": {
-            "label": "Vale Bandit slain"
+            "label": "Scar Bandit slain"
           }
         }
       },
       "q_ringleader": {
         "title": "The Ringleader",
         "text": "The bandits answer to one man: Gorrak the Ruthless. Cut off the head and the body will scatter. He skulks at the heart of their camp. End him, {playerName}.",
-        "completion": "Gorrak is dead? Then the Vale is free of his shadow. You have done Eastbrook a great service.",
+        "completion": "Gorrak is dead? Then the Scar is free of his shadow. You have done Eastbrook a great service.",
         "objectives": {
           "0": {
             "label": "Gorrak the Ruthless slain"
@@ -10556,7 +10560,7 @@ export const en_CA: EnTranslations = {
       },
       "q_archetype_acceptance": {
         "title": "A Craft to Call Your Own",
-        "text": "Skill is knowledge, {playerName}, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.",
+        "text": "Skill is knowledge, {playerName}, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Scar with your own hands.",
         "completion": "The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.",
         "objectives": {
           "0": {
@@ -10566,11 +10570,11 @@ export const en_CA: EnTranslations = {
       },
       "q_prof_make_amends": {
         "title": "Making Amends",
-        "text": "You have carried that pair before, {playerName}. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.",
+        "text": "You have carried that pair before, {playerName}. Returning is no fresh vow. Help keep the Scar road clear, and the work will remind your hands what they once knew.",
         "completion": "The old rhythm returns. Your former pair is active once more.",
         "objectives": {
           "0": {
-            "label": "Forest Wolf slain"
+            "label": "Ashfang Wolf slain"
           }
         }
       },
@@ -10650,7 +10654,7 @@ export const en_CA: EnTranslations = {
     },
     "zones": {
       "eastbrook_vale": {
-        "name": "Eastbrook Vale",
+        "name": "Eastbrook Scar",
         "welcome": "Find Marshal Redbrook in town - he has work for you.",
         "pois": {
           "0": {
@@ -10660,10 +10664,10 @@ export const en_CA: EnTranslations = {
             "label": "Wolf Run"
           },
           "2": {
-            "label": "Boar Meadow"
+            "label": "Ashboar Flat"
           },
           "3": {
-            "label": "Mirror Lake"
+            "label": "Glasswater Lake"
           },
           "4": {
             "label": "Sableweb"
@@ -10681,10 +10685,10 @@ export const en_CA: EnTranslations = {
             "label": "Reliquary Hill"
           },
           "9": {
-            "label": "Brightwood Glade"
+            "label": "Emberwood Glade"
           },
           "10": {
-            "label": "The Sowfield"
+            "label": "The Cinderfield"
           }
         }
       },

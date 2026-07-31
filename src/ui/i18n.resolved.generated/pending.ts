@@ -14,6 +14,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -23,6 +27,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -32,6 +40,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -41,6 +53,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -51,6 +67,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -60,29 +80,66 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
-  "zh_CN": [],
-  "zh_TW": [],
-  "ko_KR": [],
-  "ja_JP": [],
+  "zh_CN": [
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes"
+  ],
+  "zh_TW": [
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes"
+  ],
+  "ko_KR": [
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes"
+  ],
+  "ja_JP": [
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes"
+  ],
   "pt_BR": [
     "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
   ],
-  "ru_RU": [],
+  "ru_RU": [
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes"
+  ],
   "cs_CZ": [
     "apiError.firebase_auth.invalid_token",
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -92,6 +149,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -101,6 +162,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -110,6 +175,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -119,6 +188,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -128,6 +201,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -137,6 +214,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"
@@ -146,6 +227,10 @@ export const pending: Record<string, readonly string[]> = {
     "entities.mobs.amber_heart_golem.name",
     "guide.family.golem.desc",
     "guide.family.golem.name",
+    "guide.worldPage.volcanoBlurb",
+    "guide.worldPage.volcanoGreeter",
+    "guide.worldPage.volcanoGreeting",
+    "guide.worldPage.volcanoPlaceNotes",
     "hudChrome.auth.googleError",
     "hudChrome.auth.googleLoginCta",
     "hudChrome.theme.presets.emberwood"

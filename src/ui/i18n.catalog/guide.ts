@@ -801,6 +801,8 @@ export const guideStrings = {
       'A drowned country of fog and ruins. Mudfins swarm the shallows and something older stirs beneath the water, watched from the bridge-town of Fenbridge.',
     peaksBlurb:
       "Wind-scoured ridges and old mine-works climbing to the realm's coldest, highest dangers, held by the outpost of Highwatch.",
+    volcanoBlurb:
+      'A wasteland of scorched earth and ember skies where Eastbrook stands defiant. New heroes learn survival here, among ash wolves and bandits.',
 
     // One quotable hub greeting per zone, keyed by biome. Speaker names are proper nouns
     // (passed as raw text in world.ts), so only the spoken line is a key here.
@@ -811,6 +813,8 @@ export const guideStrings = {
     peaksGreeting:
       'Two hundred years this wall has held. It will not break on my watch, but it groans.',
     peaksGreeter: 'Captain Thessaly, Highwatch',
+    volcanoGreeting: 'Keep your blade close. The Scar is not what it was.',
+    volcanoGreeter: 'Marshal Redbrook, Eastbrook',
 
     // Short, spoiler-safe one-liners for each zone's notable places (keyed by biome). One
     // sentence per place, in the same order as the POI list.
@@ -820,6 +824,8 @@ export const guideStrings = {
       "Fenbridge guards the only dry road. The Prowler Reeds and Deepfen Shallows teem with marsh beasts and mudfins; the Widow Thicket is spun thick with web; the Drowned Chapel and the Troll Mounds keep older dangers, with The Drowned Litany, the marsh's own delve, opening just north of the mounds; the Gravecaller Encampment is the cult dug in, and the Sunken Bastion is the marsh's instanced heart.",
     peaksPlaceNotes:
       "Highwatch holds the wall. Stalker Ridge and the Deeprock Burrows belong to ridge cats and burrowers; the Ogre Foothills and Drogmar's War-Camp to brutes for hire; Stormcrag crackles with elementals, and below it glows the Glimmermere, the tarn whose shore keeps the gate of pale light down to the Drowned Temple; the Wyrmcult Tents and Revenant Fields ring the cult's high ground, with Gravewyrm Sanctum at its peak.",
+    volcanoPlaceNotes:
+      "Eastbrook is your first home base. Wolf Run and Ashboar Flat are scorched hunting ground; Glasswater Lake is a mineral-hot water source, though mudfins swarm its shallows; the Sableweb and the Copper Dig hide spiders and ore-greedy diggers; a Bandit Camp and the Fallen Chapel hold rougher work; Reliquary Hill drops into the Collapsed Reliquary, the realm's first delve; Emberwood Glade is a sparse, ember-tinted grove to the north; and the Cinderfield is Eastbrook's walled boarball ground, where the Vale Cup plays under a harvest truce.",
 
     // Brightwood Glade vignette, distilled spoiler-safe.
     gladeTitle: 'A quiet corner: Brightwood Glade',
