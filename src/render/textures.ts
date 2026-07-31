@@ -370,6 +370,62 @@ export function lavaPoolTexture(): THREE.CanvasTexture {
   });
 }
 
+// Eastbrook Scar lava stones: jagged obsidian boulders scattered across the
+// ground (lava_stone_scatter.ts). Near-black glassy rock with a scatter of
+// thin glowing veins, distinct from lavaCrackTexture()'s warmer cracked-earth
+// ground decal: this reads as rock SURFACE, tiled over simple boulder
+// geometry rather than painted on a flat ground plane.
+export function obsidianRockTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, s) => {
+    ctx.fillStyle = '#0d0b10';
+    ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 50; i++) {
+      const x = rnd() * s,
+        y = rnd() * s,
+        w = 4 + rnd() * 14,
+        h = 4 + rnd() * 14;
+      const v = 14 + Math.floor(rnd() * 14);
+      ctx.fillStyle = `rgb(${v + 4},${v},${v + 6})`;
+      ctx.fillRect(x, y, w, h);
+    }
+    // Wide, dim halo under each vein first, then the hot core on top: the
+    // two passes together read as glowing magma seen through cracked rock
+    // rather than a flat orange line.
+    ctx.strokeStyle = '#7a2409';
+    ctx.lineWidth = 7;
+    const veins: [number, number][][] = [];
+    for (let i = 0; i < 9; i++) {
+      let x = rnd() * s;
+      let y = rnd() * s;
+      const pts: [number, number][] = [[x, y]];
+      const segs = 3 + Math.floor(rnd() * 3);
+      for (let j = 0; j < segs; j++) {
+        x += (rnd() - 0.5) * s * 0.34;
+        y += (rnd() - 0.5) * s * 0.34;
+        pts.push([x, y]);
+      }
+      veins.push(pts);
+      ctx.beginPath();
+      ctx.moveTo(pts[0][0], pts[0][1]);
+      for (let j = 1; j < pts.length; j++) ctx.lineTo(pts[j][0], pts[j][1]);
+      ctx.stroke();
+    }
+    for (const pass of [
+      { style: '#ff6a2e', width: 3.2 },
+      { style: '#ffc27a', width: 1.3 },
+    ]) {
+      ctx.strokeStyle = pass.style;
+      ctx.lineWidth = pass.width;
+      for (const pts of veins) {
+        ctx.beginPath();
+        ctx.moveTo(pts[0][0], pts[0][1]);
+        for (let j = 1; j < pts.length; j++) ctx.lineTo(pts[j][0], pts[j][1]);
+        ctx.stroke();
+      }
+    }
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';

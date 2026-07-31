@@ -114,6 +114,7 @@ import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
 import { buildLavaCrackScatter, type LavaCrackScatterView } from './lava_crack_scatter';
+import { buildLavaStoneScatter, type LavaStoneScatterView } from './lava_stone_scatter';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import {
@@ -1018,6 +1019,7 @@ export class Renderer {
   private terrainView: TerrainView;
   private townDressing: TownDressingView | null = null;
   private lavaCrackScatter: LavaCrackScatterView | null = null;
+  private lavaStoneScatter: LavaStoneScatterView | null = null;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
   private placedAssetsView: PlacedAssetsView | null = null;
@@ -1535,6 +1537,19 @@ export class Renderer {
       setRenderCategory(this.lavaCrackScatter.group, 'lavaCrackScatter');
       this.scene.add(this.lavaCrackScatter.group);
       freezeStaticMatrices(this.lavaCrackScatter.group);
+      this.lavaStoneScatter = buildLavaStoneScatter(
+        this.sim.cfg.seed,
+        eastbrookZone.zMin,
+        eastbrookZone.zMax,
+        WORLD_MAX_X,
+        [
+          { x: eastbrookZone.hub.x, z: eastbrookZone.hub.z, radius: eastbrookZone.hub.radius + 10 },
+          ...eastbrookZone.lakes.map((l) => ({ x: l.x, z: l.z, radius: l.radius + 15 })),
+        ],
+      );
+      setRenderCategory(this.lavaStoneScatter.group, 'lavaStoneScatter');
+      this.scene.add(this.lavaStoneScatter.group);
+      freezeStaticMatrices(this.lavaStoneScatter.group);
     }
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
