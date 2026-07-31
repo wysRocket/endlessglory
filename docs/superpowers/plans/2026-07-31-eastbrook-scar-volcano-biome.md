@@ -440,7 +440,464 @@ EOF
 
 ---
 
-### Task 6: Manual verification + screenshots
+### Task 6: Real lava ground — rock-leaning terrain splat
+
+Per the spec's Section 9 escalation addendum (2026-07-31): live verification found the
+volcano biome's flat ground still reads as tinted grass, because the terrain's texture-
+blend system only leans off the grass splat layer on steep slopes or near water/roads —
+never for a zone's own base biome. This task adds ONE new branch, scoped strictly to
+`biome === 'volcano'`, that cannot affect any other biome/zone.
+
+**Files:**
+- Modify: `src/render/terrain.ts`
+
+- [ ] **Step 1: Add the volcano splat branch**
+
+In `src/render/terrain.ts`, inside `sampleVertex`, find the existing block:
+
+```ts
+  const painted = biome !== zoneBiomeAt(z);
+  if (painted) {
+    if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
+    else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
+    else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
+  }
+```
+
+Change it to add a new `else if` arm, leaving the existing `if (painted)` body byte-for-byte unchanged:
+
+```ts
+  const painted = biome !== zoneBiomeAt(z);
+  if (painted) {
+    if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
+    else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
+    else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
+  } else if (biome === 'volcano') {
+    // Volcano is currently only zone1's own base biome (no other zone uses it,
+    // and this arm is unreachable for vale/marsh/peaks/beach/desert/cave), so
+    // this cannot change any other zone's terrain. Without it, a flat volcano
+    // zone stays grass-textured (just recolored dark) everywhere the slope/
+    // road/hub/shore blends below don't already kick in. Slope, road, hub-
+    // dirt, and shoreline blends further down in this function still layer
+    // on top of this baseline exactly as before.
+    lerpSplat(w, 2, 0.75);
+  }
+```
+
+- [ ] **Step 2: Typecheck**
+
+Run: `npx tsc --noEmit`
+Expected: no new errors.
+
+- [ ] **Step 3: Run the relevant test suites**
+
+Run: `npx vitest run tests/architecture.test.ts tests/progression.test.ts`
+Expected: PASS (no sim/id change, this is `src/render/` presentation only).
+
+- [ ] **Step 4: Commit**
+
+```bash
+git add src/render/terrain.ts
+git commit -m "$(cat <<'EOF'
+feat(render): lean volcano's flat ground toward the rock splat texture
+
+The terrain splat system previously only left the grass texture for
+steep slopes, water, or roads, which is why a flat volcano zone (only
+zone1 uses this biome) still read as tinted grass. Adds one new
+branch, scoped strictly to biome === 'volcano' and placed beside
+(never inside) the existing painted-cell branch, so vale/marsh/peaks/
+beach/desert/cave zones are provably unaffected.
+EOF
+)"
+```
+
+---
+
+### Task 7: Real lava ground — scattered lava-crack decals
+
+**Files:**
+- Create: `src/render/lava_crack_scatter_core.ts`
+- Test: `tests/lava_crack_scatter_core.test.ts`
+- Create: `src/render/lava_crack_scatter.ts`
+- Modify: `src/render/textures.ts`
+- Modify: `src/render/renderer.ts`
+
+- [ ] **Step 1: Write the failing test**
+
+Create `tests/lava_crack_scatter_core.test.ts`:
+
+```ts
+import { describe, expect, it } from 'vitest';
+import { planLavaCracks } from '../src/render/lava_crack_scatter_core';
+
+const BASE_INPUT = {
+  zMin: -180,
+  zMax: 180,
+  xHalfWidth: 150,
+  cellSize: 42,
+  spawnChance: 0.22,
+  exclusions: [{ x: 0, z: 0, radius: 36 }],
+};
+
+describe('planLavaCracks', () => {
+  it('is deterministic for the same input', () => {
+    expect(planLavaCracks(BASE_INPUT)).toEqual(planLavaCracks(BASE_INPUT));
+  });
+
+  it('produces a modest, non-empty scatter across the given bounds', () => {
+    const plan = planLavaCracks(BASE_INPUT);
+    expect(plan.length).toBeGreaterThan(0);
+    expect(plan.length).toBeLessThan(80);
+    for (const p of plan) {
+      expect(p.x).toBeGreaterThanOrEqual(-BASE_INPUT.xHalfWidth);
+      expect(p.x).toBeLessThanOrEqual(BASE_INPUT.xHalfWidth);
+      expect(p.z).toBeGreaterThanOrEqual(BASE_INPUT.zMin);
+      expect(p.z).toBeLessThanOrEqual(BASE_INPUT.zMax);
+    }
+  });
+
+  it('never places a crack inside an exclusion circle', () => {
+    const plan = planLavaCracks(BASE_INPUT);
+    for (const p of plan) {
+      for (const ex of BASE_INPUT.exclusions) {
+        expect(Math.hypot(p.x - ex.x, p.z - ex.z)).toBeGreaterThanOrEqual(ex.radius);
+      }
+    }
+  });
+
+  it('produces no cracks at all when spawnChance is 0', () => {
+    const plan = planLavaCracks({ ...BASE_INPUT, spawnChance: 0 });
+    expect(plan).toHaveLength(0);
+  });
+
+  it('produces a rotation and scale for every crack', () => {
+    const plan = planLavaCracks(BASE_INPUT);
+    for (const p of plan) {
+      expect(Number.isFinite(p.rot)).toBe(true);
+      expect(p.scale).toBeGreaterThan(0);
+    }
+  });
+});
+```
+
+- [ ] **Step 2: Run the test to verify it fails**
+
+Run: `npx vitest run tests/lava_crack_scatter_core.test.ts`
+Expected: FAIL (`src/render/lava_crack_scatter_core.ts` doesn't exist yet).
+
+- [ ] **Step 3: Write the core**
+
+Create `src/render/lava_crack_scatter_core.ts`:
+
+```ts
+// Pure placement planner for the Eastbrook Scar lava-crack ground decal
+// scatter. Three/DOM-free and deterministic (hash2, never Math.random).
+// src/render/lava_crack_scatter.ts is the thin Three.js painter that reads
+// the plan this module produces.
+
+import { hash2 } from '../sim/rng';
+
+export interface ExclusionCircle {
+  x: number;
+  z: number;
+  radius: number;
+}
+
+export interface LavaCrackScatterInput {
+  zMin: number;
+  zMax: number;
+  /** scatter spans world x in [-xHalfWidth, xHalfWidth] */
+  xHalfWidth: number;
+  cellSize: number;
+  /** 0..1, per-cell probability a crack spawns in that cell */
+  spawnChance: number;
+  exclusions: ExclusionCircle[];
+}
+
+export interface LavaCrackPlan {
+  x: number;
+  z: number;
+  rot: number;
+  scale: number;
+}
+
+export function planLavaCracks(input: LavaCrackScatterInput): LavaCrackPlan[] {
+  const { zMin, zMax, xHalfWidth, cellSize, spawnChance, exclusions } = input;
+  const plans: LavaCrackPlan[] = [];
+  const cols = Math.floor((xHalfWidth * 2) / cellSize);
+  const rows = Math.floor((zMax - zMin) / cellSize);
+  for (let row = 0; row < rows; row++) {
+    for (let col = 0; col < cols; col++) {
+      const roll = hash2(col, row, 0x4c6176);
+      if (roll >= spawnChance) continue;
+      const cellX = -xHalfWidth + col * cellSize;
+      const cellZ = zMin + row * cellSize;
+      const jitterX = (hash2(col, row, 0x1a2b3c) - 0.5) * cellSize * 0.8;
+      const jitterZ = (hash2(col, row, 0x2b3c4d) - 0.5) * cellSize * 0.8;
+      const x = cellX + cellSize / 2 + jitterX;
+      const z = cellZ + cellSize / 2 + jitterZ;
+      const blocked = exclusions.some((e) => Math.hypot(x - e.x, z - e.z) < e.radius);
+      if (blocked) continue;
+      const rot = hash2(col, row, 0x3c4d5e) * Math.PI * 2;
+      const scale = 1.4 + hash2(col, row, 0x4d5e6f) * 1.8;
+      plans.push({ x, z, rot, scale });
+    }
+  }
+  return plans;
+}
+```
+
+- [ ] **Step 4: Run the test to verify it passes**
+
+Run: `npx vitest run tests/lava_crack_scatter_core.test.ts`
+Expected: PASS, 5 tests.
+
+- [ ] **Step 5: Register the core in `RENDER_PURE_CORES`**
+
+In `tests/architecture.test.ts`, add `'src/render/lava_crack_scatter_core.ts'` to the
+`RENDER_PURE_CORES` array (same array `town_dressing_core.ts` was added to earlier in
+this session — insert alphabetically, e.g. right after `'src/render/lava_crack_scatter_core.ts'`
+sorts between `'src/render/foliage.ts'`-adjacent entries and `'src/render/nameplate_view.ts'`;
+match the file's existing alphabetical-ish ordering).
+
+Run: `npx vitest run tests/architecture.test.ts`
+Expected: PASS.
+
+- [ ] **Step 6: Commit the core**
+
+```bash
+git add src/render/lava_crack_scatter_core.ts tests/lava_crack_scatter_core.test.ts tests/architecture.test.ts
+git commit -m "$(cat <<'EOF'
+feat(render): add the lava-crack ground decal scatter planner
+
+Pure, deterministic core for scattering Eastbrook Scar's ground
+cracks (grid-jittered, hash2-seeded), excluding the town hub and the
+zone's lake. The painter that draws these lands in a follow-up
+commit.
+EOF
+)"
+```
+
+- [ ] **Step 7: Add the lava-crack texture**
+
+Append to `src/render/textures.ts`, after the `plazaEmblemTexture()` function added
+earlier in this session and before `waterNormalish()`:
+
+```ts
+// Eastbrook Scar lava-crack ground decal: dark cracked rock with a few
+// bright orange fissure lines. Used with a warm glow sprite layered on top
+// (see lava_crack_scatter.ts) rather than an emissive map, so no change to
+// the shared surfaceMat() material factory is needed.
+export function lavaCrackTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, s) => {
+    ctx.fillStyle = '#241a16';
+    ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 40; i++) {
+      const x = rnd() * s,
+        y = rnd() * s,
+        w = 8 + rnd() * 20,
+        h = 6 + rnd() * 14;
+      const v = 30 + Math.floor(rnd() * 20);
+      ctx.fillStyle = `rgb(${v + 10},${v},${v - 4})`;
+      ctx.fillRect(x, y, w, h);
+    }
+    const cx = s / 2,
+      cy = s / 2;
+    ctx.strokeStyle = '#ff7a33';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 40, cy + 30);
+    ctx.lineTo(cx - 10, cy - 5);
+    ctx.lineTo(cx + 8, cy + 12);
+    ctx.lineTo(cx + 42, cy - 28);
+    ctx.stroke();
+    ctx.strokeStyle = '#ffb066';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy - 5);
+    ctx.lineTo(cx - 2, cy + 18);
+    ctx.stroke();
+  });
+}
+```
+
+Run `npx tsc --noEmit` and `npx @biomejs/biome check --write src/render/textures.ts`,
+then commit this piece on its own:
+
+```bash
+git add src/render/textures.ts
+git commit -m "$(cat <<'EOF'
+feat(render): add the lava-crack ground decal texture
+
+A dark cracked-rock albedo with a bright orange fissure line, for
+the Eastbrook Scar ground scatter. Not yet wired into a painter
+(next commit).
+EOF
+)"
+```
+
+- [ ] **Step 8: Write the painter**
+
+Create `src/render/lava_crack_scatter.ts`:
+
+```ts
+// Thin painter for the Eastbrook Scar lava-crack ground scatter: reads the
+// plan from lava_crack_scatter_core.ts and builds the actual Three.js
+// geometry. One instanced mesh for every crack decal (single draw call)
+// plus one small glow sprite per decal, reusing the same radialGlowTexture()
+// additive-sprite pattern already shipped for the town dressing's lanterns
+// and skyline landmark.
+
+import * as THREE from 'three';
+import { terrainHeight } from '../sim/world';
+import { surfaceMat } from './gfx';
+import { lavaCrackTexture, radialGlowTexture } from './textures';
+import { planLavaCracks, type ExclusionCircle } from './lava_crack_scatter_core';
+
+export interface LavaCrackScatterView {
+  group: THREE.Group;
+}
+
+const CELL_SIZE = 42;
+// One instanced draw call regardless of count, plus a handful of cheap
+// sprites: a fixed, tier-independent density is simple and plenty cheap at
+// this scale (roughly a dozen decals across the whole zone).
+const SPAWN_CHANCE = 0.18;
+
+export function buildLavaCrackScatter(
+  seed: number,
+  zMin: number,
+  zMax: number,
+  xHalfWidth: number,
+  exclusions: ExclusionCircle[],
+): LavaCrackScatterView {
+  const group = new THREE.Group();
+  group.name = 'lavaCrackScatter';
+  const ground = (x: number, z: number) => terrainHeight(x, z, seed);
+
+  const plan = planLavaCracks({
+    zMin,
+    zMax,
+    xHalfWidth,
+    cellSize: CELL_SIZE,
+    spawnChance: SPAWN_CHANCE,
+    exclusions,
+  });
+
+  if (plan.length > 0) {
+    const mat = surfaceMat({ map: lavaCrackTexture(), roughness: 0.85 });
+    const geo = new THREE.PlaneGeometry(1, 1);
+    geo.rotateX(-Math.PI / 2);
+    const mesh = new THREE.InstancedMesh(geo, mat, plan.length);
+    const m = new THREE.Matrix4();
+    const q = new THREE.Quaternion();
+    const pos = new THREE.Vector3();
+    const scaleV = new THREE.Vector3();
+    plan.forEach((p, i) => {
+      pos.set(p.x, ground(p.x, p.z) + 0.03, p.z);
+      q.setFromEuler(new THREE.Euler(0, p.rot, 0));
+      scaleV.set(p.scale, 1, p.scale);
+      m.compose(pos, q, scaleV);
+      mesh.setMatrixAt(i, m);
+    });
+    mesh.instanceMatrix.needsUpdate = true;
+    mesh.receiveShadow = true;
+    group.add(mesh);
+  }
+
+  const glowMat = new THREE.SpriteMaterial({
+    map: radialGlowTexture(),
+    color: 0xff6a2e,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
+  for (const p of plan) {
+    const glow = new THREE.Sprite(glowMat);
+    glow.scale.setScalar(p.scale * 1.3);
+    glow.position.set(p.x, ground(p.x, p.z) + 0.15, p.z);
+    group.add(glow);
+  }
+
+  return { group };
+}
+```
+
+- [ ] **Step 9: Wire it into `renderer.ts`**
+
+Add `buildLavaCrackScatter`/`LavaCrackScatterView` to the imports (near the
+`buildTownDressing`/`TownDressingView` import added earlier this session):
+
+```ts
+import { buildLavaCrackScatter, type LavaCrackScatterView } from './lava_crack_scatter';
+```
+
+Add a private field near `townDressing`:
+
+```ts
+  private lavaCrackScatter: LavaCrackScatterView | null = null;
+```
+
+Right after the existing `townDressing` build block (the `if (eastbrookZone) { ... }`
+block added earlier this session), add:
+
+```ts
+    if (eastbrookZone) {
+      this.lavaCrackScatter = buildLavaCrackScatter(
+        this.sim.cfg.seed,
+        eastbrookZone.zMin,
+        eastbrookZone.zMax,
+        WORLD_MAX_X,
+        [
+          { x: eastbrookZone.hub.x, z: eastbrookZone.hub.z, radius: eastbrookZone.hub.radius + 10 },
+          ...eastbrookZone.lakes.map((l) => ({ x: l.x, z: l.z, radius: l.radius + 15 })),
+        ],
+      );
+      setRenderCategory(this.lavaCrackScatter.group, 'lavaCrackScatter');
+      this.scene.add(this.lavaCrackScatter.group);
+      freezeStaticMatrices(this.lavaCrackScatter.group);
+    }
+```
+
+`WORLD_MAX_X` is already imported in `renderer.ts` (confirm this before adding a
+duplicate import — grep the existing `from '../sim/data'` block first; it's very likely
+already there since `terrain.ts` and other modules use it too, but if it is NOT already
+in `renderer.ts`'s import list, add it to the same existing `from '../sim/data'` block,
+alphabetically, same as the `getActiveWorldContent` addition earlier this session — never
+a second import statement for that module).
+
+- [ ] **Step 10: Typecheck**
+
+Run: `npx tsc --noEmit`
+Expected: no new errors.
+
+- [ ] **Step 11: Format**
+
+Run: `npx @biomejs/biome check --write src/render/lava_crack_scatter.ts src/render/renderer.ts`
+
+- [ ] **Step 12: Run the test suites**
+
+Run: `npx vitest run tests/architecture.test.ts tests/lava_crack_scatter_core.test.ts tests/progression.test.ts`
+Expected: PASS.
+
+- [ ] **Step 13: Commit**
+
+```bash
+git add src/render/lava_crack_scatter.ts src/render/renderer.ts
+git commit -m "$(cat <<'EOF'
+feat(render): paint and wire the Eastbrook Scar lava-crack scatter
+
+Instanced ground decals plus a glow sprite per crack, built once at
+world-build time alongside the town dressing, scoped to zone1 (excludes
+the town hub and the zone's lake). No shared terrain/material changes
+beyond Task 6's single splat branch.
+EOF
+)"
+```
+
+---
+
+### Task 8: Manual verification + screenshots
 
 **Files:**
 - Create: `docs/screenshots/eastbrook-scar-volcano/after-desktop.png`
@@ -484,21 +941,21 @@ EOF
 
 ---
 
-### Task 7: Full gate + final check
+### Task 9: Full gate + final check
 
 - [ ] **Step 1: Run the full pre-merge gate**
 
 Run: `npm run gate`
-Expected: PASS. (Note from the prior plan in this session: `npm run gate`'s changed-files biome check lints the WHOLE file once any part of it changes, not just new lines — if it flags an organize-imports or style fix in `zone1.ts` or `src/guide/content.generated.ts`, apply `npx @biomejs/biome check --write <file>` and re-verify the diff is still scoped to expected content before committing, rather than reverting the auto-fix.)
+Expected: PASS. (Note from the prior plan in this session: `npm run gate`'s changed-files biome check lints the WHOLE file once any part of it changes, not just new lines — if it flags an organize-imports or style fix in a file this plan touched, apply `npx @biomejs/biome check --write <file>` and re-verify the diff is still scoped to expected content before committing, rather than reverting the auto-fix.)
 
 - [ ] **Step 2: Final status check**
 
 ```bash
 git status --short
-git log --oneline -10
+git log --oneline -12
 ```
 
-Expected: clean working tree, all 6 content/verification commits from Tasks 1-6 present on `main`, each with the Conventional Commits body the repo requires.
+Expected: clean working tree, all commits from Tasks 1-8 present on `main`, each with the Conventional Commits body the repo requires.
 
 ---
 
