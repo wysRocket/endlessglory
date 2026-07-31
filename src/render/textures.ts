@@ -220,7 +220,7 @@ export function cobblestonePavingTexture(): THREE.CanvasTexture {
   });
 }
 
-// Blue-and-gold banner/awning cloth. Eastbrook town-square dressing only —
+// Blue-and-gold banner/awning cloth. Eastbrook town-square dressing only,
 // never used to recolor the shared village kit, so no other town is affected.
 export function bannerClothTexture(): THREE.CanvasTexture {
   return makeCanvas(64, (ctx, s) => {
@@ -984,7 +984,7 @@ export function foliageCardTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 240; i++) {
     // leaves cluster densely at the centre, thin toward the rim
     const a = rnd() * Math.PI * 2;
-    const d = rnd() ** 0.6 * 56;
+    const d = Math.pow(rnd(), 0.6) * 56;
     const x = cx + Math.cos(a) * d,
       y = cy + Math.sin(a) * d;
     const fade = 1 - d / 64;
