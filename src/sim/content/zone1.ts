@@ -91,7 +91,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
   },
   forest_wolf: {
     id: 'forest_wolf',
-    name: 'Forest Wolf',
+    name: 'Ashfang Wolf',
     minLevel: 1,
     maxLevel: 2,
     family: 'beast',
@@ -144,7 +144,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
   },
   wild_boar: {
     id: 'wild_boar',
-    name: 'Wild Boar',
+    name: 'Ash Boar',
     minLevel: 2,
     maxLevel: 3,
     family: 'beast',
@@ -347,7 +347,7 @@ export const ZONE1_MOBS: Record<string, MobTemplate> = {
   },
   vale_bandit: {
     id: 'vale_bandit',
-    name: 'Vale Bandit',
+    name: 'Scar Bandit',
     minLevel: 3,
     maxLevel: 5,
     family: 'humanoid',
