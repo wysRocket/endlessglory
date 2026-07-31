@@ -199,6 +199,58 @@ export function stoneTexture(): THREE.CanvasTexture {
   });
 }
 
+// Eastbrook plaza/path paving: irregular flagstones with dark mortar gaps,
+// distinct from stoneTexture()'s rough-boulder look (used for rock props).
+export function cobblestonePavingTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, s) => {
+    ctx.fillStyle = '#3c3630';
+    ctx.fillRect(0, 0, s, s);
+    const cell = s / 8;
+    for (let gy = 0; gy < 8; gy++) {
+      for (let gx = 0; gx < 8; gx++) {
+        const jx = (rnd() - 0.5) * cell * 0.25;
+        const jy = (rnd() - 0.5) * cell * 0.25;
+        const w = cell - 3 + rnd() * 2;
+        const h = cell - 3 + rnd() * 2;
+        const v = 120 + Math.floor(rnd() * 45);
+        ctx.fillStyle = `rgb(${v},${v - 6},${v - 14})`;
+        ctx.fillRect(gx * cell + jx, gy * cell + jy, w, h);
+      }
+    }
+  });
+}
+
+// Blue-and-gold banner/awning cloth. Eastbrook town-square dressing only —
+// never used to recolor the shared village kit, so no other town is affected.
+export function bannerClothTexture(): THREE.CanvasTexture {
+  return makeCanvas(64, (ctx, s) => {
+    ctx.fillStyle = '#1f3f66';
+    ctx.fillRect(0, 0, s, s);
+    ctx.fillStyle = '#cf9d33';
+    const trim = s * 0.12;
+    ctx.fillRect(0, 0, s, trim);
+    ctx.fillRect(0, s - trim, s, trim);
+  });
+}
+
+// Small soil-and-blossom cap for a window flower box.
+export function flowerBoxTexture(): THREE.CanvasTexture {
+  return makeCanvas(64, (ctx, s) => {
+    ctx.fillStyle = '#4a3626';
+    ctx.fillRect(0, 0, s, s);
+    const colors = ['#d9556b', '#e8c34d', '#f2f2f2'];
+    for (let i = 0; i < 14; i++) {
+      ctx.fillStyle = colors[i % colors.length];
+      const x = rnd() * s;
+      const y = rnd() * s * 0.7;
+      const r = 2 + rnd() * 2.5;
+      ctx.beginPath();
+      ctx.arc(x, y, r, 0, Math.PI * 2);
+      ctx.fill();
+    }
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';
@@ -932,7 +984,7 @@ export function foliageCardTexture(): THREE.CanvasTexture {
   for (let i = 0; i < 240; i++) {
     // leaves cluster densely at the centre, thin toward the rim
     const a = rnd() * Math.PI * 2;
-    const d = Math.pow(rnd(), 0.6) * 56;
+    const d = rnd() ** 0.6 * 56;
     const x = cx + Math.cos(a) * d,
       y = cy + Math.sin(a) * d;
     const fade = 1 - d / 64;
