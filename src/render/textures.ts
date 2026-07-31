@@ -297,6 +297,42 @@ export function plazaEmblemTexture(): THREE.CanvasTexture {
   });
 }
 
+// Eastbrook Scar lava-crack ground decal: dark cracked rock with a few
+// bright orange fissure lines. Used with a warm glow sprite layered on top
+// (see lava_crack_scatter.ts) rather than an emissive map, so no change to
+// the shared surfaceMat() material factory is needed.
+export function lavaCrackTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, s) => {
+    ctx.fillStyle = '#241a16';
+    ctx.fillRect(0, 0, s, s);
+    for (let i = 0; i < 40; i++) {
+      const x = rnd() * s,
+        y = rnd() * s,
+        w = 8 + rnd() * 20,
+        h = 6 + rnd() * 14;
+      const v = 30 + Math.floor(rnd() * 20);
+      ctx.fillStyle = `rgb(${v + 10},${v},${v - 4})`;
+      ctx.fillRect(x, y, w, h);
+    }
+    const cx = s / 2,
+      cy = s / 2;
+    ctx.strokeStyle = '#ff7a33';
+    ctx.lineWidth = 2.5;
+    ctx.beginPath();
+    ctx.moveTo(cx - 40, cy + 30);
+    ctx.lineTo(cx - 10, cy - 5);
+    ctx.lineTo(cx + 8, cy + 12);
+    ctx.lineTo(cx + 42, cy - 28);
+    ctx.stroke();
+    ctx.strokeStyle = '#ffb066';
+    ctx.lineWidth = 1;
+    ctx.beginPath();
+    ctx.moveTo(cx - 10, cy - 5);
+    ctx.lineTo(cx - 2, cy + 18);
+    ctx.stroke();
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';
