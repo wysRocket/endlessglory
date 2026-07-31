@@ -282,6 +282,15 @@ function sampleVertex(x: number, z: number, seed: number): VertexSample {
     if (biome === 'marsh' || biome === 'cave') lerpSplat(w, 1, 0.8);
     else if (biome === 'peaks' || biome === 'volcano') lerpSplat(w, 2, 0.75);
     else if (biome === 'beach' || biome === 'desert') lerpSplat(w, 3, 0.9);
+  } else if (biome === 'volcano') {
+    // Volcano is currently only zone1's own base biome (no other zone uses it,
+    // and this arm is unreachable for vale/marsh/peaks/beach/desert/cave), so
+    // this cannot change any other zone's terrain. Without it, a flat volcano
+    // zone stays grass-textured (just recolored dark) everywhere the slope/
+    // road/hub/shore blends below don't already kick in. Slope, road, hub-
+    // dirt, and shoreline blends further down in this function still layer
+    // on top of this baseline exactly as before.
+    lerpSplat(w, 2, 0.75);
   }
   const impact = impactCraterTerrainBlend(x, z);
 
