@@ -67,6 +67,16 @@ export interface RingPlan {
   radius: number;
 }
 
+export interface BuntingLine {
+  from: Point2;
+  to: Point2;
+}
+
+export interface FlowerBedPlan {
+  x: number;
+  z: number;
+}
+
 export interface TownDressingPlan {
   plaza: RingPlan;
   paths: PlazaPathPlan[];
@@ -75,14 +85,17 @@ export interface TownDressingPlan {
   wellRings: RingPlan[];
   campfireRings: RingPlan[];
   lanterns: Point2[];
+  buntingLines: BuntingLine[];
+  pathFlowerBeds: FlowerBedPlan[];
 }
 
 const PLAZA_RADIUS_FRACTION = 0.55;
-const LANTERN_COUNT = 8;
+const LANTERN_COUNT = 12;
 const LANTERN_RING_MARGIN = 1.2;
 const LANTERN_MIN_CLEARANCE = 3;
 const WELL_RING_MARGIN = 1.4;
 const CAMPFIRE_RING_RADIUS = 2.6;
+const FLOWERBED_OFFSET = 1.1;
 
 const BUILDING_ROOF_HEIGHT: Record<BuildingDef['kind'], number> = {
   house: 7.4,
@@ -118,6 +131,22 @@ export function planTownDressing(input: TownDressingInput): TownDressingPlan {
     paths.push({ from, to: anchor });
   }
 
+  const pathFlowerBeds: FlowerBedPlan[] = paths.flatMap((path) => {
+    const dx = path.to.x - path.from.x;
+    const dz = path.to.z - path.from.z;
+    const len = Math.hypot(dx, dz);
+    const ux = dx / len;
+    const uz = dz / len;
+    const px = -uz;
+    const pz = ux;
+    const mx = (path.from.x + path.to.x) / 2;
+    const mz = (path.from.z + path.to.z) / 2;
+    return [
+      { x: mx + px * FLOWERBED_OFFSET, z: mz + pz * FLOWERBED_OFFSET },
+      { x: mx - px * FLOWERBED_OFFSET, z: mz - pz * FLOWERBED_OFFSET },
+    ];
+  });
+
   const obstacles: Point2[] = [
     ...anchors,
     ...wells.map((w) => ({ x: w.x, z: w.z })),
@@ -130,6 +159,20 @@ export function planTownDressing(input: TownDressingInput): TownDressingPlan {
     const lz = hub.z + Math.sin(angle) * (plazaRadius + LANTERN_RING_MARGIN);
     const blocked = obstacles.some((o) => Math.hypot(o.x - lx, o.z - lz) < LANTERN_MIN_CLEARANCE);
     if (!blocked) lanterns.push({ x: lx, z: lz });
+  }
+
+  const buntingLines: BuntingLine[] = [];
+  for (let i = 0; i < lanterns.length - 1; i++) {
+    buntingLines.push({ from: lanterns[i], to: lanterns[i + 1] });
+  }
+  if (lanterns.length > 2) {
+    const first = lanterns[0];
+    const last = lanterns[lanterns.length - 1];
+    const closingGap = Math.hypot(last.x - first.x, last.z - first.z);
+    const ringSpacing = (2 * Math.PI * (plazaRadius + LANTERN_RING_MARGIN)) / LANTERN_COUNT;
+    if (closingGap <= ringSpacing * 1.5) {
+      buntingLines.push({ from: last, to: first });
+    }
   }
 
   const buildingDressing: BuildingDressingPlan[] = buildings.map((b) => {
@@ -157,5 +200,15 @@ export function planTownDressing(input: TownDressingInput): TownDressingPlan {
     radius: CAMPFIRE_RING_RADIUS,
   }));
 
-  return { plaza, paths, buildingDressing, stallAwnings, wellRings, campfireRings, lanterns };
+  return {
+    plaza,
+    paths,
+    buildingDressing,
+    stallAwnings,
+    wellRings,
+    campfireRings,
+    lanterns,
+    buntingLines,
+    pathFlowerBeds,
+  };
 }

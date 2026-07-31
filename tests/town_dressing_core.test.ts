@@ -121,4 +121,37 @@ describe('planTownDressing', () => {
       expect(dressing.bannerHeight).toBe(expectedHeight[dressing.kind]);
     }
   });
+
+  it('produces a pair of flower beds straddling each path, not overlapping the path itself', () => {
+    const p = plan();
+    expect(p.pathFlowerBeds).toHaveLength(p.paths.length * 2);
+    for (const bed of p.pathFlowerBeds) {
+      expect(Number.isFinite(bed.x)).toBe(true);
+      expect(Number.isFinite(bed.z)).toBe(true);
+    }
+  });
+
+  it('only strings bunting between positions that are real lanterns in the plan', () => {
+    const p = plan();
+    const isLantern = (pt: { x: number; z: number }) =>
+      p.lanterns.some((l) => l.x === pt.x && l.z === pt.z);
+    for (const line of p.buntingLines) {
+      expect(isLantern(line.from)).toBe(true);
+      expect(isLantern(line.to)).toBe(true);
+    }
+  });
+
+  it('raises the lantern count while still respecting the 3-unit clearance', () => {
+    const p = plan();
+    expect(p.lanterns.length).toBeGreaterThan(8);
+    const obstacles = [
+      ...ZONE1_PROPS.buildings.map((b) => ({ x: b.x, z: b.z })),
+      ...ZONE1_PROPS.stalls.map((s) => ({ x: s.x, z: s.z })),
+    ];
+    for (const lantern of p.lanterns) {
+      for (const o of obstacles) {
+        expect(Math.hypot(o.x - lantern.x, o.z - lantern.z)).toBeGreaterThanOrEqual(3);
+      }
+    }
+  });
 });
