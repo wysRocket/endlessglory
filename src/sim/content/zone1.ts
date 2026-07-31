@@ -553,7 +553,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: Math.PI,
     color: 0xb7950b,
     questIds: ['q_wolves', 'q_greyjaw', 'q_bandits', 'q_ringleader', 'q_mogger'],
-    greeting: 'Keep your blade close, $C. The Vale is not what it was.',
+    greeting: 'Keep your blade close, $C. The Scar is not what it was.',
   },
   trader_wilkes: {
     id: 'trader_wilkes',
@@ -592,12 +592,12 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     facing: -Math.PI / 2,
     color: 0x7d3c98,
     questIds: ['q_spiders'],
-    greeting: 'Careful where you step in the eastern woods, friend.',
+    greeting: 'Careful where you step in the eastern ash scrub, friend.',
   },
   brother_aldric: {
     id: 'brother_aldric',
     name: 'Brother Aldric',
-    title: 'Priest of the Vale',
+    title: 'Priest of the Scar',
     pos: { x: -14, z: -10 },
     facing: 0.8,
     color: 0xf7f9f9,
@@ -690,7 +690,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
   groundskeeper_bram: {
     id: 'groundskeeper_bram',
     name: 'Groundskeeper Bram',
-    title: 'Keeper of the Sowfield',
+    title: 'Keeper of the Cinderfield',
     // At the Sowfield's north gate with the book of fixtures (vale_cup_layout
     // BRAM_POS). dynamic: the generic surface-placement loop skips him; the
     // Vale Cup module spawns him at world init under a RESERVED entity id so
@@ -701,12 +701,12 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     questIds: [],
     dynamic: true,
     greeting:
-      'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
+      'The truce holds at the Cinderfield, $C: boots and shoulders only. Care to play for the Copper Pail?',
   },
   chronicler_saul: {
     id: 'chronicler_saul',
     name: 'Saul the Chronicler',
-    title: 'The Vale Chronicle',
+    title: 'The Scar Chronicle',
     // Southeast corner of the square, on the quiet side away from the well
     // cluster and the player start, looking back northwest across the square
     // (nearest authored neighbor ~13 units; he had been shoulder to shoulder
