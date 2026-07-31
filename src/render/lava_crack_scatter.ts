@@ -26,8 +26,8 @@ const CRACK_CELL_SIZE = 42;
 // this scale.
 const CRACK_SPAWN_CHANCE = 0.32;
 
-const POOL_CELL_SIZE = 95;
-const POOL_SPAWN_CHANCE = 0.15;
+const POOL_CELL_SIZE = 65;
+const POOL_SPAWN_CHANCE = 0.35;
 const POOL_SCALE_MIN = 4.5;
 const POOL_SCALE_RANGE = 3.0;
 
