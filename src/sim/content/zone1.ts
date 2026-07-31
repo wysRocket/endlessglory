@@ -1,4 +1,4 @@
-// Zone 1 - Eastbrook Vale (levels 1-7). The starter zone: town of Eastbrook,
+// Zone 1 - Eastbrook Scar (levels 1-7). The starter zone: town of Eastbrook,
 // wolves and boars, the bandit camp, and Brother Aldric's Gravecaller chain
 // leading to the Hollow Crypt.
 
@@ -20,26 +20,26 @@ export const LAKE = { x: -92, z: 88, radius: 30 };
 
 export const ZONE1_ZONE: ZoneDef = {
   id: 'eastbrook_vale',
-  name: 'Eastbrook Vale',
+  name: 'Eastbrook Scar',
   zMin: -180,
   zMax: 180,
   levelRange: [1, 7],
-  biome: 'vale',
+  biome: 'volcano',
   hub: { x: 0, z: 0, radius: TOWN_RADIUS, name: 'Eastbrook' },
   graveyard: GRAVEYARD_POS,
   lakes: [LAKE],
   pois: [
     { x: 0, z: -3, label: 'Eastbrook', id: 'eastbrook' },
     { x: -2, z: 70, label: 'Wolf Run', id: 'wolf_run' },
-    { x: 65, z: 0, label: 'Boar Meadow', id: 'boar_meadow' },
-    { x: -88, z: 82, label: 'Mirror Lake', id: 'mirror_lake' },
+    { x: 65, z: 0, label: 'Ashboar Flat', id: 'boar_meadow' },
+    { x: -88, z: 82, label: 'Glasswater Lake', id: 'mirror_lake' },
     { x: -60, z: 4, label: 'Sableweb', id: 'sableweb' },
     { x: -84, z: -64, label: 'Copper Dig', id: 'copper_dig' },
     { x: 76, z: -76, label: 'Bandit Camp', id: 'bandit_camp' },
     { x: 80, z: 80, label: 'Fallen Chapel', id: 'fallen_chapel' },
     { x: -148, z: 120, label: 'Reliquary Hill', id: 'reliquary_hill' },
-    { x: 40, z: 140, label: 'Brightwood Glade', id: 'brightwood_glade' },
-    { x: -11, z: -112, label: 'The Sowfield', id: 'the_sowfield' },
+    { x: 40, z: 140, label: 'Emberwood Glade', id: 'brightwood_glade' },
+    { x: -11, z: -112, label: 'The Cinderfield', id: 'the_sowfield' },
   ],
   welcome: 'Find Marshal Redbrook in town - he has work for you.',
   welcomeQuestId: 'q_wolves',
