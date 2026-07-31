@@ -24,9 +24,9 @@ never assigned to any zone:
 
 - `src/render/terrain.ts`: `BIOME_PALETTE.volcano` (ground color), `ROCK_SLOPE_START.volcano = 0.35` (rock creeps in earliest of any biome), splat blending treats `volcano` like `peaks`/`cave` (rockier, less grass).
 - `src/sim/world.ts`: `BIOME_SHAPE.volcano` (terrain height/hub shape), a `biome === 'volcano'` branch in the heightfield generator.
-- `src/render/foliage.ts`: `volcano` gets the lowest tree density of any biome (`0.05`) and its non-tree decoration defaults to `'bush'` — sparse scrub, no forest canopy.
+- `src/render/foliage.ts`: `volcano` gets the lowest tree density of any biome (`0.05`) and its non-tree decoration defaults to `'bush'`: sparse scrub, no forest canopy.
 - `src/render/sky.ts`: `volcano` has its own HDR environment maps, fog gain/clamp, and sun-angle constants.
-- `src/render/motes.ts`: `volcano: 0xe8a070` — warm ember-orange ambient motes already defined.
+- `src/render/motes.ts`: `volcano: 0xe8a070`, warm ember-orange ambient motes already defined.
 - `src/render/renderer.ts`: `volcano: { color: 0x8a7468, near: 50, far: 220 }` fog band already defined.
 
 So the render-layer change is structurally a **one-line biome flag flip**, not
@@ -58,15 +58,15 @@ shipped zone before).
 - Any change to mob/NPC/quest/zone **ids**, stats, loot, spawn counts,
   aggro/AI, quest objectives, item rewards, or XP/copper values. This is a
   reskin of display text and one render flag, not a content or balance pass.
-- Reskinning mob VISUALS (models/colors) — the "also reskin the mobs" option
+- Reskinning mob VISUALS (models/colors): the "also reskin the mobs" option
   was explicitly declined. A wolf mob keeps its wolf model; only its display
   name may change (e.g. "Forest Wolf" → "Ashfang Wolf").
 - Any change to `ZONE1_PROPS` (building/well/stall/fence/campfire/graveyard
-  positions) or the town dressing built in the prior spec — both stay exactly
+  positions) or the town dressing built in the prior spec: both stay exactly
   as shipped. The town's blue/gold palette is a deliberate contrast (an
   ordered outpost amid a transformed wasteland), not an inconsistency to fix.
-- Any change to zone2's `biome: 'marsh'` or the cross-zone blend logic itself
-  — per the approved decision, the existing blend is trusted as-is.
+- Any change to zone2's `biome: 'marsh'` or the cross-zone blend logic itself:
+  per the approved decision, the existing blend is trusted as-is.
 - New GLB assets, new textures, new render code. This spec uses only the
   already-wired volcano biome pipeline plus content-file text edits.
 
@@ -77,7 +77,7 @@ Rename a label/name only when it actively clashes with scorched/volcanic
 terrain (green, forest, or "fresh water" imagery). Leave it alone when it's
 biome-neutral (a person's name, an occupation, a structure, or content that
 already fits or reads fine ambiguously). When in doubt, prefer the smaller
-edit — this is a tone pass, not a rewrite.
+edit: this is a tone pass, not a rewrite.
 
 ### Confirmed anchors (already agreed)
 | Field | Current | New |
@@ -90,19 +90,19 @@ edit — this is a tone pass, not a rewrite.
 | Mob name (`wild_boar`) | "Wild Boar" | "Ash Boar" |
 
 Mob name `warlock_imp` → "Fire Demon" and `warlock_voidwalker` → "Void Demon"
-already fit a volcanic vale and need no change — a nice pre-existing
+already fit a volcanic vale and need no change, a nice pre-existing
 coincidence. `hub.name: 'Eastbrook'` (the town itself) is unchanged, per
 Section 3.
 
 ### What the implementation plan still needs to enumerate
 `zone1.ts` has ~15 mobs, ~14 NPCs, and roughly a dozen quests with flavor
 text (`ZONE1_MOBS` lines 52-533, `ZONE1_NPCS` lines 534-818, `ZONE1_QUESTS`
-lines 819-1209 as of this writing — anchor by content, these line numbers
+lines 819-1209 as of this writing; anchor by content, these line numbers
 will drift). The plan's job is a full pass over each, applying the rule
 above, keeping a running table of "keep as-is" vs "renamed to X" so the
 change is auditable. Expect most NPC names to survive unchanged (people and
 occupations: "Marshal Redbrook," "Smith Haldren," "Trader Wilkes," "Apothecary
-Lin," "Brother Aldric," "Cook Marlow" — a smith arguably fits BETTER next to
+Lin," "Brother Aldric," "Cook Marlow"; a smith arguably fits BETTER next to
 volcanic ore/heat). Content most likely to need a pass: anything mentioning
 "the lake," "the woods/forest," "green," "the vale's fields," or wildlife
 grazing/foraging language dependent on live vegetation. `fisherman_brandt`
@@ -115,7 +115,7 @@ lighter adjustment? Flag it, don't presuppose it here.
 `src/render/props.ts` already places a `lavaHouse` landmark (a Meshy-generated
 molten dwelling) near `(-5, -52)` with a comment noting it's a leftover from
 an older layout, sitting oddly in the currently-green vale. Once the zone is
-volcanic this stops being an anomaly and starts being a natural fit — no
+volcanic this stops being an anomaly and starts being a natural fit: no
 change needed there, just noting it resolves itself.
 
 ## 5. i18n
@@ -123,11 +123,11 @@ change needed there, just noting it resolves itself.
 Mechanically free. Per `src/sim/content/CLAUDE.md`, the canonical English
 source for mob/NPC/quest/zone display names is `src/ui/world_entity_i18n.ts`,
 which reads the live `MOBS`/`NPCS`/`QUESTS`/`ZONES` tables by a fixed **id**
-list — since no id changes, no catalog surgery is needed; changed English
+list: since no id changes, no catalog surgery is needed; changed English
 text in the content file IS the new source of truth automatically. Every
 other locale simply goes stale/`pending` for the changed strings until a
 translator fills them at release time, which is the existing, expected
-lazy-locale workflow (see `docs/i18n-scaling/translation-workflow.md`) — not
+lazy-locale workflow (see `docs/i18n-scaling/translation-workflow.md`), not
 something this change needs to author.
 
 The S3 guard (`tests/localization_fixes.test.ts`) governs DYNAMIC sim-emitted
@@ -139,7 +139,7 @@ catch a surprise.
 ## 6. Testing & verification
 
 - `npx vitest run tests/progression.test.ts`: referential integrity (every
-  loot table, vendor stock, camp, and dungeon spawn resolves) — must stay
+  loot table, vendor stock, camp, and dungeon spawn resolves): must stay
   green since no id changes; this is the primary regression gate for this
   change.
 - `npx vitest run tests/localization_fixes.test.ts`: cheap sanity check per
@@ -171,7 +171,7 @@ in the same change.
 has a rough edge** (a bad color blend, a missing HDR asset, foliage that pops
 oddly at the vale/marsh seam). *Mitigation:* this is exactly why Section 6
 calls for live manual verification and boundary walking before calling this
-done — the render code is trusted but unproven in practice.
+done: the render code is trusted but unproven in practice.
 
 ## 8. Decision log
 
@@ -190,7 +190,7 @@ Live verification after the content rename pass (Section 6) surfaced a real gap:
 (`sky.ts` points `volcano` at `marsh_overcast.hdr` and the `peaks` mountain backdrop; no
 fire/lava-toned environment map exists anywhere under `public/env/`), and the terrain's
 texture-blend system only leans away from the grass splat texture on steep slopes or
-near water/roads/hub-dirt — a flat starter-town zone stays mostly grass-textured (just
+near water/roads/hub-dirt; a flat starter-town zone stays mostly grass-textured (just
 recolored dark) everywhere else. The ground palette change (Section 2) is real and
 confirmed live, but on its own it reads as "darker vale," not "lava world."
 

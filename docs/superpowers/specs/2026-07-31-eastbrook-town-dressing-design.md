@@ -39,7 +39,7 @@ touch `src/sim/`.
 - Any change to the shared `village` kit's GLB assets or `MAT_OVERRIDES` in
   `src/render/props.ts` (`village:RoofTiles`, `village:Wood`, etc.), since
   those materials are deduped by `(kit, name)` across every town (Fenbridge,
-  Highwatch) — changing them would restyle those towns too.
+  Highwatch): changing them would restyle those towns too.
 - Generating new custom 3D models (no Meshy/asset-pipeline work this pass).
 - A distant castle silhouette (present in the reference image). Cut for this
   pass: least essential element, non-trivial to place well against the
@@ -52,7 +52,7 @@ Two new sibling modules in `src/render/`, following the pure-core +
 thin-painter recipe mandated by `src/render/CLAUDE.md` (reference pair:
 `nameplate_view.ts` + `nameplate_painter.ts`):
 
-- **`town_dressing_core.ts`** — pure, Three/DOM-free, deterministic. Given the
+- **`town_dressing_core.ts`**: pure, Three/DOM-free, deterministic. Given the
   Eastbrook hub `{x, z, radius}` and the zone's existing
   `buildings`/`stalls`/`wells` arrays (read from
   `getActiveWorldContent().props`, already merged and available), computes a
@@ -63,7 +63,7 @@ thin-painter recipe mandated by `src/render/CLAUDE.md` (reference pair:
   `Math.random`, so the layout is stable across reloads. Registered in the
   `RENDER_PURE_CORES` allowlist (`tests/architecture.test.ts`) and covered by
   a plain Vitest.
-- **`town_dressing.ts`** — thin painter. Consumes the plan from the core,
+- **`town_dressing.ts`**: thin painter. Consumes the plan from the core,
   builds the actual Three.js geometry/materials (reusing `surfaceMat`/
   `textures.ts` canvas-texture conventions from `gfx.ts`), and returns a
   `TownDressingView` shaped like the existing `TerrainView`/`WaterView`
@@ -73,7 +73,7 @@ thin-painter recipe mandated by `src/render/CLAUDE.md` (reference pair:
 **Wiring:** `renderer.ts` calls `buildTownDressing(hub)` alongside its other
 `build*()` calls (`buildTerrain`, `buildProps`, `buildFoliage`, ...). `hub` is
 resolved by finding the `eastbrook_vale` zone in `ZONES` (`src/sim/data`,
-already imported the same way by `terrain.ts`) and reading its `hub` field —
+already imported the same way by `terrain.ts`) and reading its `hub` field,
 not by guessing positions. This makes the Eastbrook-only scoping structural:
 the module is never invoked for any other zone's hub, so Fenbridge/Highwatch
 are untouched by construction, independent of the shared-material concern
@@ -93,7 +93,7 @@ above.
    vertex shader driven by `sharedUniforms.uTime`, the same shared clock every
    other wind/water shader already reads) and a small flower box under a
    window. Both are new geometry anchored to the building's existing
-   transform (`x/z/rot`) — no edits to the building's own GLB/materials.
+   transform (`x/z/rot`): no edits to the building's own GLB/materials.
 3. **Market stalls.** A blue/gold cloth awning quad over each of the 3
    existing stalls, instanced/merged since it's a repeated element (same
    `instanceBatches` pattern `props.ts` already uses for fences/graves).
@@ -115,7 +115,7 @@ towns.
 
 `buildTownDressing(hub)` runs once at world build time (same lifecycle as
 `buildProps`/`buildFoliage`), reading already-resolved zone content
-(`getActiveWorldContent().props`) — no new `IWorld` surface, no new sim data,
+(`getActiveWorldContent().props`): no new `IWorld` surface, no new sim data,
 no new `SimEvent`. The returned `TownDressingView.update(dt)` is ticked from
 `renderer.ts`'s `sync()` for the small set of animated elements (banner sway,
 lantern flicker); everything else is static geometry frozen after build, per
@@ -124,7 +124,7 @@ the existing "reuse, don't allocate" performance discipline.
 ## 6. Performance
 
 - Repeated elements (lanterns, awnings, banners) use the existing
-  `instanceBatches`/merge-per-band pattern already in `props.ts` — no new
+  `instanceBatches`/merge-per-band pattern already in `props.ts`: no new
   per-frame allocations.
 - Total new draw calls are bounded by construction: one town's worth of
   dressing (4 buildings, 3 stalls, 1 plaza, a handful of lanterns), not a
@@ -137,7 +137,7 @@ the existing "reuse, don't allocate" performance discipline.
 
 ## 7. i18n
 
-No new player-visible strings — this is pure geometry/VFX. No `t()` keys, no
+No new player-visible strings: this is pure geometry/VFX. No `t()` keys, no
 `src/ui/i18n.catalog/` changes, no Guide/wiki regen needed.
 
 ## 8. Testing & verification

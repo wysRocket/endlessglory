@@ -8,7 +8,7 @@
 
 **Tech Stack:** TypeScript (strict), Three.js, Vitest. No new dependencies, no new GLB assets, no new `IWorld` surface.
 
-**Working directly on `main`** (per explicit instruction — no worktree, no branch). Commit after each task.
+**Working directly on `main`** (per explicit instruction: no worktree, no branch). Commit after each task.
 
 ---
 
@@ -19,9 +19,9 @@ Spec: [`docs/superpowers/specs/2026-07-31-eastbrook-town-dressing-design.md`](..
 Key facts this plan relies on (already verified against the current code):
 - `ZONE1_ZONE.hub` = `{ x: 0, z: 0, radius: 26, name: 'Eastbrook' }` (`src/sim/content/zone1.ts`).
 - `ZONE1_PROPS.buildings` = 4 entries (2 house, 1 inn, 1 chapel), `stalls` = 3, `wells` = 1 (at `(0,2)`), `campfires` includes `(3,-4)` (in-town) plus several far-away camp fires elsewhere in the zone.
-- `getActiveWorldContent().props` (from `../sim/data`) returns the merged `ZonePropsDef` (`buildings`/`stalls`/`wells`/`campfires`/...) across every zone — my code filters by distance to the Eastbrook hub, so it only ever touches Eastbrook's own entries even though the source array is global.
-- `renderer.ts` already has a point-light budget system: pushing new lights into `this.fireLights` (the same array `buildProps`/`stations.ts` already populate) makes them participate in the existing ranked/culled budget automatically — never create a raw always-on light outside that array.
-- `surfaceMat()` (`src/render/gfx.ts`) is the material factory (dedupes by content, tier-aware). `sharedUniforms.uTime` is the one shared clock every wind/water shader already reads, ticked once per frame by `sync()` — a `onBeforeCompile` shader hook needs no extra per-frame JS.
+- `getActiveWorldContent().props` (from `../sim/data`) returns the merged `ZonePropsDef` (`buildings`/`stalls`/`wells`/`campfires`/...) across every zone; my code filters by distance to the Eastbrook hub, so it only ever touches Eastbrook's own entries even though the source array is global.
+- `renderer.ts` already has a point-light budget system: pushing new lights into `this.fireLights` (the same array `buildProps`/`stations.ts` already populate) makes them participate in the existing ranked/culled budget automatically; never create a raw always-on light outside that array.
+- `surfaceMat()` (`src/render/gfx.ts`) is the material factory (dedupes by content, tier-aware). `sharedUniforms.uTime` is the one shared clock every wind/water shader already reads, ticked once per frame by `sync()`: a `onBeforeCompile` shader hook needs no extra per-frame JS.
 - `RENDER_PURE_CORES` lives in `tests/architecture.test.ts` (~line 234); a new `*_core.ts` file MUST be added there or the completeness sweep fails CI.
 
 ---
@@ -138,7 +138,7 @@ describe('planTownDressing', () => {
 - [ ] **Step 2: Run the test to verify it fails**
 
 Run: `npx vitest run tests/town_dressing_core.test.ts`
-Expected: FAIL — `Cannot find module '../src/render/town_dressing_core'` (the file doesn't exist yet).
+Expected: FAIL, `Cannot find module '../src/render/town_dressing_core'` (the file doesn't exist yet).
 
 - [ ] **Step 3: Write the implementation**
 
@@ -401,7 +401,7 @@ export function cobblestonePavingTexture(): THREE.CanvasTexture {
   });
 }
 
-// Blue-and-gold banner/awning cloth. Eastbrook town-square dressing only —
+// Blue-and-gold banner/awning cloth. Eastbrook town-square dressing only:
 // never used to recolor the shared village kit, so no other town is affected.
 export function bannerClothTexture(): THREE.CanvasTexture {
   return makeCanvas(64, (ctx, s) => {
@@ -461,7 +461,7 @@ EOF
 Note on performance (deviates slightly from the spec's "instanced/merged" phrasing,
 worth calling out explicitly): the spec's Section 6 anticipated reusing
 `props.ts`'s `instanceBatches` pattern. Once the plan's actual counts were worked out
-(4 buildings, 3 stalls, 8 lanterns — at most ~30 new meshes total for one town), that
+(4 buildings, 3 stalls, 8 lanterns; at most ~30 new meshes total for one town), that
 pattern is unnecessary: `InstancedMesh` earns its complexity for hundreds/thousands of
 repeats (grass, fences across a whole zone), not a handful of one-off fixtures for a
 single town square. Plain individual `THREE.Mesh` objects sharing a small set of
@@ -475,7 +475,7 @@ Create `src/render/town_dressing.ts`:
 ```ts
 // Thin painter for the Eastbrook town-square dressing: reads the plan from
 // town_dressing_core.ts and builds the actual Three.js geometry. Presentation
-// only — never touches ZONE1_PROPS or any other sim content; every mesh here
+// only: never touches ZONE1_PROPS or any other sim content; every mesh here
 // is purely decorative and anchored to the zone's EXISTING building/stall/well
 // positions. All materials here are dedicated to this module (never reusing
 // or mutating the shared `village:*` MAT_OVERRIDES in props.ts), so no other
@@ -646,7 +646,7 @@ export function buildTownDressing(seed: number, hub: TownHub, content: ZoneProps
 - [ ] **Step 2: Typecheck**
 
 Run: `npx tsc --noEmit`
-Expected: no new errors. (This file is intentionally NOT added to `RENDER_PURE_CORES` — it imports `three` and is the painter half of the pair, not the pure core.)
+Expected: no new errors. (This file is intentionally NOT added to `RENDER_PURE_CORES`: it imports `three` and is the painter half of the pair, not the pure core.)
 
 - [ ] **Step 3: Commit**
 
@@ -742,7 +742,7 @@ EOF
 
 ---
 
-### Task 6: Escalation — core extensions (bunting lines, path flower beds, more lanterns)
+### Task 6: Escalation, core extensions (bunting lines, path flower beds, more lanterns)
 
 Per the spec's Section 12 escalation addendum (2026-07-31, post-Task-5): the user asked to push
 the visual treatment further within the same agreed constraints. This task extends the pure
@@ -789,7 +789,7 @@ export interface TownDressingPlan {
 }
 ```
 
-5. Right after the existing `paths` computation loop (after the `for (const anchor of anchors) { ... }` block that builds `paths`, before the `obstacles`/`lanterns` block), add the flower-bed computation — one pair per path, straddling its midpoint:
+5. Right after the existing `paths` computation loop (after the `for (const anchor of anchors) { ... }` block that builds `paths`, before the `obstacles`/`lanterns` block), add the flower-bed computation (one pair per path, straddling its midpoint):
 
 ```ts
   const pathFlowerBeds: FlowerBedPlan[] = paths.map((path) => {
@@ -830,7 +830,7 @@ so each path yields two beds:
 
 Use the `flatMap` version (two beds per path).
 
-6. Right after the existing `lanterns` computation loop (after the `for (let i = 0; i < LANTERN_COUNT; i++) { ... }` block), add the bunting computation — chain consecutive surviving lanterns, and close the loop only if the closing gap isn't obviously spanning a skipped obstacle:
+6. Right after the existing `lanterns` computation loop (after the `for (let i = 0; i < LANTERN_COUNT; i++) { ... }` block), add the bunting computation (chain consecutive surviving lanterns, and close the loop only if the closing gap isn't obviously spanning a skipped obstacle):
 
 ```ts
   const buntingLines: BuntingLine[] = [];
@@ -913,9 +913,9 @@ Expected: PASS, 13 tests (10 existing + 3 new).
 
 Run: `npx tsc --noEmit`
 Expected: no new errors. (`town_dressing.ts` will now fail to compile because it destructures a
-plan that's missing the two new fields it doesn't yet use — no wait, TypeScript structural typing
+plan that's missing the two new fields it doesn't yet use; no wait, TypeScript structural typing
 means EXTRA fields on `TownDressingPlan` don't break `town_dressing.ts`, which only reads the
-fields it already knows about. Confirm this is actually the case by running `tsc` — it should
+fields it already knows about. Confirm this is actually the case by running `tsc`: it should
 still be clean, since `town_dressing.ts` never destructures `plan` positionally.)
 
 - [ ] **Step 5: Commit**
@@ -936,7 +936,7 @@ EOF
 
 ---
 
-### Task 7: Escalation — painter additions (plaza centerpiece, bunting, warmth, skyline landmark)
+### Task 7: Escalation, painter additions (plaza centerpiece, bunting, warmth, skyline landmark)
 
 **Files:**
 - Modify: `src/render/textures.ts`
@@ -1038,12 +1038,12 @@ import {
   });
 ```
 
-   This needs a new import too — add `radialGlowTexture` to the same `textures` import block from
+   This needs a new import too: add `radialGlowTexture` to the same `textures` import block from
    step 1 above (final import list: `bannerClothTexture, cobblestonePavingTexture,
    flowerBoxTexture, plazaEmblemTexture, radialGlowTexture`).
 
 3. In the existing plaza-disc block, change the material from `pavingMat` to `emblemMat` (the
-   plaza disc is the ONLY mesh that switches material — paths and rings keep `pavingMat`):
+   plaza disc is the ONLY mesh that switches material; paths and rings keep `pavingMat`):
 
 ```ts
   // ---- plaza (flat paved disc, sampled at the hub's ground height) --------
@@ -1057,7 +1057,7 @@ import {
   }
 ```
 
-4. Add a warm glow sprite at each lantern — extend the existing lantern loop (find the `for (const
+4. Add a warm glow sprite at each lantern: extend the existing lantern loop (find the `for (const
    lantern of plan.lanterns) { ... }` block, which currently adds `post`, `head`, and pushes a
    `light`) by adding one more child right after the `head` mesh is added, before the `light` is
    created:
@@ -1069,8 +1069,8 @@ import {
     group.add(glow);
 ```
 
-5. Add flower beds along the paths — new block, placed after the existing "market stall awnings"
-   loop and before the "lantern ring" loop:
+5. Add flower beds along the paths (new block, placed after the existing "market stall awnings"
+   loop and before the "lantern ring" loop):
 
 ```ts
   // ---- path-side flower beds ------------------------------------------------
@@ -1087,8 +1087,8 @@ import {
   }
 ```
 
-6. Add the bunting garlands — new block, placed after the flower-bed block and before the lantern
-   ring loop:
+6. Add the bunting garlands (new block, placed after the flower-bed block and before the lantern
+   ring loop):
 
 ```ts
   // ---- bunting garlands strung between surviving lantern posts -------------
@@ -1110,7 +1110,7 @@ import {
   }
 ```
 
-7. Add the skyline landmark — a new standalone function, added after `buildTownDressing` (same
+7. Add the skyline landmark, a new standalone function, added after `buildTownDressing` (same
    file), then called once from inside `buildTownDressing` right before the `return { group,
    fireLights };` line:
 
@@ -1162,7 +1162,7 @@ Run: `npx @biomejs/biome check --write src/render/town_dressing.ts`
 - [ ] **Step 5: Run the test suites**
 
 Run: `npx vitest run tests/architecture.test.ts tests/town_dressing_core.test.ts`
-Expected: PASS (the painter isn't Vitest-covered directly, same as Task 4 — this just confirms
+Expected: PASS (the painter isn't Vitest-covered directly, same as Task 4; this just confirms
 nothing in the core/architecture suites regressed).
 
 - [ ] **Step 6: Commit**
@@ -1197,7 +1197,7 @@ EOF
 git stash
 ```
 
-Start the dev server (`npm run dev`), open the offline client at `http://localhost:5173`, let a fresh character spawn (Eastbrook IS the spawn point — no teleport needed), and screenshot the town square at desktop size (1280x800). Save it to `docs/screenshots/eastbrook-town-dressing/before-desktop.png`.
+Start the dev server (`npm run dev`), open the offline client at `http://localhost:5173`, let a fresh character spawn (Eastbrook IS the spawn point, no teleport needed), and screenshot the town square at desktop size (1280x800). Save it to `docs/screenshots/eastbrook-town-dressing/before-desktop.png`.
 
 ```bash
 git stash pop
@@ -1218,7 +1218,7 @@ Check for:
 - Bunting garlands sag believably between lantern posts and don't clip through the ground or a building.
 - The skyline landmark reads as a distant background feature north of town, not overlapping any nearby building/NPC and not floating obviously disconnected from the terrain.
 - No stutter walking around the hub compared to the BEFORE build (informal check; the perf-budget test in Task 9 is the real gate).
-- Fenbridge and Highwatch (the other two towns) look completely unchanged — spot-check one of them in the same session.
+- Fenbridge and Highwatch (the other two towns) look completely unchanged; spot-check one of them in the same session.
 
 If anything clips or looks wrong, adjust the constants in `town_dressing_core.ts` (offsets, `PLAZA_RADIUS_FRACTION`, `LANTERN_MIN_CLEARANCE`) or `town_dressing.ts` (mesh sizes/heights), re-run `npx vitest run tests/town_dressing_core.test.ts`, and re-screenshot.
 
@@ -1271,4 +1271,4 @@ Expected: clean working tree, all commits from Tasks 1-8 present on `main` (plan
 - No `IWorld`/`world_api` change: this feature reads already-resolved `getActiveWorldContent().props` and existing `ZONES` data, and emits no new `SimEvent`.
 - No i18n change: no new player-visible strings.
 - No GLB/asset-manifest change: everything here is procedural geometry + canvas textures.
-- If a future request asks to also dress Fenbridge or Highwatch, that is a NEW spec (generalizing `buildTownDressing`'s zone lookup from a single hardcoded `'eastbrook_vale'` id to a list, plus its own before/after screenshots) — don't fold it into this change.
+- If a future request asks to also dress Fenbridge or Highwatch, that is a NEW spec (generalizing `buildTownDressing`'s zone lookup from a single hardcoded `'eastbrook_vale'` id to a list, plus its own before/after screenshots); don't fold it into this change.

@@ -4,11 +4,11 @@
 
 **Goal:** Flip the starter zone's biome to the already-wired `'volcano'` `BiomeId` and carry a consistent content-text rename pass across every zone name/POI/mob/NPC-title/quest string that reads as vale/forest/lake imagery, while leaving every id, stat, loot table, quest objective, and reward byte-identical.
 
-**Architecture:** All changes land in one file, `src/sim/content/zone1.ts` (a `biome` flag flip plus text-only edits), followed by the generated-guide regen the CLAUDE.md content workflow requires, then verification and the gate. No render code changes — the volcano rendering pipeline (terrain palette, foliage density, sky, motes, fog) already exists and activates automatically once the flag flips.
+**Architecture:** All changes land in one file, `src/sim/content/zone1.ts` (a `biome` flag flip plus text-only edits), followed by the generated-guide regen the CLAUDE.md content workflow requires, then verification and the gate. No render code changes: the volcano rendering pipeline (terrain palette, foliage density, sky, motes, fog) already exists and activates automatically once the flag flips.
 
 **Tech Stack:** TypeScript content data, no new dependencies.
 
-**Working directly on `main`** (continuing the session's established convention — no worktree, no branch). Commit after each task.
+**Working directly on `main`** (continuing the session's established convention: no worktree, no branch). Commit after each task.
 
 ---
 
@@ -16,7 +16,7 @@
 
 Spec: [`docs/superpowers/specs/2026-07-31-eastbrook-scar-volcano-biome-design.md`](../specs/2026-07-31-eastbrook-scar-volcano-biome-design.md)
 
-**The complete rename table** (derived by reading the entirety of `src/sim/content/zone1.ts`, all 1410 lines, during planning). This is the single source of truth for every task below — apply exactly these changes, nothing more:
+**The complete rename table** (derived by reading the entirety of `src/sim/content/zone1.ts`, all 1410 lines, during planning). This is the single source of truth for every task below; apply exactly these changes, nothing more:
 
 ### Zone
 | Field | Old | New |
@@ -31,7 +31,7 @@ Spec: [`docs/superpowers/specs/2026-07-31-eastbrook-scar-volcano-biome-design.md
 | `mirror_lake` | Mirror Lake | Glasswater Lake | Confirmed anchor |
 | `brightwood_glade` | Brightwood Glade | Emberwood Glade | Confirmed anchor |
 | `the_sowfield` | The Sowfield | The Cinderfield | Confirmed anchor |
-| everything else (`eastbrook`, `wolf_run`, `sableweb`, `copper_dig`, `bandit_camp`, `fallen_chapel`, `reliquary_hill`) | — | **unchanged** | Neutral or already fits (mining/ruins/camp/hill names aren't biome-specific) |
+| everything else (`eastbrook`, `wolf_run`, `sableweb`, `copper_dig`, `bandit_camp`, `fallen_chapel`, `reliquary_hill`) | n/a | **unchanged** | Neutral or already fits (mining/ruins/camp/hill names aren't biome-specific) |
 
 ### Mob display names (`ZONE1_MOBS[id].name`; ids never change)
 | id | Old name | New name | Why |
@@ -39,11 +39,11 @@ Spec: [`docs/superpowers/specs/2026-07-31-eastbrook-scar-volcano-biome-design.md
 | `forest_wolf` | Forest Wolf | Ashfang Wolf | Confirmed anchor |
 | `wild_boar` | Wild Boar | Ash Boar | Confirmed anchor |
 | `vale_bandit` | Vale Bandit | Scar Bandit | "Vale" → "Scar" consistency (see below) |
-| all other mobs (`warlock_imp`, `warlock_voidwalker`, `old_greyjaw`, `webwood_spider`, `mogger`, `mogger_lackey`, `mudfin_murloc`, `tunnel_rat`, `grix_the_tunnelking`, `restless_bones`, `captain_verlan`, `wraithbinder_maldrec`, `gorrak`, `amber_heart_golem`) | — | **unchanged** | Proper names, already-fitting names, or biome-neutral |
+| all other mobs (`warlock_imp`, `warlock_voidwalker`, `old_greyjaw`, `webwood_spider`, `mogger`, `mogger_lackey`, `mudfin_murloc`, `tunnel_rat`, `grix_the_tunnelking`, `restless_bones`, `captain_verlan`, `wraithbinder_maldrec`, `gorrak`, `amber_heart_golem`) | n/a | **unchanged** | Proper names, already-fitting names, or biome-neutral |
 
-**New finding from the full read:** "the Vale" is used repeatedly in NPC dialogue and quest text as the *colloquial name for the whole region* (independent of the `ZONE1_ZONE.name` field), e.g. "The Vale is not what it was," "Bandits of the Vale," "the Vale's dead." Since the zone's proper name is becoming "Eastbrook Scar," every one of these in-world references to "the Vale" becomes "the Scar" for consistency — leaving them as "Vale" while the zone is officially "Eastbrook Scar" would read as an error, not a choice. This is captured per-instance in the quest/NPC tables below.
+**New finding from the full read:** "the Vale" is used repeatedly in NPC dialogue and quest text as the *colloquial name for the whole region* (independent of the `ZONE1_ZONE.name` field), e.g. "The Vale is not what it was," "Bandits of the Vale," "the Vale's dead." Since the zone's proper name is becoming "Eastbrook Scar," every one of these in-world references to "the Vale" becomes "the Scar" for consistency: leaving them as "Vale" while the zone is officially "Eastbrook Scar" would read as an error, not a choice. This is captured per-instance in the quest/NPC tables below.
 
-### NPC title/greeting edits (personal names — Marshal Redbrook, Smith Haldren, etc. — never change; most titles/greetings are unaffected and stay as-is)
+### NPC title/greeting edits (personal names (Marshal Redbrook, Smith Haldren, etc.) never change; most titles/greetings are unaffected and stay as-is)
 | NPC id | Field | Old | New |
 |---|---|---|---|
 | `marshal_redbrook` | `greeting` | `'Keep your blade close, $C. The Vale is not what it was.'` | `'Keep your blade close, $C. The Scar is not what it was.'` |
@@ -53,7 +53,7 @@ Spec: [`docs/superpowers/specs/2026-07-31-eastbrook-scar-volcano-biome-design.md
 | `groundskeeper_bram` | `greeting` | `'The truce holds at the Sowfield, $C: boots and shoulders only. Care to play for the Copper Pail?'` | `'The truce holds at the Cinderfield, $C: boots and shoulders only. Care to play for the Copper Pail?'` |
 | `chronicler_saul` | `title` | `'The Vale Chronicle'` | `'The Scar Chronicle'` |
 
-**Resolved editorial call (per the spec's flagged item):** `fisherman_brandt` stays unchanged — role, greeting, and quest all untouched. "Glasswater Lake" is still a body of water; a mineral-hot lake plausibly still supports fish (and murlocs) in-fiction, so no NPC-role rework is needed, only the lake's own label (already in the POI table above) and the one quest line that names it (below).
+**Resolved editorial call (per the spec's flagged item):** `fisherman_brandt` stays unchanged: role, greeting, and quest all untouched. "Glasswater Lake" is still a body of water; a mineral-hot lake plausibly still supports fish (and murlocs) in-fiction, so no NPC-role rework is needed, only the lake's own label (already in the POI table above) and the one quest line that names it (below).
 
 ### Quest name/text edits (`ZONE1_QUESTS`; ids, objectives, rewards, gates never change)
 Only quests with an actual vale/forest/lake reference are touched. Every other quest (`q_prof_intro`, `q_bones`, `q_supplies`, `q_whispers`, `q_names_of_the_dead`, `q_silence_the_call`, `q_rite`, `q_sexton`, `q_gravecallers_trail`, `q_mine`, `q_prof_hobby_switch`) is **unchanged**.
@@ -135,7 +135,7 @@ export const ZONE1_ZONE: ZoneDef = {
 };
 ```
 
-Note the `id` fields on every POI entry are untouched (`boar_meadow`, `mirror_lake`, `brightwood_glade`, `the_sowfield` all keep their original id despite the label change) — only `label` and the top-level `name`/`biome` change.
+Note the `id` fields on every POI entry are untouched (`boar_meadow`, `mirror_lake`, `brightwood_glade`, `the_sowfield` all keep their original id despite the label change): only `label` and the top-level `name`/`biome` change.
 
 - [ ] **Step 3: Typecheck**
 
@@ -173,7 +173,7 @@ EOF
 
 - [ ] **Step 1: Rename the three mob display names**
 
-In `ZONE1_MOBS`, apply these three edits (each is a single `name:` field inside its mob's object — the surrounding fields on each mob are unchanged, shown here only for anchoring):
+In `ZONE1_MOBS`, apply these three edits (each is a single `name:` field inside its mob's object; the surrounding fields on each mob are unchanged, shown here only for anchoring):
 
 ```ts
   forest_wolf: {
@@ -291,7 +291,7 @@ EOF
 
 - [ ] **Step 1: Apply the eleven quest edits**
 
-In `ZONE1_QUESTS`, apply each of these (only the shown field changes; every other field on each quest — `objectives` types/counts/ids beyond the shown `label`, `xpReward`, `copperReward`, `itemRewards`, `requiresQuest`, `giverNpcId`, `turnInNpcId`, `minLevel`, `suggestedPlayers` — is untouched):
+In `ZONE1_QUESTS`, apply each of these (only the shown field changes; every other field on each quest (`objectives` types/counts/ids beyond the shown `label`, `xpReward`, `copperReward`, `itemRewards`, `requiresQuest`, `giverNpcId`, `turnInNpcId`, `minLevel`, `suggestedPlayers`) is untouched):
 
 `q_wolves`:
 ```ts
@@ -375,7 +375,7 @@ Run:
 grep -n "Forest Wolf\|Wild Boar\|Vale Bandit\|Mirror Lake\|Boar Meadow\|Brightwood Glade\|The Sowfield\|Eastbrook Vale\|the Vale \|the Vale'\|Priest of the Vale\|Vale Chronicle" src/sim/content/zone1.ts
 ```
 (quoted as literal substrings, not regex word-boundary escapes, since macOS's default `grep` does not support `\b`)
-Expected: no output (every occurrence was one of the edits above). If anything prints, it's a missed spot from this plan's table — fix it to match the rename table before continuing (do not invent a new rename not in the table; if you find a genuinely new spot, it means the table missed it, so apply the same word-for-word substitution pattern used elsewhere: "Vale" -> "Scar", "Forest Wolf" -> "Ashfang Wolf", etc.)
+Expected: no output (every occurrence was one of the edits above). If anything prints, it's a missed spot from this plan's table: fix it to match the rename table before continuing (do not invent a new rename not in the table; if you find a genuinely new spot, it means the table missed it, so apply the same word-for-word substitution pattern used elsewhere: "Vale" -> "Scar", "Forest Wolf" -> "Ashfang Wolf", etc.)
 
 - [ ] **Step 3: Typecheck**
 
@@ -385,7 +385,7 @@ Expected: no new errors.
 - [ ] **Step 4: Run the referential-integrity test**
 
 Run: `npx vitest run tests/progression.test.ts`
-Expected: PASS (every `targetMobId`/`itemId`/`giverNpcId`/`turnInNpcId`/`requiresQuest` value is untouched — only `text`/`completionText`/`name`/`objectives[].label` strings changed).
+Expected: PASS (every `targetMobId`/`itemId`/`giverNpcId`/`turnInNpcId`/`requiresQuest` value is untouched; only `text`/`completionText`/`name`/`objectives[].label` strings changed).
 
 - [ ] **Step 5: Commit**
 
@@ -423,7 +423,7 @@ Expected: PASS.
 - [ ] **Step 3: Review the diff**
 
 Run: `git diff --stat src/guide/content.generated.ts`
-Expected: a diff touching only the renamed strings (POI/mob/quest/zone names/labels) carried through into the generated guide content — no unrelated content should move.
+Expected: a diff touching only the renamed strings (POI/mob/quest/zone names/labels) carried through into the generated guide content; no unrelated content should move.
 
 - [ ] **Step 4: Commit**
 
@@ -440,11 +440,11 @@ EOF
 
 ---
 
-### Task 6: Real lava ground — rock-leaning terrain splat
+### Task 6: Real lava ground, rock-leaning terrain splat
 
 Per the spec's Section 9 escalation addendum (2026-07-31): live verification found the
 volcano biome's flat ground still reads as tinted grass, because the terrain's texture-
-blend system only leans off the grass splat layer on steep slopes or near water/roads —
+blend system only leans off the grass splat layer on steep slopes or near water/roads,
 never for a zone's own base biome. This task adds ONE new branch, scoped strictly to
 `biome === 'volcano'`, that cannot affect any other biome/zone.
 
@@ -513,7 +513,7 @@ EOF
 
 ---
 
-### Task 7: Real lava ground — scattered lava-crack decals
+### Task 7: Real lava ground, scattered lava-crack decals
 
 **Files:**
 - Create: `src/render/lava_crack_scatter_core.ts`
@@ -656,7 +656,7 @@ Expected: PASS, 5 tests.
 
 In `tests/architecture.test.ts`, add `'src/render/lava_crack_scatter_core.ts'` to the
 `RENDER_PURE_CORES` array (same array `town_dressing_core.ts` was added to earlier in
-this session — insert alphabetically, e.g. right after `'src/render/lava_crack_scatter_core.ts'`
+this session; insert alphabetically, e.g. right after `'src/render/lava_crack_scatter_core.ts'`
 sorts between `'src/render/foliage.ts'`-adjacent entries and `'src/render/nameplate_view.ts'`;
 match the file's existing alphabetical-ish ordering).
 
@@ -860,10 +860,10 @@ block added earlier this session), add:
 ```
 
 `WORLD_MAX_X` is already imported in `renderer.ts` (confirm this before adding a
-duplicate import — grep the existing `from '../sim/data'` block first; it's very likely
+duplicate import: grep the existing `from '../sim/data'` block first; it's very likely
 already there since `terrain.ts` and other modules use it too, but if it is NOT already
 in `renderer.ts`'s import list, add it to the same existing `from '../sim/data'` block,
-alphabetically, same as the `getActiveWorldContent` addition earlier this session — never
+alphabetically, same as the `getActiveWorldContent` addition earlier this session, never
 a second import statement for that module).
 
 - [ ] **Step 10: Typecheck**
@@ -918,12 +918,12 @@ Screenshot the town square at desktop size (1280x800): `docs/screenshots/eastbro
 
 Travel to roughly `z = 170-190` (near `zMax = 180`) and look both directions along the boundary. Confirm the volcano-to-marsh blend reads as a coherent transition, not a hard seam or a broken color/height pop. Screenshot it: `docs/screenshots/eastbrook-scar-volcano/after-boundary.png`.
 
-If the blend looks broken (not just "different," but visually wrong — a hard color seam, a height discontinuity, missing textures), stop and report it rather than trying to fix the shared cross-zone blend code — that system is out of scope for this plan per the spec's explicit decision to trust it as-is; a real defect there is a separate bug, not a follow-up task here.
+If the blend looks broken (not just "different," but visually wrong: a hard color seam, a height discontinuity, missing textures), stop and report it rather than trying to fix the shared cross-zone blend code: that system is out of scope for this plan per the spec's explicit decision to trust it as-is; a real defect there is a separate bug, not a follow-up task here.
 
 - [ ] **Step 3: Run the localization guard**
 
 Run: `npx vitest run tests/localization_fixes.test.ts`
-Expected: PASS (sanity check per the spec's Section 5 — this change touches static content prose, not dynamic sim-emitted text, so it should be a no-op for this guard).
+Expected: PASS (sanity check per the spec's Section 5; this change touches static content prose, not dynamic sim-emitted text, so it should be a no-op for this guard).
 
 - [ ] **Step 4: Commit the screenshots**
 
@@ -946,7 +946,7 @@ EOF
 - [ ] **Step 1: Run the full pre-merge gate**
 
 Run: `npm run gate`
-Expected: PASS. (Note from the prior plan in this session: `npm run gate`'s changed-files biome check lints the WHOLE file once any part of it changes, not just new lines — if it flags an organize-imports or style fix in a file this plan touched, apply `npx @biomejs/biome check --write <file>` and re-verify the diff is still scoped to expected content before committing, rather than reverting the auto-fix.)
+Expected: PASS. (Note from the prior plan in this session: `npm run gate`'s changed-files biome check lints the WHOLE file once any part of it changes, not just new lines; if it flags an organize-imports or style fix in a file this plan touched, apply `npx @biomejs/biome check --write <file>` and re-verify the diff is still scoped to expected content before committing, rather than reverting the auto-fix.)
 
 - [ ] **Step 2: Final status check**
 
@@ -961,9 +961,9 @@ Expected: clean working tree, all commits from Tasks 1-8 present on `main`, each
 
 ## Notes for the executor
 
-- **"Vale Cup" is a different, unrelated system — never touch it.** `social/vale_cup.ts` and its render/UI surface implement the Vale Cup boarball minigame (a shared cross-zone event, not part of Eastbrook's identity). It shares the word "Vale" by coincidence. `zone1.ts` has a couple of dev comments referencing it (e.g. near `groundskeeper_bram`, who spawns via `vale_cup_layout`); those comments and every "Vale Cup" reference anywhere in the codebase are out of scope for this plan. If a straggler-grep in Task 4 ever matches "Vale Cup," that is a false positive — leave it alone.
-- No `IWorld`/`world_api` change, no new `SimEvent`, no i18n catalog surgery (see spec Section 5) — every non-English locale simply goes `pending` for the changed strings until a translator fills them at release, which is expected and not part of this change.
-- If, during Task 4's grep-for-stragglers step, you find a vale/forest/lake reference this plan's table didn't anticipate, apply the SAME substitution pattern already established (Vale→Scar, Forest Wolf→Ashfang Wolf, meadow/woods→ash flat/ash scrub) rather than inventing a new term — consistency with the rest of the pass matters more than a locally clever rewrite.
-- Do not touch `ZONE1_PROPS`, `ZONE1_CAMPS`, `ZONE1_CHAPEL_CAMPS`, `ZONE1_OBJECTS`, `ZONE1_ROADS`, or any position/radius/count field anywhere in `zone1.ts` — this plan is display-text and one biome flag, nothing spatial or mechanical.
-- Do not touch item ids or item display names (e.g. `vale_carving_knife`, `brightwood_venison` sold by NPCs in this file) — item renames follow a different, stricter workflow (`src/ui/i18n.catalog/items.ts`) and were explicitly out of scope for this pass.
-- Do not touch the town dressing (`src/render/town_dressing_core.ts`/`town_dressing.ts`) or `ZONE1_PROPS` — both are complete, shipped, and deliberately left as a contrasting "ordered outpost" amid the new terrain, per the spec.
+- **"Vale Cup" is a different, unrelated system: never touch it.** `social/vale_cup.ts` and its render/UI surface implement the Vale Cup boarball minigame (a shared cross-zone event, not part of Eastbrook's identity). It shares the word "Vale" by coincidence. `zone1.ts` has a couple of dev comments referencing it (e.g. near `groundskeeper_bram`, who spawns via `vale_cup_layout`); those comments and every "Vale Cup" reference anywhere in the codebase are out of scope for this plan. If a straggler-grep in Task 4 ever matches "Vale Cup," that is a false positive; leave it alone.
+- No `IWorld`/`world_api` change, no new `SimEvent`, no i18n catalog surgery (see spec Section 5): every non-English locale simply goes `pending` for the changed strings until a translator fills them at release, which is expected and not part of this change.
+- If, during Task 4's grep-for-stragglers step, you find a vale/forest/lake reference this plan's table didn't anticipate, apply the SAME substitution pattern already established (Vale→Scar, Forest Wolf→Ashfang Wolf, meadow/woods→ash flat/ash scrub) rather than inventing a new term: consistency with the rest of the pass matters more than a locally clever rewrite.
+- Do not touch `ZONE1_PROPS`, `ZONE1_CAMPS`, `ZONE1_CHAPEL_CAMPS`, `ZONE1_OBJECTS`, `ZONE1_ROADS`, or any position/radius/count field anywhere in `zone1.ts`: this plan is display-text and one biome flag, nothing spatial or mechanical.
+- Do not touch item ids or item display names (e.g. `vale_carving_knife`, `brightwood_venison` sold by NPCs in this file): item renames follow a different, stricter workflow (`src/ui/i18n.catalog/items.ts`) and were explicitly out of scope for this pass.
+- Do not touch the town dressing (`src/render/town_dressing_core.ts`/`town_dressing.ts`) or `ZONE1_PROPS`: both are complete, shipped, and deliberately left as a contrasting "ordered outpost" amid the new terrain, per the spec.
