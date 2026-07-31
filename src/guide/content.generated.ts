@@ -1492,23 +1492,23 @@ export const GUIDE_CLASSES: GuideClassInfo[] = [
 export const GUIDE_ZONES: GuideZoneInfo[] = [
   {
     "id": "eastbrook_vale",
-    "name": "Eastbrook Vale",
+    "name": "Eastbrook Scar",
     "min": 1,
     "max": 7,
-    "biome": "vale",
+    "biome": "volcano",
     "hub": "Eastbrook",
     "pois": [
       "Eastbrook",
       "Wolf Run",
-      "Boar Meadow",
-      "Mirror Lake",
+      "Ashboar Flat",
+      "Glasswater Lake",
       "Sableweb",
       "Copper Dig",
       "Bandit Camp",
       "Fallen Chapel",
       "Reliquary Hill",
-      "Brightwood Glade",
-      "The Sowfield"
+      "Emberwood Glade",
+      "The Cinderfield"
     ],
     "welcome": "Find Marshal Redbrook in town - he has work for you.",
     "families": [
@@ -1699,7 +1699,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
     "family": "beast",
     "creatures": [
       {
-        "name": "Forest Wolf",
+        "name": "Ashfang Wolf",
         "min": 1,
         "max": 2,
         "rare": false,
@@ -1708,7 +1708,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "still": "/guide-stills/mob_hallow.webp"
       },
       {
-        "name": "Wild Boar",
+        "name": "Ash Boar",
         "min": 2,
         "max": 3,
         "rare": false,
@@ -1847,7 +1847,7 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
     "family": "humanoid",
     "creatures": [
       {
-        "name": "Vale Bandit",
+        "name": "Scar Bandit",
         "min": 3,
         "max": 5,
         "rare": false,
