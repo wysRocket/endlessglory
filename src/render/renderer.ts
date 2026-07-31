@@ -16,6 +16,7 @@ import {
   delveOrigin,
   delveSlotAt,
   dungeonAt,
+  getActiveWorldContent,
   INSTANCE_SLOT_COUNT,
   ITEM_SETS,
   instanceOrigin,
@@ -164,6 +165,7 @@ import {
 } from './temporal_hourglass_visual';
 import { buildTerrain, type TerrainView } from './terrain';
 import { sparkleTexture } from './textures';
+import { buildTownDressing, type TownDressingView } from './town_dressing';
 import { targetIntensity } from './travel_speed_fx';
 import { TravelSpeedFxPainter } from './travel_speed_fx_painter';
 import {
@@ -1012,6 +1014,7 @@ export class Renderer {
   private clouds: THREE.Sprite[] = [];
   private waterView: WaterView;
   private terrainView: TerrainView;
+  private townDressing: TownDressingView | null = null;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
   private placedAssetsView: PlacedAssetsView | null = null;
@@ -1496,6 +1499,21 @@ export class Renderer {
     // flames, whose flicker rescales them every frame: re-enable those.
     freezeStaticMatrices(props.group);
     for (const flame of this.flames) flame.matrixAutoUpdate = true;
+    // Eastbrook town-square dressing: presentation-only, scoped to this one
+    // zone's hub so no other town is affected. See
+    // docs/superpowers/specs/2026-07-31-eastbrook-town-dressing-design.md.
+    const eastbrookZone = ZONES.find((z) => z.id === 'eastbrook_vale');
+    if (eastbrookZone) {
+      this.townDressing = buildTownDressing(
+        this.sim.cfg.seed,
+        eastbrookZone.hub,
+        getActiveWorldContent().props,
+      );
+      setRenderCategory(this.townDressing.group, 'townDressing');
+      this.scene.add(this.townDressing.group);
+      freezeStaticMatrices(this.townDressing.group);
+      this.fireLights.push(...this.townDressing.fireLights);
+    }
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
     // numPointLights -> materials never recompile for a light-count change).
