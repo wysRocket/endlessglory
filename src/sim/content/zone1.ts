@@ -641,7 +641,7 @@ export const ZONE1_NPCS: Record<string, NpcDef> = {
     id: 'fisherman_brandt',
     name: 'Fisherman Brandt',
     title: 'Old Salt',
-    // in town (east edge, glaring out at Mirror Lake) - his old spot by the
+    // in town (east edge, glaring out at Glasswater Lake) - his old spot by the
     // dock sat inside the Mudfin spawn radius and new players got ambushed
     // walking up to a quest giver
     pos: { x: -16, z: 6 },
@@ -848,10 +848,10 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Wolves at the Door',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'The forest wolves grow bold, snapping at travelers on the north road. Thin their numbers, $N. Slay 8 Forest Wolves and Eastbrook will breathe easier.',
+    text: 'The ashfang wolves grow bold, snapping at travelers on the north road. Thin their numbers, $N. Slay 8 Ashfang Wolves and Eastbrook will breathe easier.',
     completionText: 'Fine work. The road feels safer already.',
     objectives: [
-      { type: 'kill', targetMobId: 'forest_wolf', count: 8, label: 'Forest Wolf slain' },
+      { type: 'kill', targetMobId: 'forest_wolf', count: 8, label: 'Ashfang Wolf slain' },
     ],
     xpReward: 250,
     copperReward: 75,
@@ -862,7 +862,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'The Old Wolf',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: "There is one wolf no trap has held: Old Greyjaw. He has taken three hounds and a stable boy's arm. He prowls the deep woods north of the wolf runs. Bring me his fang.",
+    text: "There is one wolf no trap has held: Old Greyjaw. He has taken three hounds and a stable boy's arm. He prowls the scorched hills north of the wolf runs. Bring me his fang.",
     completionText:
       'So the old devil is dead at last. The stable boy will sleep easier - and so will I.',
     objectives: [
@@ -882,7 +882,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Bristly Boar Hides',
     giverNpcId: 'trader_wilkes',
     turnInNpcId: 'trader_wilkes',
-    text: 'Boar hide makes the finest travel packs, and the meadows west of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.',
+    text: 'Boar hide makes the finest travel packs, and the ash flats west of town are crawling with the beasts. Bring me 5 Bristly Boar Hides and I will make it worth your time.',
     completionText: 'Ah, fine bristly hides! These will fetch a good price.',
     objectives: [{ type: 'collect', itemId: 'boar_hide', count: 5, label: 'Bristly Boar Hide' }],
     xpReward: 350,
@@ -894,7 +894,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Sableweb Menace',
     giverNpcId: 'apothecary_lin',
     turnInNpcId: 'apothecary_lin',
-    text: 'The lurkers in the eastern woods spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.',
+    text: 'The lurkers in the eastern ash scrub spin a silk I need for my poultices - and they have grown far too numerous besides. Cull 6 Sableweb Lurkers and cut 4 silk glands from their bellies.',
     completionText: "Ugh, still twitching. Perfect. Here, you've earned this.",
     objectives: [
       { type: 'kill', targetMobId: 'webwood_spider', count: 6, label: 'Sableweb Lurker slain' },
@@ -910,7 +910,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Trouble at the Lake',
     giverNpcId: 'fisherman_brandt',
     turnInNpcId: 'fisherman_brandt',
-    text: 'Twenty years I have fished Mirror Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back - slay 8 of them. And watch yourself: where there is one mudfin, there are five.',
+    text: 'Twenty years I have fished Glasswater Lake, and never lost a net until those gurgling fish-men crawled out of the shallows. Drive the Mudfin back - slay 8 of them. And watch yourself: where there is one mudfin, there are five.',
     completionText: 'Hah! That will teach them to mind their own mudholes.',
     objectives: [
       { type: 'kill', targetMobId: 'mudfin_murloc', count: 8, label: 'Mudfin Skulker slain' },
@@ -1045,9 +1045,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Into the Hollow',
     giverNpcId: 'brother_aldric',
     turnInNpcId: 'brother_aldric',
-    text: "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero - take four companions, no fewer. End him, and the Vale's dead will finally sleep.",
+    text: "Morthen the Gravecaller waits at the bottom of the Hollow Crypt, ringed by the elite dead he has raised. He is far beyond any one hero - take four companions, no fewer. End him, and the Scar's dead will finally sleep.",
     completionText:
-      'The whispering has stopped. You have done what the whole Vale could not, $N - the dead sleep, and Eastbrook owes you everything it has.',
+      'The whispering has stopped. You have done what the whole Scar could not, $N - the dead sleep, and Eastbrook owes you everything it has.',
     objectives: [
       { type: 'kill', targetMobId: 'morthen', count: 1, label: 'Morthen the Gravecaller slain' },
     ],
@@ -1100,13 +1100,13 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
   },
   q_bandits: {
     id: 'q_bandits',
-    name: 'Bandits of the Vale',
+    name: 'Bandits of the Scar',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out - slay 10 Vale Bandits.',
+    text: 'A pack of cutthroats has made camp in the southwest hills. They have robbed three wagons this week. Drive them out - slay 10 Scar Bandits.',
     completionText: 'Ten fewer knives in the dark. Take this - you have earned it.',
     objectives: [
-      { type: 'kill', targetMobId: 'vale_bandit', count: 10, label: 'Vale Bandit slain' },
+      { type: 'kill', targetMobId: 'vale_bandit', count: 10, label: 'Scar Bandit slain' },
     ],
     xpReward: 550,
     copperReward: 200,
@@ -1120,7 +1120,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     turnInNpcId: 'marshal_redbrook',
     text: 'The bandits answer to one man: Gorrak the Ruthless. Cut off the head and the body will scatter. He skulks at the heart of their camp. End him, $N.',
     completionText:
-      'Gorrak is dead? Then the Vale is free of his shadow. You have done Eastbrook a great service.',
+      'Gorrak is dead? Then the Scar is free of his shadow. You have done Eastbrook a great service.',
     objectives: [
       { type: 'kill', targetMobId: 'gorrak', count: 1, label: 'Gorrak the Ruthless slain' },
     ],
@@ -1134,9 +1134,9 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Mogger Must Fall',
     giverNpcId: 'marshal_redbrook',
     turnInNpcId: 'marshal_redbrook',
-    text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Vale. Do not face him alone. Take two strong companions into the eastern meadow and put the brute down for good.',
+    text: 'Mogger has split carts, flattened fences, and killed enough livestock to empty half the Scar. Do not face him alone. Take two strong companions into the eastern ash flat and put the brute down for good.',
     completionText:
-      "Mogger dead at last. Eastbrook's fields are safer, and you leave the Vale with one more tale worth retelling.",
+      "Mogger dead at last. Eastbrook's fields are safer, and you leave the Scar with one more tale worth retelling.",
     objectives: [{ type: 'kill', targetMobId: 'mogger', count: 1, label: 'Mogger slain' }],
     xpReward: 1200,
     copperReward: 900,
@@ -1157,7 +1157,7 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'A Craft to Call Your Own',
     giverNpcId: 'smith_haldren',
     turnInNpcId: 'smith_haldren',
-    text: 'Skill is knowledge, $N, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Vale with your own hands.',
+    text: 'Skill is knowledge, $N, but attunement is a promise. Choose two neighboring crafts whose methods you will carry as your majors, then bring me ore worked from the Scar with your own hands.',
     completionText:
       'The promise holds. These two crafts are now your majors, and the knowledge opposite them becomes your hobby.',
     objectives: [{ type: 'gather', nodeType: 'ore', count: 3, label: 'Ore vein harvested' }],
@@ -1174,10 +1174,10 @@ export const ZONE1_QUESTS: Record<string, QuestDef> = {
     name: 'Making Amends',
     giverNpcId: 'smith_haldren',
     turnInNpcId: 'smith_haldren',
-    text: 'You have carried that pair before, $N. Returning is no fresh vow. Help keep the Vale road clear, and the work will remind your hands what they once knew.',
+    text: 'You have carried that pair before, $N. Returning is no fresh vow. Help keep the Scar road clear, and the work will remind your hands what they once knew.',
     completionText: 'The old rhythm returns. Your former pair is active once more.',
     objectives: [
-      { type: 'kill', targetMobId: 'forest_wolf', count: 5, label: 'Forest Wolf slain' },
+      { type: 'kill', targetMobId: 'forest_wolf', count: 5, label: 'Ashfang Wolf slain' },
     ],
     xpReward: 100,
     copperReward: 0,
