@@ -10,7 +10,13 @@ import * as THREE from 'three';
 import type { ZonePropsDef } from '../sim/types';
 import { terrainHeight } from '../sim/world';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
-import { bannerClothTexture, cobblestonePavingTexture, flowerBoxTexture } from './textures';
+import {
+  bannerClothTexture,
+  cobblestonePavingTexture,
+  flowerBoxTexture,
+  plazaEmblemTexture,
+  radialGlowTexture,
+} from './textures';
 import { planTownDressing, type TownHub } from './town_dressing_core';
 
 export interface TownDressingView {
@@ -76,12 +82,20 @@ export function buildTownDressing(
     emissiveIntensity: 1.4,
     roughness: 0.4,
   });
+  const emblemMat = surfaceMat({ map: plazaEmblemTexture(), roughness: 0.9 });
+  const glowMat = new THREE.SpriteMaterial({
+    map: radialGlowTexture(),
+    color: 0xffb066,
+    transparent: true,
+    depthWrite: false,
+    blending: THREE.AdditiveBlending,
+  });
 
   // ---- plaza (flat paved disc, sampled at the hub's ground height) --------
   {
     const geo = new THREE.CircleGeometry(plan.plaza.radius, 40);
     geo.rotateX(-Math.PI / 2);
-    const mesh = new THREE.Mesh(geo, pavingMat);
+    const mesh = new THREE.Mesh(geo, emblemMat);
     mesh.position.set(plan.plaza.x, ground(plan.plaza.x, plan.plaza.z) + 0.03, plan.plaza.z);
     mesh.receiveShadow = true;
     group.add(mesh);
@@ -154,6 +168,37 @@ export function buildTownDressing(
     group.add(mesh);
   }
 
+  // ---- path-side flower beds ------------------------------------------------
+  for (const bed of plan.pathFlowerBeds) {
+    const y = ground(bed.x, bed.z);
+    const box = new THREE.Mesh(new THREE.BoxGeometry(0.6, 0.35, 0.6), boxMat);
+    box.position.set(bed.x, y + 0.18, bed.z);
+    box.castShadow = true;
+    group.add(box);
+    const cap = new THREE.Mesh(new THREE.PlaneGeometry(0.55, 0.55), boxCapMat);
+    cap.rotation.x = -Math.PI / 2;
+    cap.position.set(bed.x, y + 0.36, bed.z);
+    group.add(cap);
+  }
+
+  // ---- bunting garlands strung between surviving lantern posts -------------
+  const BUNTING_FLAGS_PER_LINE = 5;
+  const BUNTING_SAG = 0.35;
+  for (const line of plan.buntingLines) {
+    const y0 = ground(line.from.x, line.from.z) + LANTERN_POST_HEIGHT + 0.1;
+    const y1 = ground(line.to.x, line.to.z) + LANTERN_POST_HEIGHT + 0.1;
+    for (let i = 0; i < BUNTING_FLAGS_PER_LINE; i++) {
+      const t = (i + 0.5) / BUNTING_FLAGS_PER_LINE;
+      const x = line.from.x + (line.to.x - line.from.x) * t;
+      const z = line.from.z + (line.to.z - line.from.z) * t;
+      const y = y0 + (y1 - y0) * t - BUNTING_SAG * 4 * t * (1 - t);
+      const flag = new THREE.Mesh(new THREE.PlaneGeometry(0.3, 0.35), clothMat);
+      flag.position.set(x, y, z);
+      flag.rotation.y = Math.atan2(line.to.x - line.from.x, line.to.z - line.from.z);
+      group.add(flag);
+    }
+  }
+
   // ---- lantern ring around the plaza ----------------------------------------
   for (const lantern of plan.lanterns) {
     const y = ground(lantern.x, lantern.z);
@@ -169,6 +214,11 @@ export function buildTownDressing(
     head.position.set(lantern.x, y + LANTERN_POST_HEIGHT + 0.1, lantern.z);
     group.add(head);
 
+    const glow = new THREE.Sprite(glowMat);
+    glow.scale.setScalar(1.6);
+    glow.position.set(lantern.x, y + LANTERN_POST_HEIGHT + 0.1, lantern.z);
+    group.add(glow);
+
     const light = new THREE.PointLight(
       LANTERN_LIGHT_COLOR,
       LANTERN_LIGHT_INTENSITY,
@@ -179,5 +229,38 @@ export function buildTownDressing(
     fireLights.push(light);
   }
 
+  addSkylineLandmark(group, hub, seed);
+
   return { group, fireLights };
+}
+
+function addSkylineLandmark(group: THREE.Group, hub: TownHub, seed: number): void {
+  const lx = hub.x + 10;
+  const lz = hub.z + 185; // well past every named POI in ZONE1_ZONE.pois; see the 2026-07-31 escalation addendum
+  const baseY = terrainHeight(lx, lz, seed);
+  const rockMat = surfaceMat({ color: 0x2b2420, roughness: 1 });
+  const craterMat = surfaceMat({
+    color: 0xff8040,
+    emissive: 0xff5a1e,
+    emissiveIntensity: 2.2,
+    roughness: 0.5,
+  });
+  const cone = new THREE.Mesh(new THREE.ConeGeometry(24, 70, 8), rockMat);
+  cone.position.set(lx, baseY + 35, lz);
+  group.add(cone);
+  const crater = new THREE.Mesh(new THREE.ConeGeometry(9, 8, 8), craterMat);
+  crater.position.set(lx, baseY + 70, lz);
+  group.add(crater);
+  const glow = new THREE.Sprite(
+    new THREE.SpriteMaterial({
+      map: radialGlowTexture(),
+      color: 0xff6a2e,
+      transparent: true,
+      depthWrite: false,
+      blending: THREE.AdditiveBlending,
+    }),
+  );
+  glow.scale.setScalar(30);
+  glow.position.set(lx, baseY + 74, lz);
+  group.add(glow);
 }
