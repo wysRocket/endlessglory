@@ -118,7 +118,11 @@ export function planTownDressing(input: TownDressingInput): TownDressingPlan {
     paths.push({ from, to: anchor });
   }
 
-  const obstacles = anchors;
+  const obstacles: Point2[] = [
+    ...anchors,
+    ...wells.map((w) => ({ x: w.x, z: w.z })),
+    ...campfires.map(([x, z]) => ({ x, z })),
+  ];
   const lanterns: Point2[] = [];
   for (let i = 0; i < LANTERN_COUNT; i++) {
     const angle = (i / LANTERN_COUNT) * Math.PI * 2;

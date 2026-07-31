@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { ZONE1_PROPS, ZONE1_ZONE } from '../src/sim/content/zone1';
 import { planTownDressing } from '../src/render/town_dressing_core';
+import { ZONE1_PROPS, ZONE1_ZONE } from '../src/sim/content/zone1';
 
 const HUB = ZONE1_ZONE.hub;
 
@@ -53,7 +53,7 @@ describe('planTownDressing', () => {
     }
   });
 
-  it('produces one dressing entry per in-hub building, at that building\'s own position', () => {
+  it("produces one dressing entry per in-hub building, at that building's own position", () => {
     const p = plan();
     expect(p.buildingDressing).toHaveLength(ZONE1_PROPS.buildings.length);
     for (const dressing of p.buildingDressing) {
@@ -92,5 +92,33 @@ describe('planTownDressing', () => {
     expect(p.campfireRings).toHaveLength(1);
     expect(p.campfireRings[0].x).toBe(3);
     expect(p.campfireRings[0].z).toBe(-4);
+  });
+
+  it('produces one well ring per in-hub well, radius offset from the well radius', () => {
+    const p = plan();
+    expect(p.wellRings).toHaveLength(ZONE1_PROPS.wells.length);
+    for (const ring of p.wellRings) {
+      const source = ZONE1_PROPS.wells.find((w) => w.x === ring.x && w.z === ring.z);
+      expect(source).toBeDefined();
+      expect(ring.radius).toBeCloseTo(source!.r + 1.4);
+    }
+  });
+
+  it("produces one awning per in-hub stall, at that stall's own position and rotation", () => {
+    const p = plan();
+    expect(p.stallAwnings).toHaveLength(ZONE1_PROPS.stalls.length);
+    for (const awning of p.stallAwnings) {
+      const source = ZONE1_PROPS.stalls.find((s) => s.x === awning.x && s.z === awning.z);
+      expect(source).toBeDefined();
+      expect(awning.rot).toBe(source!.rot);
+    }
+  });
+
+  it('assigns each building dressing entry the roof height for its own kind', () => {
+    const p = plan();
+    const expectedHeight: Record<string, number> = { house: 7.4, inn: 7.0, chapel: 9.6 };
+    for (const dressing of p.buildingDressing) {
+      expect(dressing.bannerHeight).toBe(expectedHeight[dressing.kind]);
+    }
   });
 });
