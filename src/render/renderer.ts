@@ -25,6 +25,7 @@ import {
   isYumiMazePos,
   MOBS,
   NPCS,
+  WORLD_MAX_X,
   WORLD_MAX_Z,
   WORLD_MIN_Z,
   YUMI_MAZE_SLOT_COUNT,
@@ -112,6 +113,7 @@ import { type IceBlockVisual, syncIceBlockVisual } from './ice_block_visual';
 import { buildImpactSite, type ImpactSiteView } from './impact_site';
 import { ensureDelveInteriorKit } from './interior_kit';
 import { buildJailScene } from './jail_scene';
+import { buildLavaCrackScatter, type LavaCrackScatterView } from './lava_crack_scatter';
 import { LightPulses } from './light_pulses';
 import { type LocoTrack, newLocoTrack, updateLocomotion } from './locomotion';
 import {
@@ -1015,6 +1017,7 @@ export class Renderer {
   private waterView: WaterView;
   private terrainView: TerrainView;
   private townDressing: TownDressingView | null = null;
+  private lavaCrackScatter: LavaCrackScatterView | null = null;
   // Map-editor placed GLB assets; null when the world has none and the editor
   // never asked for the view (the shipped game with the built-in world).
   private placedAssetsView: PlacedAssetsView | null = null;
@@ -1517,6 +1520,21 @@ export class Renderer {
       this.scene.add(this.townDressing.group);
       freezeStaticMatrices(this.townDressing.group);
       this.fireLights.push(...this.townDressing.fireLights);
+    }
+    if (eastbrookZone) {
+      this.lavaCrackScatter = buildLavaCrackScatter(
+        this.sim.cfg.seed,
+        eastbrookZone.zMin,
+        eastbrookZone.zMax,
+        WORLD_MAX_X,
+        [
+          { x: eastbrookZone.hub.x, z: eastbrookZone.hub.z, radius: eastbrookZone.hub.radius + 10 },
+          ...eastbrookZone.lakes.map((l) => ({ x: l.x, z: l.z, radius: l.radius + 15 })),
+        ],
+      );
+      setRenderCategory(this.lavaCrackScatter.group, 'lavaCrackScatter');
+      this.scene.add(this.lavaCrackScatter.group);
+      freezeStaticMatrices(this.lavaCrackScatter.group);
     }
     // The impact-site light rides the campfire point-light budget so the visible
     // point-light count stays constant as the player travels (constant
