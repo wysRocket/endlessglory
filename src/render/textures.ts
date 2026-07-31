@@ -333,6 +333,43 @@ export function lavaCrackTexture(): THREE.CanvasTexture {
   });
 }
 
+// A larger, rounder molten lava pool: a dark rock rim around a bright
+// orange-to-yellow radial "liquid" center. Distinct from lavaCrackTexture()'s
+// angular fissure lines, for the bigger, sparser pool layer scattered
+// alongside the crack decals.
+export function lavaPoolTexture(): THREE.CanvasTexture {
+  return makeCanvas(128, (ctx, s) => {
+    ctx.fillStyle = '#241a16';
+    ctx.fillRect(0, 0, s, s);
+    const cx = s / 2,
+      cy = s / 2;
+    for (let i = 0; i < 24; i++) {
+      const x = rnd() * s,
+        y = rnd() * s,
+        w = 6 + rnd() * 16,
+        h = 5 + rnd() * 12;
+      const v = 26 + Math.floor(rnd() * 16);
+      ctx.fillStyle = `rgb(${v + 8},${v},${v - 4})`;
+      ctx.fillRect(x, y, w, h);
+    }
+    const poolR = s * 0.34;
+    const grad = ctx.createRadialGradient(cx, cy, 0, cx, cy, poolR);
+    grad.addColorStop(0, '#ffe9a3');
+    grad.addColorStop(0.35, '#ffb347');
+    grad.addColorStop(0.7, '#e0521c');
+    grad.addColorStop(1, '#6b1f0c');
+    ctx.fillStyle = grad;
+    ctx.beginPath();
+    ctx.arc(cx, cy, poolR, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.strokeStyle = '#2a1712';
+    ctx.lineWidth = s * 0.03;
+    ctx.beginPath();
+    ctx.arc(cx, cy, poolR + s * 0.015, 0, Math.PI * 2);
+    ctx.stroke();
+  });
+}
+
 export function waterNormalish(): THREE.CanvasTexture {
   const tex = makeCanvas(256, (ctx, s) => {
     ctx.fillStyle = '#7f7fff';

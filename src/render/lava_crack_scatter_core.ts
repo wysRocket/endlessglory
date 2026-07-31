@@ -20,6 +20,10 @@ export interface LavaCrackScatterInput {
   /** 0..1, per-cell probability a crack spawns in that cell */
   spawnChance: number;
   exclusions: ExclusionCircle[];
+  /** lower bound of the per-decal scale range (default 1.4, matches the original crack tuning) */
+  scaleMin?: number;
+  /** width of the per-decal scale range added on top of scaleMin (default 1.8) */
+  scaleRange?: number;
 }
 
 export interface LavaCrackPlan {
@@ -31,6 +35,8 @@ export interface LavaCrackPlan {
 
 export function planLavaCracks(input: LavaCrackScatterInput): LavaCrackPlan[] {
   const { zMin, zMax, xHalfWidth, cellSize, spawnChance, exclusions } = input;
+  const scaleMin = input.scaleMin ?? 1.4;
+  const scaleRange = input.scaleRange ?? 1.8;
   const plans: LavaCrackPlan[] = [];
   const cols = Math.floor((xHalfWidth * 2) / cellSize);
   const rows = Math.floor((zMax - zMin) / cellSize);
@@ -47,7 +53,7 @@ export function planLavaCracks(input: LavaCrackScatterInput): LavaCrackPlan[] {
       const blocked = exclusions.some((e) => Math.hypot(x - e.x, z - e.z) < e.radius);
       if (blocked) continue;
       const rot = hash2(col, row, 0x3c4d5e) * Math.PI * 2;
-      const scale = 1.4 + hash2(col, row, 0x4d5e6f) * 1.8;
+      const scale = scaleMin + hash2(col, row, 0x4d5e6f) * scaleRange;
       plans.push({ x, z, rot, scale });
     }
   }

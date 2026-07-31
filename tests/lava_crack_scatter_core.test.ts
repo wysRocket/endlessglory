@@ -48,4 +48,21 @@ describe('planLavaCracks', () => {
       expect(p.scale).toBeGreaterThan(0);
     }
   });
+
+  it('defaults to the original 1.4-3.2 scale range when scaleMin/scaleRange are omitted', () => {
+    const plan = planLavaCracks(BASE_INPUT);
+    for (const p of plan) {
+      expect(p.scale).toBeGreaterThanOrEqual(1.4);
+      expect(p.scale).toBeLessThanOrEqual(3.2);
+    }
+  });
+
+  it('honors a custom scaleMin/scaleRange for larger decals (e.g. lava pools)', () => {
+    const plan = planLavaCracks({ ...BASE_INPUT, scaleMin: 4.5, scaleRange: 3.0 });
+    expect(plan.length).toBeGreaterThan(0);
+    for (const p of plan) {
+      expect(p.scale).toBeGreaterThanOrEqual(4.5);
+      expect(p.scale).toBeLessThanOrEqual(7.5);
+    }
+  });
 });

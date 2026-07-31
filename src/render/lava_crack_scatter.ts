@@ -1,48 +1,47 @@
-// Thin painter for the Eastbrook Scar lava-crack ground scatter: reads the
-// plan from lava_crack_scatter_core.ts and builds the actual Three.js
-// geometry. One instanced mesh for every crack decal (single draw call)
-// plus one small glow sprite per decal, reusing the same radialGlowTexture()
-// additive-sprite pattern already shipped for the town dressing's lanterns
-// and skyline landmark.
+// Thin painter for the Eastbrook Scar lava ground scatter: reads plans from
+// lava_crack_scatter_core.ts and builds the actual Three.js geometry. Two
+// decal layers share one instancing helper: small, dense crack fissures and
+// larger, sparser molten pools. Each instanced mesh is one draw call
+// regardless of count; each decal also gets a glow sprite, reusing the same
+// radialGlowTexture() additive-sprite pattern already shipped for the town
+// dressing's lanterns and skyline landmark.
 
 import * as THREE from 'three';
 import { terrainHeight } from '../sim/world';
 import { surfaceMat } from './gfx';
-import { type ExclusionCircle, planLavaCracks } from './lava_crack_scatter_core';
-import { lavaCrackTexture, radialGlowTexture } from './textures';
+import {
+  type ExclusionCircle,
+  type LavaCrackPlan,
+  planLavaCracks,
+} from './lava_crack_scatter_core';
+import { lavaCrackTexture, lavaPoolTexture, radialGlowTexture } from './textures';
 
 export interface LavaCrackScatterView {
   group: THREE.Group;
 }
 
-const CELL_SIZE = 42;
+const CRACK_CELL_SIZE = 42;
 // One instanced draw call regardless of count, plus a handful of cheap
 // sprites: a fixed, tier-independent density is simple and plenty cheap at
-// this scale (roughly a dozen decals across the whole zone).
-const SPAWN_CHANCE = 0.18;
+// this scale.
+const CRACK_SPAWN_CHANCE = 0.32;
 
-export function buildLavaCrackScatter(
+const POOL_CELL_SIZE = 95;
+const POOL_SPAWN_CHANCE = 0.15;
+const POOL_SCALE_MIN = 4.5;
+const POOL_SCALE_RANGE = 3.0;
+
+function addDecalLayer(
+  group: THREE.Group,
   seed: number,
-  zMin: number,
-  zMax: number,
-  xHalfWidth: number,
-  exclusions: ExclusionCircle[],
-): LavaCrackScatterView {
-  const group = new THREE.Group();
-  group.name = 'lavaCrackScatter';
+  texture: THREE.Texture,
+  glowMat: THREE.SpriteMaterial,
+  glowScaleMult: number,
+  plan: LavaCrackPlan[],
+): void {
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
-
-  const plan = planLavaCracks({
-    zMin,
-    zMax,
-    xHalfWidth,
-    cellSize: CELL_SIZE,
-    spawnChance: SPAWN_CHANCE,
-    exclusions,
-  });
-
   if (plan.length > 0) {
-    const mat = surfaceMat({ map: lavaCrackTexture(), roughness: 0.85 });
+    const mat = surfaceMat({ map: texture, roughness: 0.85 });
     const geo = new THREE.PlaneGeometry(1, 1);
     geo.rotateX(-Math.PI / 2);
     const mesh = new THREE.InstancedMesh(geo, mat, plan.length);
@@ -61,6 +60,42 @@ export function buildLavaCrackScatter(
     mesh.receiveShadow = true;
     group.add(mesh);
   }
+  for (const p of plan) {
+    const glow = new THREE.Sprite(glowMat);
+    glow.scale.setScalar(p.scale * glowScaleMult);
+    glow.position.set(p.x, ground(p.x, p.z) + 0.15, p.z);
+    group.add(glow);
+  }
+}
+
+export function buildLavaCrackScatter(
+  seed: number,
+  zMin: number,
+  zMax: number,
+  xHalfWidth: number,
+  exclusions: ExclusionCircle[],
+): LavaCrackScatterView {
+  const group = new THREE.Group();
+  group.name = 'lavaCrackScatter';
+
+  const crackPlan = planLavaCracks({
+    zMin,
+    zMax,
+    xHalfWidth,
+    cellSize: CRACK_CELL_SIZE,
+    spawnChance: CRACK_SPAWN_CHANCE,
+    exclusions,
+  });
+  const poolPlan = planLavaCracks({
+    zMin,
+    zMax,
+    xHalfWidth,
+    cellSize: POOL_CELL_SIZE,
+    spawnChance: POOL_SPAWN_CHANCE,
+    exclusions,
+    scaleMin: POOL_SCALE_MIN,
+    scaleRange: POOL_SCALE_RANGE,
+  });
 
   const glowMat = new THREE.SpriteMaterial({
     map: radialGlowTexture(),
@@ -69,12 +104,9 @@ export function buildLavaCrackScatter(
     depthWrite: false,
     blending: THREE.AdditiveBlending,
   });
-  for (const p of plan) {
-    const glow = new THREE.Sprite(glowMat);
-    glow.scale.setScalar(p.scale * 1.3);
-    glow.position.set(p.x, ground(p.x, p.z) + 0.15, p.z);
-    group.add(glow);
-  }
+
+  addDecalLayer(group, seed, lavaCrackTexture(), glowMat, 1.3, crackPlan);
+  addDecalLayer(group, seed, lavaPoolTexture(), glowMat, 1.6, poolPlan);
 
   return { group };
 }
