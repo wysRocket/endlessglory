@@ -745,6 +745,13 @@ export interface SurfaceMatOpts {
   emissive?: number;
   emissiveIntensity?: number;
   side?: THREE.Side;
+  /**
+   * Alpha cut-out threshold: fragments below it are discarded outright. Lets a
+   * decal or card carry its own silhouette in the map's alpha without paying
+   * for blending or draw-order sorting. Defaults to Three's own 0 (no cut-out),
+   * so every existing caller is unchanged.
+   */
+  alphaTest?: number;
   /** subtle cool fresnel rim glow — sells silhouettes against dark ground */
   rim?: boolean;
 }
@@ -799,6 +806,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,
         side: opts.side ?? THREE.FrontSide,
+        alphaTest: opts.alphaTest ?? 0,
       })
     : new THREE.MeshLambertMaterial({
         color: opts.color ?? 0xffffff,
@@ -807,6 +815,7 @@ export function surfaceMat(opts: SurfaceMatOpts): THREE.Material {
         emissive: opts.emissive ?? 0x000000,
         emissiveIntensity: opts.emissiveIntensity ?? 1,
         side: opts.side ?? THREE.FrontSide,
+        alphaTest: opts.alphaTest ?? 0,
       });
   if (opts.rim && GFX.standardMaterials) addRimGlow(mat);
   matCache.set(key, mat);

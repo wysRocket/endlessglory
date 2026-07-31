@@ -41,7 +41,12 @@ function addDecalLayer(
 ): void {
   const ground = (x: number, z: number) => terrainHeight(x, z, seed);
   if (plan.length > 0) {
-    const mat = surfaceMat({ map: texture, roughness: 0.85 });
+    // alphaTest, not blending: the decal textures carry their own irregular
+    // silhouette in the map's alpha, so the transparent corners are discarded
+    // and the quad's square edge never shows against the ground. Cut-out keeps
+    // depth writes intact, so these need no sorting against each other or the
+    // glow sprites layered over them.
+    const mat = surfaceMat({ map: texture, roughness: 0.85, alphaTest: 0.5 });
     const geo = new THREE.PlaneGeometry(1, 1);
     geo.rotateX(-Math.PI / 2);
     const mesh = new THREE.InstancedMesh(geo, mat, plan.length);

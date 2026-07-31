@@ -297,12 +297,39 @@ export function plazaEmblemTexture(): THREE.CanvasTexture {
   });
 }
 
+// Clip subsequent drawing to an irregular closed blob centred in the canvas.
+// Ground decals are drawn on a square quad, so anything painted edge to edge
+// shows the quad's rectangle sitting on the terrain. Confining the paint to a
+// wobbling silhouette leaves the corners fully transparent, and the consuming
+// material's alphaTest then cuts a natural, angular patch of broken ground:
+// no blending, no sort order, and no perfect-circle tell either. The caller
+// owns ctx.save()/ctx.restore() around this.
+function clipToBlob(ctx: CanvasRenderingContext2D, s: number, baseR: number, wobble: number): void {
+  const cx = s / 2;
+  const cy = s / 2;
+  const steps = 20;
+  const radii: number[] = [];
+  for (let i = 0; i < steps; i++) radii.push(baseR * (1 - wobble + rnd() * wobble * 2));
+  ctx.beginPath();
+  for (let i = 0; i < steps; i++) {
+    const a = (i / steps) * Math.PI * 2;
+    const x = cx + Math.cos(a) * radii[i];
+    const y = cy + Math.sin(a) * radii[i];
+    if (i === 0) ctx.moveTo(x, y);
+    else ctx.lineTo(x, y);
+  }
+  ctx.closePath();
+  ctx.clip();
+}
+
 // Eastbrook Scar lava-crack ground decal: dark cracked rock with a few
 // bright orange fissure lines. Used with a warm glow sprite layered on top
 // (see lava_crack_scatter.ts) rather than an emissive map, so no change to
 // the shared surfaceMat() material factory is needed.
 export function lavaCrackTexture(): THREE.CanvasTexture {
   return makeCanvas(128, (ctx, s) => {
+    ctx.save();
+    clipToBlob(ctx, s, s * 0.4, 0.24);
     ctx.fillStyle = '#241a16';
     ctx.fillRect(0, 0, s, s);
     for (let i = 0; i < 40; i++) {
@@ -330,6 +357,7 @@ export function lavaCrackTexture(): THREE.CanvasTexture {
     ctx.moveTo(cx - 10, cy - 5);
     ctx.lineTo(cx - 2, cy + 18);
     ctx.stroke();
+    ctx.restore();
   });
 }
 
@@ -339,6 +367,10 @@ export function lavaCrackTexture(): THREE.CanvasTexture {
 // alongside the crack decals.
 export function lavaPoolTexture(): THREE.CanvasTexture {
   return makeCanvas(128, (ctx, s) => {
+    ctx.save();
+    // Wider than the crack blob and less wobbly: the pool's own rim ring sits
+    // at 0.355s, so the silhouette has to clear it or the ring gets shaved.
+    clipToBlob(ctx, s, s * 0.44, 0.14);
     ctx.fillStyle = '#241a16';
     ctx.fillRect(0, 0, s, s);
     const cx = s / 2,
@@ -367,6 +399,7 @@ export function lavaPoolTexture(): THREE.CanvasTexture {
     ctx.beginPath();
     ctx.arc(cx, cy, poolR + s * 0.015, 0, Math.PI * 2);
     ctx.stroke();
+    ctx.restore();
   });
 }
 
