@@ -37,14 +37,19 @@ export class LoginPainter {
     ensureTurnstile(this.turnstileHandle, TURNSTILE_SITEKEY, TURNSTILE_CONTAINER_ID);
   }
 
-  private async submit(username: string, password: string, code: string): Promise<void> {
+  private async submit(
+    username: string,
+    password: string,
+    code: string,
+    email: string,
+  ): Promise<void> {
     this.state = { ...this.state, username, password, error: null };
     try {
       const token = turnstileToken(TURNSTILE_SITEKEY, this.turnstileHandle);
       const result =
         this.state.mode === 'login'
           ? await this.api.login(username, password, token, code)
-          : await this.api.register(username, password, '', token);
+          : await this.api.register(username, password, email, token);
       if ('twoFactorRequired' in result && result.twoFactorRequired) {
         this.state = { ...this.state, twoFactorRequired: true };
         this.render();
@@ -66,7 +71,8 @@ export class LoginPainter {
       <form class="arc-card" id="dashboard-login-form">
         <h1 class="arc-title">${t(isLogin ? 'dashboard.login.title' : 'dashboard.register.title')}</h1>
         <label>${t('dashboard.login.username')}<input name="username" autocomplete="username" /></label>
-        <label>${t('dashboard.login.password')}<input name="password" type="password" autocomplete="current-password" /></label>
+        <label>${t('dashboard.login.password')}<input name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" /></label>
+        ${isLogin ? '' : `<label>${t('dashboard.register.email')}<input name="email" type="email" autocomplete="email" required /></label>`}
         ${model.showTwoFactorField ? `<label>${t('dashboard.login.twoFactorLabel')}<input name="code" inputmode="numeric" maxlength="14" /></label>` : ''}
         <div id="${TURNSTILE_CONTAINER_ID}"></div>
         ${model.errorText ? `<div class="dashboard-login-error">${model.errorText}</div>` : ''}
@@ -82,6 +88,7 @@ export class LoginPainter {
         String(data.get('username') ?? ''),
         String(data.get('password') ?? ''),
         String(data.get('code') ?? ''),
+        String(data.get('email') ?? ''),
       );
     });
     this.container.querySelector('#dashboard-login-toggle-mode')?.addEventListener('click', () => {
