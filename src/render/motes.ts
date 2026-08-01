@@ -35,7 +35,6 @@ const MOTE_TINT: Record<BiomeId, number> = {
 
 const RADIUS = 26; // motes live within this ring of the player
 const FLOOR = 0.6; // min height above the sampled ground
-const CEIL = 3.4; // max height above the sampled ground (classic baseline)
 
 // deterministic per-render RNG (render convention: never Math.random)
 function mulberry32(seed: number): () => number {
