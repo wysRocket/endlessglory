@@ -841,15 +841,17 @@ export class LoginPainter {
 
   private render(): void {
     const model = loginFormModel(this.state);
+    const isLogin = model.mode === 'login';
     this.container.innerHTML = `
       <form class="arc-card" id="dashboard-login-form">
-        <h1 class="arc-title">${t(this.state.mode === 'login' ? 'dashboard.login.title' : 'dashboard.register.title')}</h1>
+        <h1 class="arc-title">${t(isLogin ? 'dashboard.login.title' : 'dashboard.register.title')}</h1>
         <label>${t('dashboard.login.username')}<input name="username" autocomplete="username" /></label>
         <label>${t('dashboard.login.password')}<input name="password" type="password" autocomplete="current-password" /></label>
         ${model.showTwoFactorField ? `<label>${t('dashboard.login.twoFactorLabel')}<input name="code" inputmode="numeric" maxlength="14" /></label>` : ''}
         <div id="${TURNSTILE_CONTAINER_ID}"></div>
         ${model.errorText ? `<div class="dashboard-login-error">${model.errorText}</div>` : ''}
-        <button type="submit" ${model.submitDisabled ? 'disabled' : ''}>${t('dashboard.login.submit')}</button>
+        <button type="submit" ${model.submitDisabled ? 'disabled' : ''}>${t(isLogin ? 'dashboard.login.submit' : 'dashboard.register.submit')}</button>
+        ${isLogin ? `<p>${t('dashboard.login.registerPrompt')} <button type="button" id="dashboard-login-toggle-mode">${t('dashboard.login.registerLink')}</button></p>` : ''}
       </form>
     `;
     const form = this.container.querySelector<HTMLFormElement>('#dashboard-login-form');
@@ -862,9 +864,22 @@ export class LoginPainter {
         String(data.get('code') ?? ''),
       );
     });
+    this.container.querySelector('#dashboard-login-toggle-mode')?.addEventListener('click', () => {
+      this.state = { ...this.state, mode: 'register', error: null };
+      this.render();
+    });
   }
 }
 ```
+
+Without the mode toggle above, `register` mode is unreachable through the UI
+(nothing ever sets `state.mode` to `'register'`), which would leave
+`Api.register` as dead code despite Task 3 adding
+`dashboard.login.registerPrompt`/`registerLink` for exactly this purpose, and
+the submit button would always read "Sign in" even when it should read
+"Create account". The toggle button is shown only in login mode (register
+mode has no way back today; that is an acceptable v1 gap, not a defect, since
+a mis-clicked toggle just needs a page reload).
 
 - [ ] **Step 6: Verify**
 
