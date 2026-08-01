@@ -260,11 +260,17 @@ commit establishes the entry shape."
 **Files:**
 - Create: `src/net/turnstile.ts`
 - Modify: `src/main.ts`
-- Test: `tests/turnstile.test.ts` (create)
+- Test: `tests/net_turnstile.test.ts` (create)
+
+Note: an unrelated `tests/turnstile.test.ts` already exists on `main` (10 tests
+covering `server/turnstile.ts`'s server-side `verifyTurnstile`). The new test
+for this client-side module is named `tests/net_turnstile.test.ts` to avoid
+colliding with it, following this repo's existing `net_<module>.test.ts`
+convention for `src/net/` pure-core tests.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `tests/turnstile.test.ts`:
+Create `tests/net_turnstile.test.ts`:
 
 ```ts
 import { describe, expect, it, vi } from 'vitest';
@@ -293,7 +299,7 @@ always been covered.
 
 - [ ] **Step 2: Run it and confirm it fails**
 
-Run: `npx vitest run tests/turnstile.test.ts`
+Run: `npx vitest run tests/net_turnstile.test.ts`
 
 Expected: FAIL, `Cannot find module '../src/net/turnstile'`.
 
@@ -382,7 +388,7 @@ module safely.
 
 - [ ] **Step 4: Run the test and confirm it passes**
 
-Run: `npx vitest run tests/turnstile.test.ts`
+Run: `npx vitest run tests/net_turnstile.test.ts`
 
 Expected: PASS, 2 tests.
 
@@ -492,14 +498,14 @@ missed; find it with `grep -n "ensureTurnstile\|turnstileToken\|resetTurnstile" 
 and confirm every hit is either one of the three wrapper definitions above or an
 unchanged zero-argument call.
 
-Run: `npx vitest run tests/turnstile.test.ts`
+Run: `npx vitest run tests/net_turnstile.test.ts`
 
 Expected: PASS, 2 tests, unchanged from step 4.
 
 - [ ] **Step 7: Format**
 
 ```bash
-npx @biomejs/biome check --write src/main.ts src/net/turnstile.ts tests/turnstile.test.ts
+npx @biomejs/biome check --write src/main.ts src/net/turnstile.ts tests/net_turnstile.test.ts
 ```
 
 Keep any auto-fix.
@@ -507,7 +513,7 @@ Keep any auto-fix.
 - [ ] **Step 8: Commit**
 
 ```bash
-git add src/main.ts src/net/turnstile.ts tests/turnstile.test.ts
+git add src/main.ts src/net/turnstile.ts tests/net_turnstile.test.ts
 git commit -m "refactor(net): extract Cloudflare Turnstile into a shared module
 
 Api.login and Api.register both take a turnstileToken, and the server enforces
@@ -1785,7 +1791,7 @@ Add `'src/dashboard/leaderboard_view.ts',` to `UI_PURE_CORES`.
 - [ ] **Step 8: Run every dashboard test together**
 
 ```bash
-npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_shell.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters_deeds.test.ts
+npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/net_turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_shell.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters_deeds.test.ts
 ```
 
 Expected: every file PASSES.
