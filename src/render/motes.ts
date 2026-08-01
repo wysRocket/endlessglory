@@ -3,6 +3,8 @@ import { DUNGEON_X_THRESHOLD, WORLD_MAX_X, WORLD_MAX_Z, WORLD_MIN_Z } from '../s
 import type { BiomeId } from '../sim/types';
 import { isInSowfieldShell } from '../sim/vale_cup_layout';
 import { terrainHeight, waterLevelAt, zoneBiomeAt } from '../sim/world';
+import { ACTIVE_VISUAL_THEME } from '../visual_theme';
+import { moteProfileForTheme } from './emberwood/motes';
 import { GFX } from './gfx';
 
 // ---------------------------------------------------------------------------
@@ -33,7 +35,7 @@ const MOTE_TINT: Record<BiomeId, number> = {
 
 const RADIUS = 26; // motes live within this ring of the player
 const FLOOR = 0.6; // min height above the sampled ground
-const CEIL = 3.4; // max height above the sampled ground
+const CEIL = 3.4; // max height above the sampled ground (classic baseline)
 
 // deterministic per-render RNG (render convention: never Math.random)
 function mulberry32(seed: number): () => number {
@@ -70,7 +72,8 @@ export function buildMotes(seed: number): MotesView {
 
   // count scales with tier — cheap THREE.Points, so high/ultra can afford a
   // dense shimmer while low stays sparse
-  const count = GFX.standardMaterials ? 80 : 30;
+  const profile = moteProfileForTheme(ACTIVE_VISUAL_THEME);
+  const count = Math.round((GFX.standardMaterials ? 80 : 30) * profile.countScale);
   const rng = mulberry32(seed ^ 0x57e3);
 
   const positions = new Float32Array(count * 3);
@@ -101,7 +104,7 @@ export function buildMotes(seed: number): MotesView {
     homeZ[i] = z;
     baseY[i] = h;
     phase[i] = rng() * Math.PI * 2;
-    bobAmp[i] = FLOOR + rng() * (CEIL - FLOOR);
+    bobAmp[i] = FLOOR + rng() * (profile.ceil - FLOOR);
     positions[i * 3] = x;
     positions[i * 3 + 1] = h + bobAmp[i];
     positions[i * 3 + 2] = z;
