@@ -1,0 +1,15 @@
+/* src/dashboard/styles.css: the dashboard entry's own style barrel, following
+   the same per-entry pattern as src/guide/styles.css and src/admin/admin.css.
+   Imports the Arcane Surface overlay from track 0; both files are inert unless
+   the document root carries data-surface="arcane" (set in dashboard.html). */
+
+@import '../styles/arcane.tokens.css';
+@import '../styles/arcane.components.css';
+
+body {
+  background: var(--arc-bg);
+  color: var(--arc-text);
+  font-family: var(--arc-font-body);
+  margin: 0;
+  min-height: 100vh;
+}

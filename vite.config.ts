@@ -382,6 +382,7 @@ export default defineConfig({
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
         guide: fileURLToPath(new URL('guide.html', import.meta.url)),
         editor: fileURLToPath(new URL('editor.html', import.meta.url)),
+        dashboard: fileURLToPath(new URL('dashboard.html', import.meta.url)),
         walletHandoff: fileURLToPath(new URL('wallet-handoff.html', import.meta.url)),
       },
       output: {
