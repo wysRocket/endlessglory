@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { lightingForTheme } from '../src/render/emberwood/lighting';
-import { terrainPaletteForTheme, foliagePaletteForTheme } from '../src/render/emberwood/palette';
+import { foliagePaletteForTheme, terrainPaletteForTheme } from '../src/render/emberwood/palette';
 
 describe('Emberwood render policy', () => {
   describe('lighting', () => {
@@ -16,15 +16,16 @@ describe('Emberwood render policy', () => {
       expect(classic.hemiIntensity).toBe(0.45);
     });
 
-    it('returns emberwood lighting with smoke-blue fog and warmer sun', () => {
+    it('returns emberwood night lighting: dim cool key, teal sky over ember ground', () => {
       const emberwood = lightingForTheme('emberwood');
-      expect(emberwood.fogColor).toBe(0x607487);
-      expect(emberwood.fogNear).toBe(95);
-      expect(emberwood.fogFar).toBe(340);
-      expect(emberwood.sunColor).toBe(0xffd6a3);
-      expect(emberwood.sunIntensity).toBe(2.8);
-      expect(emberwood.hemiColor).toBe(0xdcefff);
-      expect(emberwood.hemiIntensity).toBe(0.45);
+      expect(emberwood.fogColor).toBe(0x141d2b);
+      expect(emberwood.fogNear).toBe(55);
+      expect(emberwood.fogFar).toBe(210);
+      expect(emberwood.sunColor).toBe(0xbcd2f0);
+      expect(emberwood.sunIntensity).toBe(0.55);
+      expect(emberwood.hemiColor).toBe(0x2a4a68);
+      expect(emberwood.hemiGround).toBe(0x6b3520);
+      expect(emberwood.hemiIntensity).toBe(0.85);
     });
   });
 
