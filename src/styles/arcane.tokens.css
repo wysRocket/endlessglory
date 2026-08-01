@@ -29,7 +29,7 @@
       why the accents here are confined to structural chrome. */
 
 @layer tokens {
-  :root[data-surface='arcane'] {
+  :root[data-surface="arcane"] {
     /* Ground and surfaces */
     --arc-bg: #030508;
     --arc-surface: #0a0d14;
@@ -72,7 +72,7 @@
          tokens.css. The guide entry, for instance, defines its own font stack and
          never loads it. Without the tail this overlay would fall back to the
          browser default there. */
-    --arc-font-display: var(--font-brand, var(--font-display, 'Cinzel', Georgia, serif));
-    --arc-font-body: var(--font-ui, 'Alegreya Sans', system-ui, sans-serif);
+    --arc-font-display: var(--font-brand, var(--font-display, "Cinzel", Georgia, serif));
+    --arc-font-body: var(--font-ui, "Alegreya Sans", system-ui, sans-serif);
   }
 }
