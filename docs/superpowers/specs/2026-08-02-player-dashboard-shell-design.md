@@ -39,7 +39,7 @@ route is needed for 1a:
 | Page | Backing endpoint(s) | Already consumed by |
 |---|---|---|
 | Profile | `/api/me/characters`, `/api/characters/:id/sheet` | the in-game character sheet |
-| Collection | the deeds/achievements system (`server/deeds*.ts`) | the in-game deeds board |
+| Collection | new `GET /api/characters/:id/deeds` (paginated `character_deeds`) | see Section 2a: the in-game board reads a live WebSocket snapshot the dashboard cannot |
 | Leaderboard | `/api/leaderboard`, `/api/arena/leaderboard` | the in-game high scores view |
 
 This is why 1a is scoped the way it is: it is entirely a new PRESENTATION surface
@@ -57,6 +57,29 @@ The dashboard follows this template rather than inventing a new one.
 bundle"). Reusing it for the player dashboard would spread the one framework
 exception into a second surface, which the repo's own conventions forbid. The
 dashboard is vanilla TypeScript, same as the game, guide, and editor entries.
+
+## 2a. Correction found while planning: Collection needs one new endpoint
+
+Section 2's claim that Collection is "already consumed by the in-game deeds
+board" understated what that board actually reads. The in-game view gets the
+FULL earned-deeds map (`deedsEarned: ReadonlyMap<string, string>`, per
+`src/world_api/deeds.ts`) live over the WebSocket snapshot the game already
+holds open. A standalone dashboard has no such connection. The only REST-facing
+deeds data today is `SheetDeedRecent[]` inside `/api/characters/:id/sheet`,
+capped at `SHEET_RECENT_DEEDS = 5` (`server/character_sheet.ts`). Five recent
+entries would make Collection a materially thinner page than the name promises.
+
+The fix is small enough to keep within 1a rather than deferring the whole page:
+Postgres already has an indexed `character_deeds` table
+(`character_deeds_character_earned` on `(character_id, earned_at DESC)`,
+`server/db.ts`), which is exactly the shape a paginated full listing needs. So
+1a adds ONE new read-only route, `GET /api/characters/:id/deeds`, following the
+existing `npm run new:endpoint` `RouteDef` pattern, querying that table with the
+same shape the sheet's 5-recent fetch already uses, just without the limit and
+with real pagination.
+
+This is the one exception to "no new server route for 1a" stated in Section 3.
+Every other claim in Section 2 stands: Profile and Leaderboard need nothing new.
 
 ## 3. Scope
 
@@ -189,13 +212,23 @@ works today.
 read-only pages. Any page needing a new server route or a write action belongs
 in a later track, not folded into 1a because it seems small.
 
-**The login form duplicates validation logic that already lives in
-`src/main.ts`.** The game's landing page already has username/password rules,
-2FA handling, and error copy. The implementation plan should extract shared
-validation into something both entries import rather than hand-copying it, if
-that extraction is small; if it is not small, duplicating once with a comment
-pointing at the original is acceptable rather than a large unrelated refactor of
-the game's landing page. This is a judgment call for the plan, not resolved here.
+**The login form duplicates logic that already lives in `src/main.ts`, resolved:
+extract Cloudflare Turnstile, not the whole form.** `Api.login()` and
+`Api.register()` both take a `turnstileToken` parameter, and the server enforces
+it in production (`server/auth_routes.ts`'s injected `passesTurnstile`, skipped
+only when no secret is configured, i.e. dev/test). Without a widget, every
+dashboard login attempt would be rejected in production exactly as a bot's
+would. `src/main.ts` already has this as one self-contained block
+(`TURNSTILE_SITEKEY`, `ensureTurnstile`, `turnstileToken`, `resetTurnstile`,
+about 35 lines, module-scoped state, one external dependency on `DESKTOP_APP`)
+rendering into a `#cf-turnstile-container` div, with the loader script already
+in `index.html`. This is exactly the "small, extract it" case the original risk
+anticipated: the plan extracts it into a shared module both `main.ts` and the
+dashboard's login view import, and `dashboard.html` gets its own copy of the
+Turnstile loader `<script>` tag and container div. The rest of the login form
+(username/password fields, error copy, 2FA code entry) is small enough per-entry
+that this spec does NOT require extracting it; the plan may duplicate it with a
+short comment pointing at `src/main.ts`'s equivalent.
 
 ## 9. The wider program
 
@@ -212,5 +245,13 @@ the game's landing page. This is a judgment call for the plan, not resolved here
 Scope, the auth model (own login form, not a redirect), and full responsiveness
 from day one were selected by the user on 2026-08-02. The 1a/1b split was
 proposed during brainstorming on the grounds that 1a ships something real and
-lookable-at with zero new backend work, while 1b's economy-proxy integration is
-real work best done against a proven foundation; the user approved the split.
+lookable-at with only one small new endpoint (Section 2a), while 1b's
+economy-proxy integration is real work best done against a proven foundation;
+the user approved the split.
+
+**Post-approval correction (2026-08-02):** Section 2a's new endpoint was found
+while gathering exact code references for the implementation plan, after this
+approval. It does not change the shape of 1a: Profile and Leaderboard remain
+untouched, and the new route follows the repo's existing scaffolded endpoint
+pattern over an already-indexed table. Noted here rather than silently folded
+into the plan.
