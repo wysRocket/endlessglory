@@ -781,7 +781,7 @@ Create `src/dashboard/login_painter.ts`:
 // Api.login/register calls, and all localization (t()), mirroring how
 // nameplate_painter.ts owns localization for its pure core's decisions.
 
-import { Api, isAuthError } from '../net/online';
+import type { Api } from '../net/online';
 import {
   ensureTurnstile,
   resetTurnstile,
@@ -791,6 +791,11 @@ import {
 import { t } from '../ui/i18n';
 import { userFacingApiError } from '../ui/api_error_i18n';
 import { type LoginFormState, loginFormModel } from './login_view';
+
+// isAuthError is deliberately NOT imported here: userFacingApiError already
+// resolves both auth and non-auth error codes on its own, so a ternary
+// branching on isAuthError with the same call on both arms would be dead
+// weight. See src/ui/api_error_i18n.ts.
 
 const TURNSTILE_SITEKEY = String(import.meta.env.VITE_TURNSTILE_SITEKEY ?? '');
 const TURNSTILE_CONTAINER_ID = 'dashboard-cf-turnstile-container';
@@ -816,14 +821,19 @@ export class LoginPainter {
     ensureTurnstile(this.turnstileHandle, TURNSTILE_SITEKEY, TURNSTILE_CONTAINER_ID);
   }
 
-  private async submit(username: string, password: string, code: string): Promise<void> {
+  private async submit(
+    username: string,
+    password: string,
+    code: string,
+    email: string,
+  ): Promise<void> {
     this.state = { ...this.state, username, password, error: null };
     try {
       const token = turnstileToken(TURNSTILE_SITEKEY, this.turnstileHandle);
       const result =
         this.state.mode === 'login'
           ? await this.api.login(username, password, token, code)
-          : await this.api.register(username, password, '', token);
+          : await this.api.register(username, password, email, token);
       if ('twoFactorRequired' in result && result.twoFactorRequired) {
         this.state = { ...this.state, twoFactorRequired: true };
         this.render();
@@ -833,8 +843,7 @@ export class LoginPainter {
       this.onLoggedIn();
     } catch (err) {
       resetTurnstile(this.turnstileHandle);
-      const message = isAuthError(err) ? userFacingApiError(err) : userFacingApiError(err);
-      this.state = { ...this.state, error: message };
+      this.state = { ...this.state, error: userFacingApiError(err) };
       this.render();
     }
   }
@@ -846,7 +855,8 @@ export class LoginPainter {
       <form class="arc-card" id="dashboard-login-form">
         <h1 class="arc-title">${t(isLogin ? 'dashboard.login.title' : 'dashboard.register.title')}</h1>
         <label>${t('dashboard.login.username')}<input name="username" autocomplete="username" /></label>
-        <label>${t('dashboard.login.password')}<input name="password" type="password" autocomplete="current-password" /></label>
+        <label>${t('dashboard.login.password')}<input name="password" type="password" autocomplete="${isLogin ? 'current-password' : 'new-password'}" /></label>
+        ${isLogin ? '' : `<label>${t('dashboard.register.email')}<input name="email" type="email" autocomplete="email" required /></label>`}
         ${model.showTwoFactorField ? `<label>${t('dashboard.login.twoFactorLabel')}<input name="code" inputmode="numeric" maxlength="14" /></label>` : ''}
         <div id="${TURNSTILE_CONTAINER_ID}"></div>
         ${model.errorText ? `<div class="dashboard-login-error">${model.errorText}</div>` : ''}
@@ -862,6 +872,7 @@ export class LoginPainter {
         String(data.get('username') ?? ''),
         String(data.get('password') ?? ''),
         String(data.get('code') ?? ''),
+        String(data.get('email') ?? ''),
       );
     });
     this.container.querySelector('#dashboard-login-toggle-mode')?.addEventListener('click', () => {
@@ -871,6 +882,13 @@ export class LoginPainter {
   }
 }
 ```
+
+The register form needs an email field: `server/auth_routes.ts` rejects
+`POST /api/register` with `EMAIL_INVALID` unless a valid email is supplied.
+Without it, `Api.register`'s `email` argument would always be an empty
+string and registration through the dashboard would always fail
+server-side. The `dashboard.register.email` catalog key added in Task 3
+exists for exactly this field.
 
 Without the mode toggle above, `register` mode is unreachable through the UI
 (nothing ever sets `state.mode` to `'register'`), which would leave
