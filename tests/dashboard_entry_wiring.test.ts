@@ -19,7 +19,7 @@ describe('dashboard entry wiring', () => {
   });
 
   it('the style barrel imports both track-0 arcane files', () => {
-    expect(stylesCss).toContain("@import '../styles/arcane.tokens.css'");
-    expect(stylesCss).toContain("@import '../styles/arcane.components.css'");
+    expect(stylesCss).toContain('@import "../styles/arcane.tokens.css"');
+    expect(stylesCss).toContain('@import "../styles/arcane.components.css"');
   });
 });

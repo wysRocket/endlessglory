@@ -3,8 +3,8 @@
    Imports the Arcane Surface overlay from track 0; both files are inert unless
    the document root carries data-surface="arcane" (set in dashboard.html). */
 
-@import '../styles/arcane.tokens.css';
-@import '../styles/arcane.components.css';
+@import "../styles/arcane.tokens.css";
+@import "../styles/arcane.components.css";
 
 body {
   background: var(--arc-bg);
