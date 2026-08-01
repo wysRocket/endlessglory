@@ -827,7 +827,22 @@ No spec requirement is unimplemented.
 
 **Ordering note:** Task 2 must precede Task 3, because Task 2 exports `MAT_OVERRIDES` and creates the pattern the later selectors follow. Task 4 is independent and could run at any point. Tasks 6 and 7 must be last.
 
-**Known risk:** Task 2 exports a previously private constant from `src/render/props.ts`. That widens that module's public surface by one table. The alternative, duplicating the whole table inside `emberwood/materials.ts`, would guarantee the two copies drift, which is worse. The `adds no keys that classic does not have` test in Task 2 catches accidental divergence.
+**Known risk (RESOLVED during execution, 2026-08-01):** Task 2 originally exported
+`MAT_OVERRIDES` from `src/render/props.ts` and had `emberwood/materials.ts` import it,
+while `props.ts` imported the selector back. That cycle passed every Vitest run, because
+Vite's SSR transform resolves it lazily, and silently broke the shipped Rollup bundle,
+which emitted `materials.ts` first so the `{...MAT_OVERRIDES}` spread read an undefined
+binding. `{...undefined}` is legal and yields `{}`, so Emberwood shipped 1 override
+instead of 19 and lost the entire warm village palette, with a green suite.
+
+Caught by the task-2 implementer inspecting the real emitted chunk rather than trusting
+the tests. Resolved by moving the table into a leaf module, `src/render/prop_materials.ts`,
+which both consumers import and which imports nothing itself. The cycle is gone rather
+than worked around.
+
+**Lesson for the remaining tasks:** a passing Vitest run does not prove module-init order
+in the bundle. Any future task that adds a cross-module constant spread at module scope
+should be checked with `npx vite build` plus chunk inspection, not tests alone.
 
 ---
 
