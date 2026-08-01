@@ -10,8 +10,10 @@ import {
 } from '../sim/dock_layout';
 import { hash2 } from '../sim/rng';
 import { terrainHeight, waterLevel } from '../sim/world';
+import { ACTIVE_VISUAL_THEME } from '../visual_theme';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { materialOverridesForTheme } from './emberwood/materials';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
@@ -222,47 +224,6 @@ export const propPreloadInternalsForTest = {
   preloadPropKeys,
 };
 
-// Per-material look overrides, keyed `${kit}:${name}` (falls back to name).
-// Kenney/Quaternius flat materials need small nudges to sit in our lighting.
-const MAT_OVERRIDES: Record<
-  string,
-  {
-    color?: number;
-    emissive?: number;
-    emissiveIntensity?: number;
-    metalness?: number;
-    roughness?: number;
-  }
-> = {
-  'village:Windows': { emissive: 0x2a3c55, emissiveIntensity: 1.1, roughness: 0.4 },
-  'village:Bell': { metalness: 0.6, roughness: 0.35 },
-  // Emberwood village palette, applied per material so a building still reads
-  // as beams + plaster + tile + stone rather than one flat wash. Warm, muted,
-  // and desaturated to match the Emberwood direction (soot, oak, ember, brass).
-  'village:Wood': { color: 0x6b4a32, roughness: 0.85 },
-  'village:Wood_Side': { color: 0x5c4229, roughness: 0.85 },
-  'village:Wood_Light': { color: 0x9a7a4e, roughness: 0.8 },
-  'village:Plaster': { color: 0xcbb790, roughness: 0.95 },
-  'village:RoofTiles': { color: 0x8c4a33, roughness: 0.8 },
-  'village:Stone': { color: 0x8a8378, roughness: 0.9 },
-  'village:Stone_Light': { color: 0x9c958a, roughness: 0.9 },
-  'village:Stone_Dark': { color: 0x6e675e, roughness: 0.9 },
-  'ore:Stone_Dark': { color: 0xb87333, metalness: 0.45, roughness: 0.5 },
-  // bandit/cult tents: weathered canvas instead of Kenney's toy red
-  'tent:colorRed': { color: 0x9c8662 },
-  'tent:colorRedDark': { color: 0x6e5c42 },
-  // murloc huts: a giant mushroom recolored to read as a woven thatch dome
-  'shroom:colorRed': { color: 0xb29459 },
-  'shroom:_defaultMat': { color: 0xc9b896 },
-  // mine mound: Kenney nature rocks are beige dirt + teal grass - regrade to
-  // granite with a dull moss cap so the pile reads as blasted rock
-  'minerock:dirt': { color: 0x82868a },
-  'minerock:grass': { color: 0x77846a },
-  'minerock:_defaultMat': { color: 0x6f7376 },
-  // graveyard colormap is near-white; knock it toward weathered stone
-  'grave:colormap': { color: 0xd2d2c8 },
-};
-
 // ---------------------------------------------------------------------------
 // Extraction: GLTF scene -> world-baked float-attribute geometry + converted
 // shared materials. Geometries are CLONES - the cached GLTF stays pristine
@@ -303,7 +264,8 @@ function convertMaterial(
   explicitTexture?: () => THREE.Texture,
 ): THREE.Material {
   const s = src as THREE.MeshStandardMaterial; // basic (unlit) shares the fields we read
-  const ov = MAT_OVERRIDES[`${kit}:${s.name}`] ?? MAT_OVERRIDES[s.name];
+  const overrides = materialOverridesForTheme(ACTIVE_VISUAL_THEME);
+  const ov = overrides[`${kit}:${s.name}`] ?? overrides[s.name];
   // hasVertexColors must key the cache: kits share material names between
   // COLOR_0 meshes (trim 'Vertex' props) and colorless ones - a shared
   // vertexColors:true material would render the colorless meshes black
