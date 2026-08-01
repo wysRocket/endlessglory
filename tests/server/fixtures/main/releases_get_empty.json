@@ -1,7 +1,7 @@
 {
   "body": "{\"releases\":[],\"repo\":\"wysRocket/endlessglory\"}",
   "headers": {
-    "content-length": 55,
+    "content-length": 47,
     "content-type": "application/json",
     "cross-origin-opener-policy": "same-origin",
     "cross-origin-resource-policy": "same-origin",
