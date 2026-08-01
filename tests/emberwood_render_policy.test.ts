@@ -145,4 +145,40 @@ describe('Emberwood render policy', () => {
       expect(palette.pine.peaks).toBe(0x6f8a7a);
     });
   });
+  // A night world must not hide the wolf that is eating you.
+  // src/render/emberwood/CLAUDE.md: presentation "never hides actionable gameplay
+  // information". These are floors, not style preferences. If a future tuning pass
+  // needs to cross one, that is a deliberate decision that changes this test on
+  // purpose, not a silent drift.
+  describe('readability floor', () => {
+    const MIN_AMBIENT = 0.7;
+
+    it('keeps every theme and tier above the minimum light contribution', () => {
+      for (const theme of ['classic', 'emberwood'] as const) {
+        for (const [label, policy] of [
+          ['high', lightingForTheme(theme)],
+          ['low', lowTierLightingForTheme(theme)],
+        ] as const) {
+          const total = policy.hemiIntensity + policy.sunIntensity;
+          expect(total, `${theme} ${label} total light`).toBeGreaterThanOrEqual(MIN_AMBIENT);
+        }
+      }
+    });
+
+    it('compensates a dimmer key light with a stronger hemisphere', () => {
+      const classic = lightingForTheme('classic');
+      const ember = lightingForTheme('emberwood');
+      expect(ember.sunIntensity).toBeLessThan(classic.sunIntensity);
+      expect(ember.hemiIntensity).toBeGreaterThan(classic.hemiIntensity);
+    });
+
+    it('never lets fog close inside melee range', () => {
+      // melee and interact ranges sit under 30 units; fog starting inside that would
+      // grey out the thing you are hitting
+      for (const theme of ['classic', 'emberwood'] as const) {
+        expect(lightingForTheme(theme).fogNear, theme).toBeGreaterThan(30);
+        expect(lowTierLightingForTheme(theme).fogNear, `${theme} low`).toBeGreaterThan(30);
+      }
+    });
+  });
 });
