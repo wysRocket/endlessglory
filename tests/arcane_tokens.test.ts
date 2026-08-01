@@ -58,4 +58,42 @@ describe('Arcane Surface tokens', () => {
     // The rule has to survive someone reading only the CSS.
     expect(CSS).toMatch(/not for body text|never body text|non-text only/i);
   });
+
+  // Semantic state colour is off limits here. emberwood.tokens.css sets the
+  // precedent and states why: hostile, friendly, debuff school, team flag, and
+  // resource bar colours stay classic so colourblind reads and state
+  // recognition are unchanged. A web surface has no business redefining them.
+  describe('semantic state colours stay out', () => {
+    const FORBIDDEN = [
+      'hostile',
+      'friendly',
+      'neutral',
+      'debuff',
+      'buff',
+      'team',
+      'faction',
+      '--hp',
+      '--mana',
+      '--rage',
+      '--energy',
+      'health',
+      'resource',
+    ];
+
+    it('defines no semantic state token', () => {
+      const declared = [...CSS.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]);
+      const offenders = declared.filter((name) => FORBIDDEN.some((bad) => name.includes(bad)));
+      expect(offenders, `state tokens must not be redefined here: ${offenders.join(', ')}`).toEqual(
+        [],
+      );
+    });
+
+    it('every token it does define is namespaced --arc-', () => {
+      const declared = [...CSS.matchAll(/(--[a-z0-9-]+)\s*:/g)].map((m) => m[1]);
+      expect(declared.length).toBeGreaterThan(0);
+      for (const name of declared) {
+        expect(name, `${name} escapes the --arc- namespace`).toMatch(/^--arc-/);
+      }
+    });
+  });
 });
