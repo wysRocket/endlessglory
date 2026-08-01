@@ -58,6 +58,32 @@ significant-contributor name glow lives there too. Narrow helpers:
 `nameplate_combo/threat/projection/declutter.ts` plus `entity_labels.ts`
 (shared localized display names). Drive changes from `tests/nameplate_*.test.ts`.
 
+## Import cycles here FAIL THE BUILD (do not delete the guard)
+`vite.config.ts` throws on any `CIRCULAR_DEPENDENCY` whose cycle involves
+`src/render/`. This is not style policing, and it is not deletable noise.
+
+The incident (2026-08-01, fixed in `98c32c3b4`): `emberwood/materials.ts` imported a
+table from `props.ts` while `props.ts` imported the selector back. **Vitest stayed
+green the whole time**, because it runs through Vite's SSR transform, which resolves
+cycles lazily. The bundler does not: it emitted `materials.ts` first, so a
+module-scope `{...MAT_OVERRIDES}` spread read a binding that was still `undefined`.
+`{...undefined}` is legal and yields `{}`, so the shipped bundle carried **1 material
+override instead of 19**, silently dropping a whole theme's palette. It was found only
+by reading the emitted chunk by hand.
+
+**No test can catch this.** The Vitest layer never exercises the bundler's module
+ordering, so the build is the only place it is visible. Hence a build-time guard.
+
+- **Fix a cycle by extracting the shared value into a LEAF module** both sides import.
+  Reference: `prop_materials.ts` (zero imports of its own) feeding both `props.ts` and
+  `emberwood/materials.ts`.
+- The guard is scoped to `src/render/` because a survey found ~30 pre-existing cycles
+  in `node_modules` and one in `src/sim/delves/` (`runs.ts` with
+  `drowned_litany_rite.ts`). Widening it means fixing that delves cycle first.
+- Enabling detection is half the guard: the bundler's `checks.circularDependency`
+  defaults to **false**, so an `onwarn` handler on its own would catch nothing and
+  merely look like protection.
+
 ## gfx.ts: the shared core (read this before touching any subsystem)
 - **`GFX` quality tiers** (`low`/`medium`/`high`/`ultra`). Every tier-dependent knob lives
   here, not in scattered ternaries. The renderer MUST call `initGfxTier(webgl)`

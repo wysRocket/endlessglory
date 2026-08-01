@@ -274,6 +274,34 @@ function musicEditorSavePlugin() {
   };
 }
 
+// Fail the build on an import cycle inside src/render/.
+//
+// Why this exists (incident, 2026-08-01, fixed in 98c32c3b4): src/render/emberwood/
+// materials.ts imported a table from src/render/props.ts while props.ts imported the
+// selector back. Vitest stayed green throughout, because it runs through Vite's SSR
+// transform, which resolves cycles lazily. The bundler does not: it emitted
+// materials.ts first, so a module-scope `{...MAT_OVERRIDES}` spread read a binding
+// that was still undefined. `{...undefined}` is legal and evaluates to `{}`, so the
+// shipped bundle carried 1 material override instead of 19 and silently dropped a
+// whole theme's palette. It was caught by reading the emitted chunk by hand.
+//
+// No test can catch this class of bug: the Vitest layer never exercises the bundler's
+// module ordering. The build is the only place it is visible, so the guard lives here.
+//
+// Scoped to src/render/ deliberately. A survey of an instrumented build found roughly
+// thirty pre-existing cycles in node_modules (svelte, viem, @reown/appkit,
+// @solana/spl-token, ox, walletconnect) and one in first-party code,
+// src/sim/delves/runs.ts with drowned_litany_rite.ts. Guarding the whole tree would
+// block every build on dependencies we do not control. src/render/ is clean today,
+// so this starts green and stays honest. Widening it means fixing that delves cycle
+// first.
+const CYCLE_GUARD_PATH = 'src/render/';
+
+function isRenderCycle(ids: readonly string[] | undefined, message: string): boolean {
+  const haystack = ids?.length ? ids.join('\n') : message;
+  return haystack.includes(CYCLE_GUARD_PATH);
+}
+
 export default defineConfig({
   base: '/',
   // The Svelte plugin only transforms the standalone admin entry. The testing
@@ -320,6 +348,35 @@ export default defineConfig({
     // bundle or move the resolved-table SHA.
     manifest: true,
     rollupOptions: {
+      // Cycle detection is OFF by default in this bundler, so enabling it is half
+      // the guard: onwarn alone would sit here catching nothing and look like
+      // protection. See the CYCLE_GUARD_PATH note above.
+      checks: { circularDependency: true },
+      onwarn(warning, defaultHandler) {
+        if (warning.code === 'CIRCULAR_DEPENDENCY') {
+          const ids = (warning as { ids?: readonly string[] }).ids;
+          if (isRenderCycle(ids, warning.message ?? '')) {
+            const cycle = ids?.length
+              ? ids.map((id) => id.replace(root, '')).join('\n  -> ')
+              : (warning.message ?? 'unknown cycle');
+            throw new Error(
+              `Import cycle inside ${CYCLE_GUARD_PATH}:\n  -> ${cycle}\n\n` +
+                'This fails the build on purpose. A cycle here is not a style problem: ' +
+                'the bundler picks an emit order, and a module-scope read of a binding ' +
+                'from the other side of the cycle sees undefined. That is silent and ' +
+                'the test suite cannot see it (Vitest resolves cycles lazily), which is ' +
+                'how a theme once shipped with 1 material override instead of 19.\n' +
+                'Fix by moving the shared value into a leaf module both sides import, ' +
+                'as src/render/prop_materials.ts does.',
+            );
+          }
+          // Every other cycle is pre-existing (mostly node_modules, plus
+          // src/sim/delves). Enabling the check made them visible; stay quiet about
+          // them so build output is no noisier than before this guard existed.
+          return;
+        }
+        defaultHandler(warning);
+      },
       input: {
         main: fileURLToPath(new URL('index.html', import.meta.url)),
         admin: fileURLToPath(new URL('admin.html', import.meta.url)),
