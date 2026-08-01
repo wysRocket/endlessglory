@@ -11,10 +11,17 @@ export interface LightingPolicy {
   readonly hemiIntensity: number;
 }
 
+// fogNear/fogFar are the scene's BASE fog distances, the value the fog is built with.
+// They are deliberately the shipped 130/470 rather than BIOME_FOG.vale's 95/340: on the
+// high tier the base only holds until the per-frame easing pulls fog to the current
+// biome preset (~2s), but on the low tier there is no easing, so the base is what a
+// low-tier player looks at all session. fog.far also drives terrain, prop, and foliage
+// culling distance, so this is load-bearing rather than cosmetic. Classic is a shipped
+// look and keeps its shipped numbers.
 const CLASSIC_LIGHTING: LightingPolicy = {
   fogColor: 0xa6c6e0,
-  fogNear: 95,
-  fogFar: 340,
+  fogNear: 130,
+  fogFar: 470,
   sunColor: 0xffedd0,
   sunIntensity: 2.8,
   hemiColor: 0xdcefff,
@@ -39,6 +46,35 @@ const EMBERWOOD_LIGHTING: LightingPolicy = {
   hemiGround: 0x6b3520,
   hemiIntensity: 0.85,
 };
+
+// The low graphics tier draws no shadows and a cheaper sky, so it has always used
+// flatter, brighter light to compensate. Those numbers used to be hardcoded in the
+// renderer, which meant a themed night applied to high tier only: low tier stayed at
+// noon, looked like a different game, and handed low-spec players extra visibility.
+// Keeping the low tier a ROW OF THE SAME POLICY means a theme cannot be added again
+// without deciding what it looks like when shadows are off.
+const CLASSIC_LOW_LIGHTING: LightingPolicy = {
+  ...CLASSIC_LIGHTING,
+  fogColor: 0xb6cddd,
+  fogNear: 150,
+  fogFar: 520,
+  sunColor: 0xfff0d0,
+  sunIntensity: 2.65,
+  hemiIntensity: 0.98,
+};
+
+// Night, flattened: same palette and same fog as the high tier so the world reads as
+// the same place and the same hour, with ambient carrying what the missing shadows and
+// dimmer key would otherwise have shaped.
+const EMBERWOOD_LOW_LIGHTING: LightingPolicy = {
+  ...EMBERWOOD_LIGHTING,
+  sunIntensity: 0.5,
+  hemiIntensity: 1.05,
+};
+
+export function lowTierLightingForTheme(theme: VisualThemeId): LightingPolicy {
+  return theme === 'emberwood' ? EMBERWOOD_LOW_LIGHTING : CLASSIC_LOW_LIGHTING;
+}
 
 // Night draws the world in closer. Applied to each biome's own distances so the
 // relative depth character of each biome survives.

@@ -1,5 +1,9 @@
 import { describe, expect, it } from 'vitest';
-import { lightingForTheme, outdoorFogForTheme } from '../src/render/emberwood/lighting';
+import {
+  lightingForTheme,
+  lowTierLightingForTheme,
+  outdoorFogForTheme,
+} from '../src/render/emberwood/lighting';
 import { foliagePaletteForTheme, terrainPaletteForTheme } from '../src/render/emberwood/palette';
 
 describe('Emberwood render policy', () => {
@@ -7,8 +11,10 @@ describe('Emberwood render policy', () => {
     it('returns classic lighting unchanged', () => {
       const classic = lightingForTheme('classic');
       expect(classic.fogColor).toBe(0xa6c6e0);
-      expect(classic.fogNear).toBe(95);
-      expect(classic.fogFar).toBe(340);
+      // the shipped BASE fog distances the scene is constructed with, preserved
+      // exactly when the constructor stopped hardcoding them (see lighting.ts)
+      expect(classic.fogNear).toBe(130);
+      expect(classic.fogFar).toBe(470);
       expect(classic.sunColor).toBe(0xffedd0);
       expect(classic.sunIntensity).toBe(2.8);
       expect(classic.hemiColor).toBe(0xdcefff);
@@ -26,6 +32,37 @@ describe('Emberwood render policy', () => {
       expect(emberwood.hemiColor).toBe(0x2a4a68);
       expect(emberwood.hemiGround).toBe(0x6b3520);
       expect(emberwood.hemiIntensity).toBe(0.85);
+    });
+  });
+
+  describe('low graphics tier parity', () => {
+    it('gives the low tier its own row per theme', () => {
+      expect(lowTierLightingForTheme('classic').sunIntensity).toBe(2.65);
+      expect(lowTierLightingForTheme('classic').hemiIntensity).toBe(0.98);
+      expect(lowTierLightingForTheme('classic').fogColor).toBe(0xb6cddd);
+    });
+
+    it('keeps the low tier at night when the theme is night', () => {
+      const low = lowTierLightingForTheme('emberwood');
+      const high = lightingForTheme('emberwood');
+      // low tier may be cheaper and flatter, but it must still be NIGHT: a daylight
+      // low tier would both look wrong and hand low-spec players extra visibility.
+      expect(low.sunIntensity).toBeLessThan(1);
+      expect(low.fogColor).toBe(high.fogColor);
+    });
+
+    it('never lets a tier see substantially more than another', () => {
+      for (const theme of ['classic', 'emberwood'] as const) {
+        const low = lowTierLightingForTheme(theme);
+        const high = lightingForTheme(theme);
+        const lowTotal = low.sunIntensity + low.hemiIntensity;
+        const highTotal = high.sunIntensity + high.hemiIntensity;
+        // within 2x of each other; low is allowed to be flatter (it has no shadows)
+        // but not to be a different time of day
+        expect(Math.max(lowTotal, highTotal) / Math.min(lowTotal, highTotal), theme).toBeLessThan(
+          2,
+        );
+      }
     });
   });
 

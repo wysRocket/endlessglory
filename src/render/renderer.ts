@@ -79,7 +79,11 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
-import { lightingForTheme, outdoorFogForTheme } from './emberwood/lighting';
+import {
+  lightingForTheme,
+  lowTierLightingForTheme,
+  outdoorFogForTheme,
+} from './emberwood/lighting';
 import { objectDisplayName } from './entity_labels';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
@@ -1245,12 +1249,11 @@ export class Renderer {
       isHostilePlayer: (e) => this.isHostilePlayer(e),
     });
 
-    const themeLight = lightingForTheme(ACTIVE_VISUAL_THEME);
-    this.scene.fog = new THREE.Fog(
-      LOW_GFX ? 0xb6cddd : themeLight.fogColor,
-      LOW_GFX ? 150 : 130,
-      LOW_GFX ? 520 : 470,
-    );
+    // One policy, two rows. The tier picks a row; it does not invent its own light.
+    const themeLight = LOW_GFX
+      ? lowTierLightingForTheme(ACTIVE_VISUAL_THEME)
+      : lightingForTheme(ACTIVE_VISUAL_THEME);
+    this.scene.fog = new THREE.Fog(themeLight.fogColor, themeLight.fogNear, themeLight.fogFar);
 
     // sky dome — follows the camera so the world strip never outruns it.
     // High tier: shader gradient + sun glow with biome-aware horizon tints;
@@ -1338,14 +1341,11 @@ export class Renderer {
     const hemi = new THREE.HemisphereLight(
       themeLight.hemiColor,
       themeLight.hemiGround,
-      LOW_GFX ? 0.98 : themeLight.hemiIntensity,
+      themeLight.hemiIntensity,
     );
     this.scene.add(hemi);
     this.hemi = hemi;
-    const sun = new THREE.DirectionalLight(
-      LOW_GFX ? 0xfff0d0 : themeLight.sunColor,
-      LOW_GFX ? 2.65 : themeLight.sunIntensity,
-    );
+    const sun = new THREE.DirectionalLight(themeLight.sunColor, themeLight.sunIntensity);
     sun.position.copy(SUN_ANCHOR);
     sun.castShadow = !LOW_GFX;
     sun.shadow.mapSize.set(GFX.shadowMap, GFX.shadowMap);
