@@ -1,0 +1,78 @@
+/* arcane.tokens.css: the Arcane Surface palette for the web surfaces (player
+   dashboard, backoffice). Loaded under @layer tokens, scoped to
+   [data-surface="arcane"] so it only applies where an entry opts in.
+
+   NOT imported by src/styles/index.css. That barrel is the game bundle and the
+   game keeps its gold and parchment identity (design spec section 6); importing
+   there would ship dead CSS to every player.
+
+   Palette, from the reference project:
+     bg        #030508  page ground
+     surface   #0a0d14  card ground
+     surface2  #121620  raised card ground
+     primary   #00e5ff  cyan interactive accent
+     arcane    #9d4edd  purple secondary accent
+     gold      #ffd700  premium / achievement
+     danger    #ff2a2a  destructive
+
+   ACCESSIBILITY, both rules enforced by tests/arcane_tokens.test.ts:
+
+   1. --arc-arcane is NOT FOR BODY TEXT. Measured against the surfaces it scores
+      4.23 and 3.93, under the 4.5:1 body floor and over the 3:1 non-text floor.
+      Use it for borders, glows, gradient stops, and large display type only.
+
+   2. This file defines NO semantic state colour. Hostile, friendly, debuff
+      school, team flag, and resource bar colours stay at their classic values so
+      colourblind reads and state recognition are unchanged, exactly as
+      emberwood.tokens.css does. The reference palette collides with two of them
+      (its cyan sits near the semantic mana blue, its red near rage), which is
+      why the accents here are confined to structural chrome. */
+
+@layer tokens {
+  :root[data-surface='arcane'] {
+    /* Ground and surfaces */
+    --arc-bg: #030508;
+    --arc-surface: #0a0d14;
+    --arc-surface-2: #121620;
+
+    /* Text */
+    --arc-text: #f2f6ff;
+    --arc-text-muted: #9fb0c8;
+
+    /* Accents. See the accessibility note above before using --arc-arcane. */
+    --arc-primary: #00e5ff;
+    --arc-arcane: #9d4edd;
+    --arc-gold: #ffd700;
+    --arc-danger: #ff2a2a;
+
+    /* Derived chrome. Alpha variants are for edges and glows, never for text. */
+    --arc-border: rgba(255, 255, 255, 0.08);
+    --arc-border-strong: rgba(0, 229, 255, 0.35);
+    --arc-glass: linear-gradient(
+      135deg,
+      rgba(255, 255, 255, 0.05) 0%,
+      rgba(255, 255, 255, 0.01) 100%
+    );
+    --arc-glow-primary: 0 0 40px -10px rgba(0, 229, 255, 0.4);
+    --arc-glow-arcane: 0 0 40px -10px rgba(157, 78, 221, 0.4);
+
+    /* Typography: the repo's own sanctioned faces, already vendored and
+       self-hosted. The reference project's Inter is deliberately NOT adopted; it
+       duplicates the role Alegreya Sans already fills.
+
+       The fallback chains are load-bearing, not defensive noise:
+
+       - --font-brand does NOT exist yet. DESIGN.md section 5.1 introduces it as
+         the eventual home for Cinzel, after which --font-display flips to
+         Alegreya. That migration has not happened, so today Cinzel lives in
+         --font-display. Naming both, in that order, means this surface keeps
+         Cinzel before AND after the migration instead of silently turning into
+         Alegreya the day someone completes it.
+       - The literal tail covers a consuming entry whose barrel does not import
+         tokens.css. The guide entry, for instance, defines its own font stack and
+         never loads it. Without the tail this overlay would fall back to the
+         browser default there. */
+    --arc-font-display: var(--font-brand, var(--font-display, 'Cinzel', Georgia, serif));
+    --arc-font-body: var(--font-ui, 'Alegreya Sans', system-ui, sans-serif);
+  }
+}
