@@ -828,3 +828,212 @@ No spec requirement is unimplemented.
 **Ordering note:** Task 2 must precede Task 3, because Task 2 exports `MAT_OVERRIDES` and creates the pattern the later selectors follow. Task 4 is independent and could run at any point. Tasks 6 and 7 must be last.
 
 **Known risk:** Task 2 exports a previously private constant from `src/render/props.ts`. That widens that module's public surface by one table. The alternative, duplicating the whole table inside `emberwood/materials.ts`, would guarantee the two copies drift, which is worse. The `adds no keys that classic does not have` test in Task 2 catches accidental divergence.
+
+---
+
+### Task 4b: Make the low graphics tier theme-aware
+
+**Added 2026-08-01 after the Task 1 review.** Not in the original plan. The reviewer
+found that `renderer.ts` bypasses the lighting policy entirely on the low tier, and
+that two policy fields are never read at all. Without this task the feature ships
+broken for low-tier players.
+
+Evidence in `src/render/renderer.ts`:
+
+```ts
+    this.scene.fog = new THREE.Fog(
+      LOW_GFX ? 0xb6cddd : themeLight.fogColor,
+      LOW_GFX ? 150 : 130,      // themeLight.fogNear never read
+      LOW_GFX ? 520 : 470,      // themeLight.fogFar never read
+    );
+    ...
+      LOW_GFX ? 0.98 : themeLight.hemiIntensity,
+      LOW_GFX ? 0xfff0d0 : themeLight.sunColor,
+      LOW_GFX ? 2.65 : themeLight.sunIntensity,
+```
+
+Two consequences:
+
+1. `fogNear` and `fogFar` set in Task 1 are dead values at construction.
+2. On low tier the world stays full daylight while high tier is night. Beyond being
+   an obvious inconsistency, a brighter world is a genuine visibility advantage, which
+   is the concern `docs/design/graphics-settings-fairness.md` exists to police. The
+   existing invariant forbids a tier HIDING actionable information; a tier that reveals
+   substantially more is the same fairness problem viewed from the other side.
+
+**Files:**
+- Modify: `src/render/emberwood/lighting.ts`
+- Modify: `src/render/renderer.ts` (fog and light construction)
+- Modify: `src/render/emberwood/index.ts`
+- Test: `tests/emberwood_render_policy.test.ts`
+
+- [ ] **Step 1: Write the failing test**
+
+Add inside the top-level describe in `tests/emberwood_render_policy.test.ts`:
+
+```ts
+  describe('low graphics tier parity', () => {
+    it('gives the low tier its own row per theme', () => {
+      expect(lowTierLightingForTheme('classic').sunIntensity).toBe(2.65);
+      expect(lowTierLightingForTheme('classic').hemiIntensity).toBe(0.98);
+      expect(lowTierLightingForTheme('classic').fogColor).toBe(0xb6cddd);
+    });
+
+    it('keeps the low tier at night when the theme is night', () => {
+      const low = lowTierLightingForTheme('emberwood');
+      const high = lightingForTheme('emberwood');
+      // low tier may be cheaper and flatter, but it must still be NIGHT: a daylight
+      // low tier would both look wrong and hand low-spec players extra visibility.
+      expect(low.sunIntensity).toBeLessThan(1);
+      expect(low.fogColor).toBe(high.fogColor);
+    });
+
+    it('never lets a tier see substantially more than another', () => {
+      for (const theme of ['classic', 'emberwood'] as const) {
+        const low = lowTierLightingForTheme(theme);
+        const high = lightingForTheme(theme);
+        const lowTotal = low.sunIntensity + low.hemiIntensity;
+        const highTotal = high.sunIntensity + high.hemiIntensity;
+        // within 2x of each other; low is allowed to be flatter (it has no shadows)
+        // but not to be a different time of day
+        expect(Math.max(lowTotal, highTotal) / Math.min(lowTotal, highTotal), theme).toBeLessThan(2);
+      }
+    });
+  });
+```
+
+Add `lowTierLightingForTheme` to the import from `../src/render/emberwood/lighting`.
+
+- [ ] **Step 2: Run it and confirm it fails**
+
+Run: `npx vitest run tests/emberwood_render_policy.test.ts`
+Expected: FAIL, `lowTierLightingForTheme is not a function`.
+
+- [ ] **Step 3: Implement**
+
+Append to `src/render/emberwood/lighting.ts`:
+
+```ts
+// The low graphics tier draws no shadows and a cheaper sky, so it has always used
+// flatter, brighter light to compensate. Those numbers used to be hardcoded in the
+// renderer, which meant a themed night applied to high tier only: low tier stayed at
+// noon, looked like a different game, and handed low-spec players extra visibility.
+// Keeping the low tier a ROW OF THE SAME POLICY means a theme cannot be added again
+// without deciding what it looks like when shadows are off.
+const CLASSIC_LOW_LIGHTING: LightingPolicy = {
+  ...CLASSIC_LIGHTING,
+  fogColor: 0xb6cddd,
+  fogNear: 150,
+  fogFar: 520,
+  sunColor: 0xfff0d0,
+  sunIntensity: 2.65,
+  hemiIntensity: 0.98,
+};
+
+// Night, flattened: same palette and same fog as the high tier so the world reads as
+// the same place and the same hour, with ambient carrying what the missing shadows and
+// dimmer key would otherwise have shaped.
+const EMBERWOOD_LOW_LIGHTING: LightingPolicy = {
+  ...EMBERWOOD_LIGHTING,
+  sunIntensity: 0.5,
+  hemiIntensity: 1.05,
+};
+
+export function lowTierLightingForTheme(theme: VisualThemeId): LightingPolicy {
+  return theme === 'emberwood' ? EMBERWOOD_LOW_LIGHTING : CLASSIC_LOW_LIGHTING;
+}
+```
+
+- [ ] **Step 4: Run the test and confirm it passes**
+
+Run: `npx vitest run tests/emberwood_render_policy.test.ts`
+Expected: PASS.
+
+Check the ratio assertion by hand once: classic low is 2.65 + 0.98 = 3.63, classic high is 2.8 + 0.45 = 3.25, ratio 1.12. Emberwood low is 0.5 + 1.05 = 1.55, high is 0.55 + 0.85 = 1.4, ratio 1.11. Both under 2.
+
+- [ ] **Step 5: Consume it in the renderer**
+
+In `src/render/renderer.ts`, add `lowTierLightingForTheme` to the existing import from `./emberwood/lighting` on line 82.
+
+Replace the `themeLight` assignment and the fog construction:
+
+```ts
+    const themeLight = lightingForTheme(ACTIVE_VISUAL_THEME);
+    this.scene.fog = new THREE.Fog(
+      LOW_GFX ? 0xb6cddd : themeLight.fogColor,
+      LOW_GFX ? 150 : 130,
+      LOW_GFX ? 520 : 470,
+    );
+```
+
+with:
+
+```ts
+    // One policy, two rows. The tier picks a row; it does not invent its own light.
+    const themeLight = LOW_GFX
+      ? lowTierLightingForTheme(ACTIVE_VISUAL_THEME)
+      : lightingForTheme(ACTIVE_VISUAL_THEME);
+    this.scene.fog = new THREE.Fog(themeLight.fogColor, themeLight.fogNear, themeLight.fogFar);
+```
+
+Then replace the three remaining tier ternaries so they read the policy:
+
+```ts
+      LOW_GFX ? 0.98 : themeLight.hemiIntensity,
+```
+becomes
+```ts
+      themeLight.hemiIntensity,
+```
+
+```ts
+      LOW_GFX ? 0xfff0d0 : themeLight.sunColor,
+      LOW_GFX ? 2.65 : themeLight.sunIntensity,
+```
+becomes
+```ts
+      themeLight.sunColor,
+      themeLight.sunIntensity,
+```
+
+Leave `sun.castShadow = !LOW_GFX;` alone. Shadows are a genuine cost knob, not a look.
+
+IMPORTANT: high-tier fog distances change from the hardcoded 130/470 to the policy's
+values (Classic 95/340, Emberwood 55/210). For Classic that is a REAL visible change to
+a shipped look. Verify Classic in Task 6 step 5 and, if the classic view now fogs in too
+early, set `CLASSIC_LIGHTING.fogNear`/`fogFar` to 130/470 to preserve the shipped
+appearance and update the classic assertions in the test.
+
+- [ ] **Step 6: Verify**
+
+Run: `npx tsc --noEmit && npx vitest run tests/emberwood_render_policy.test.ts tests/architecture.test.ts`
+Expected: no type errors, both suites PASS.
+
+- [ ] **Step 7: Commit**
+
+```bash
+git add src/render/emberwood/lighting.ts src/render/emberwood/index.ts src/render/renderer.ts tests/emberwood_render_policy.test.ts
+git commit -m "fix(render): give the low graphics tier a themed lighting row
+
+The renderer hardcoded the low tier's fog, sun, and hemisphere, so a themed night
+reached high tier only: low tier stayed at noon. That is both an obvious visual
+inconsistency and a fairness problem, since a brighter world is extra visibility for
+whoever runs the cheaper preset.
+
+Low tier is now a row of the same policy rather than numbers living in the renderer,
+so a future theme cannot be added without deciding what it looks like with shadows
+off. Also wires fogNear and fogFar, which the constructor had never read."
+```
+
+- [ ] **Step 8: Re-export from the barrel**
+
+In `src/render/emberwood/index.ts` add:
+
+```ts
+export { lowTierLightingForTheme } from './lighting';
+```
+
+Then `git add src/render/emberwood/index.ts && git commit --amend --no-edit`.
+
+**Ordering:** run this AFTER Task 4 (they both touch the fog area of `renderer.ts`) and
+before Task 6.
