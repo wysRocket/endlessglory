@@ -1,0 +1,64 @@
+/* arcane.components.css: reusable surface primitives for the Arcane Surface
+   entries. Loaded under @layer components, scoped to [data-surface="arcane"].
+
+   Consumers compose these rather than re-authoring a card. Same placement rule
+   as arcane.tokens.css: NOT imported by src/styles/index.css (the game bundle).
+
+   Every colour here comes from a --arc- token, never a literal hex, so the
+   contrast guarantees the token tests enforce actually hold at the point of use. */
+
+@layer components {
+  :root[data-surface="arcane"] .arc-card {
+    background: var(--arc-surface);
+    border: 1px solid var(--arc-border);
+    border-radius: 12px;
+    padding: 20px;
+    color: var(--arc-text);
+    font-family: var(--arc-font-body);
+  }
+
+  :root[data-surface="arcane"] .arc-card--raised {
+    background: var(--arc-surface-2);
+  }
+
+  /* Glass panel: the reference's signature treatment. The gradient is an
+     overlay on the card ground, so text contrast is still governed by
+     --arc-surface and stays inside the measured floors. */
+  :root[data-surface="arcane"] .arc-glass {
+    background-image: var(--arc-glass);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid var(--arc-border);
+    border-radius: 12px;
+  }
+
+  :root[data-surface="arcane"] .arc-glow {
+    box-shadow: var(--arc-glow-primary);
+  }
+
+  :root[data-surface="arcane"] .arc-glow--arcane {
+    box-shadow: var(--arc-glow-arcane);
+  }
+
+  :root[data-surface="arcane"] .arc-title {
+    font-family: var(--arc-font-display);
+    color: var(--arc-text);
+    letter-spacing: 0.02em;
+  }
+
+  /* Large display type is the ONLY text role the purple accent may take, and
+     only at this size: it fails the body-text contrast floor. See the
+     accessibility note in arcane.tokens.css. */
+  :root[data-surface="arcane"] .arc-title--arcane {
+    color: var(--arc-arcane);
+    font-size: 1.75rem;
+    font-weight: 700;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :root[data-surface="arcane"] .arc-glow,
+    :root[data-surface="arcane"] .arc-glow--arcane {
+      transition: none;
+    }
+  }
+}
