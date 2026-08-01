@@ -79,7 +79,7 @@ import { buildDelveModule } from './delve_interiors';
 import { buildDelveInteractable, syncDelveInteractableVisibility } from './delve_props';
 import { buildDoorBody } from './door_portal';
 import { DungeonInteriors, ensureDungeonAssets } from './dungeon';
-import { lightingForTheme } from './emberwood/lighting';
+import { lightingForTheme, outdoorFogForTheme } from './emberwood/lighting';
 import { objectDisplayName } from './entity_labels';
 import { advanceSelfFacing, releaseSelfFacing } from './facing_smooth';
 import { type FireballTravelVisual, syncFireballTravelVisual } from './fireball_travel_visual';
@@ -4413,11 +4413,7 @@ export class Renderer {
   private outdoorFogPreset(): { color: number; near: number; far: number } {
     if (this.lowGfx) return Renderer.LOW_FOG;
     const biome = zoneBiomeAt(this.sim.player.pos.z);
-    const preset = Renderer.BIOME_FOG[biome];
-    if (ACTIVE_VISUAL_THEME === 'emberwood' && biome === 'vale') {
-      return { ...preset, color: 0x607487 };
-    }
-    return preset;
+    return outdoorFogForTheme(Renderer.BIOME_FOG[biome], ACTIVE_VISUAL_THEME);
   }
 
   private scheduleDelveModuleBuild(

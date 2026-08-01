@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { lightingForTheme } from '../src/render/emberwood/lighting';
+import { lightingForTheme, outdoorFogForTheme } from '../src/render/emberwood/lighting';
 import { foliagePaletteForTheme, terrainPaletteForTheme } from '../src/render/emberwood/palette';
 
 describe('Emberwood render policy', () => {
@@ -26,6 +26,37 @@ describe('Emberwood render policy', () => {
       expect(emberwood.hemiColor).toBe(0x2a4a68);
       expect(emberwood.hemiGround).toBe(0x6b3520);
       expect(emberwood.hemiIntensity).toBe(0.85);
+    });
+  });
+
+  describe('outdoor fog resolver', () => {
+    const VOLCANO = { color: 0x8a7468, near: 50, far: 220 };
+    const PEAKS = { color: 0xbdd3ec, near: 110, far: 390 };
+
+    it('returns the biome preset untouched on classic', () => {
+      expect(outdoorFogForTheme(VOLCANO, 'classic')).toEqual(VOLCANO);
+      expect(outdoorFogForTheme(PEAKS, 'classic')).toEqual(PEAKS);
+    });
+
+    it('applies the night fog colour to every biome on emberwood, not just one', () => {
+      expect(outdoorFogForTheme(VOLCANO, 'emberwood').color).toBe(0x141d2b);
+      expect(outdoorFogForTheme(PEAKS, 'emberwood').color).toBe(0x141d2b);
+    });
+
+    it('tightens each biome distance while preserving its relative depth', () => {
+      const volcano = outdoorFogForTheme(VOLCANO, 'emberwood');
+      const peaks = outdoorFogForTheme(PEAKS, 'emberwood');
+      expect(volcano.near).toBeCloseTo(36, 0);
+      expect(volcano.far).toBeCloseTo(158.4, 1);
+      // peaks is the airiest biome and must stay airier than volcano after tightening
+      expect(peaks.far).toBeGreaterThan(volcano.far);
+    });
+
+    it('never returns a far plane inside the near plane', () => {
+      for (const preset of [VOLCANO, PEAKS]) {
+        const out = outdoorFogForTheme(preset, 'emberwood');
+        expect(out.far).toBeGreaterThan(out.near);
+      }
     });
   });
 
