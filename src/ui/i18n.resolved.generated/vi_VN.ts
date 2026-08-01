@@ -4064,6 +4064,50 @@ export const vi_VN: EnTranslations = {
       "dialog": "Hộp thoại trình chỉnh sửa"
     }
   },
+  "dashboard": {
+    "nav": {
+      "profile": "Profile",
+      "collection": "Collection",
+      "leaderboard": "Leaderboard",
+      "logout": "Log out"
+    },
+    "login": {
+      "title": "Sign in",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "registerPrompt": "Don't have an account?",
+      "registerLink": "Create one",
+      "twoFactorLabel": "6-digit or recovery code",
+      "twoFactorSubmit": "Verify"
+    },
+    "register": {
+      "title": "Create an account",
+      "email": "Email",
+      "submit": "Create account"
+    },
+    "loggedOut": {
+      "message": "Sign in to view your account."
+    },
+    "profile": {
+      "title": "Profile",
+      "noCharacters": "No characters yet."
+    },
+    "collection": {
+      "title": "Collection",
+      "empty": "No deeds earned yet.",
+      "loadMore": "Load more"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "tabXp": "Experience",
+      "tabArena": "Arena"
+    },
+    "error": {
+      "retry": "Retry",
+      "generic": "Something went wrong."
+    }
+  },
   "skinEvent": {
     "title": "Hòm Trang Phục",
     "subtitle": "Bạn đã mở khóa phần thưởng {rank} — hãy chọn bất kỳ mẫu da nào bằng hoặc thấp hơn hạng đó.",

@@ -4064,6 +4064,50 @@ export const ru_RU: EnTranslations = {
       "dialog": "Диалог редактора"
     }
   },
+  "dashboard": {
+    "nav": {
+      "profile": "Profile",
+      "collection": "Collection",
+      "leaderboard": "Leaderboard",
+      "logout": "Log out"
+    },
+    "login": {
+      "title": "Sign in",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "registerPrompt": "Don't have an account?",
+      "registerLink": "Create one",
+      "twoFactorLabel": "6-digit or recovery code",
+      "twoFactorSubmit": "Verify"
+    },
+    "register": {
+      "title": "Create an account",
+      "email": "Email",
+      "submit": "Create account"
+    },
+    "loggedOut": {
+      "message": "Sign in to view your account."
+    },
+    "profile": {
+      "title": "Profile",
+      "noCharacters": "No characters yet."
+    },
+    "collection": {
+      "title": "Collection",
+      "empty": "No deeds earned yet.",
+      "loadMore": "Load more"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "tabXp": "Experience",
+      "tabArena": "Arena"
+    },
+    "error": {
+      "retry": "Retry",
+      "generic": "Something went wrong."
+    }
+  },
   "skinEvent": {
     "title": "Косметический тайник",
     "subtitle": "Вы открыли награду уровня {rank} — выберите любой облик этого уровня или ниже.",

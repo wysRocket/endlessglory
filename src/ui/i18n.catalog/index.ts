@@ -7,6 +7,7 @@ import { ITEM_SETS } from '../../sim/data';
 import { worldEntityText as worldNames } from '../world_entity_i18n';
 import { abilityStrings, classAbilityNames } from './abilities';
 import { apiErrorStrings } from './api_error';
+import { dashboardStrings } from './dashboard';
 import { editorStrings } from './editor';
 import { gameStrings } from './game';
 import { guideStrings } from './guide';
@@ -19,6 +20,7 @@ import { shellStrings } from './shell';
 
 export { abilityStrings, classAbilityNames } from './abilities';
 export { apiErrorStrings } from './api_error';
+export { dashboardStrings } from './dashboard';
 export { editorStrings } from './editor';
 export {
   gameStrings,
@@ -212,6 +214,7 @@ export const en = {
   apiError: apiErrorStrings,
   guide: guideStrings,
   editor: editorStrings,
+  dashboard: dashboardStrings,
   // Cosmetic skin-select event overlay. Rarity names reuse itemUi.quality.*.
   skinEvent: {
     title: 'Cosmetic Cache',

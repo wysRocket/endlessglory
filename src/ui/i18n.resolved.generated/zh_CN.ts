@@ -4064,6 +4064,50 @@ export const zh_CN: EnTranslations = {
       "dialog": "编辑器对话框"
     }
   },
+  "dashboard": {
+    "nav": {
+      "profile": "Profile",
+      "collection": "Collection",
+      "leaderboard": "Leaderboard",
+      "logout": "Log out"
+    },
+    "login": {
+      "title": "Sign in",
+      "username": "Username",
+      "password": "Password",
+      "submit": "Sign in",
+      "registerPrompt": "Don't have an account?",
+      "registerLink": "Create one",
+      "twoFactorLabel": "6-digit or recovery code",
+      "twoFactorSubmit": "Verify"
+    },
+    "register": {
+      "title": "Create an account",
+      "email": "Email",
+      "submit": "Create account"
+    },
+    "loggedOut": {
+      "message": "Sign in to view your account."
+    },
+    "profile": {
+      "title": "Profile",
+      "noCharacters": "No characters yet."
+    },
+    "collection": {
+      "title": "Collection",
+      "empty": "No deeds earned yet.",
+      "loadMore": "Load more"
+    },
+    "leaderboard": {
+      "title": "Leaderboard",
+      "tabXp": "Experience",
+      "tabArena": "Arena"
+    },
+    "error": {
+      "retry": "Retry",
+      "generic": "Something went wrong."
+    }
+  },
   "skinEvent": {
     "title": "外观宝箱",
     "subtitle": "你解锁了一份{rank}级奖励——可选择不高于该等级的任意皮肤。",

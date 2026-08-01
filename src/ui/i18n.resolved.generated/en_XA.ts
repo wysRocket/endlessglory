@@ -4064,6 +4064,50 @@ export const en_XA: EnTranslations = {
       "dialog": "[Éðíţóŕ ðíáļóĝ]"
     }
   },
+  "dashboard": {
+    "nav": {
+      "profile": "[Þŕóƒíļé]",
+      "collection": "[Çóļļéçţíóñ]",
+      "leaderboard": "[Ļéáðéŕƀóáŕð]",
+      "logout": "[Ļóĝ óúţ]"
+    },
+    "login": {
+      "title": "[Šíĝñ íñ]",
+      "username": "[Úšéŕñáɱé]",
+      "password": "[Þáššŵóŕð]",
+      "submit": "[Šíĝñ íñ]",
+      "registerPrompt": "[Ðóñ'ţ ĥáʋé áñ áççóúñţ?]",
+      "registerLink": "[Çŕéáţé óñé]",
+      "twoFactorLabel": "[6-ðíĝíţ óŕ ŕéçóʋéŕý çóðé]",
+      "twoFactorSubmit": "[Ʋéŕíƒý]"
+    },
+    "register": {
+      "title": "[Çŕéáţé áñ áççóúñţ]",
+      "email": "[Éɱáíļ]",
+      "submit": "[Çŕéáţé áççóúñţ]"
+    },
+    "loggedOut": {
+      "message": "[Šíĝñ íñ ţó ʋíéŵ ýóúŕ áççóúñţ.]"
+    },
+    "profile": {
+      "title": "[Þŕóƒíļé]",
+      "noCharacters": "[Ñó çĥáŕáçţéŕš ýéţ.]"
+    },
+    "collection": {
+      "title": "[Çóļļéçţíóñ]",
+      "empty": "[Ñó ðééðš éáŕñéð ýéţ.]",
+      "loadMore": "[Ļóáð ɱóŕé]"
+    },
+    "leaderboard": {
+      "title": "[Ļéáðéŕƀóáŕð]",
+      "tabXp": "[Éẋþéŕíéñçé]",
+      "tabArena": "[Áŕéñá]"
+    },
+    "error": {
+      "retry": "[Ŕéţŕý]",
+      "generic": "[Šóɱéţĥíñĝ ŵéñţ ŵŕóñĝ.]"
+    }
+  },
   "skinEvent": {
     "title": "[Çóšɱéţíç Çáçĥé]",
     "subtitle": "[Ýóú úñļóçķéð á {rank} ŕéŵáŕð — çĥóóšé áñý šķíñ áţ óŕ ƀéļóŵ íţ.]",
