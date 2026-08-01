@@ -546,42 +546,75 @@ Your new file follows the identical shape.
 
 - [ ] **Step 2: Create the catalog domain**
 
-Create `src/ui/i18n.catalog/dashboard.ts`:
+Create `src/ui/i18n.catalog/dashboard.ts`. Note: this uses NESTED objects, not
+flat dotted-string keys. The barrel (`index.ts`) assembles it into `en` under a
+`dashboard:` namespace key (`dashboard: dashboardStrings`), so a flat key like
+`'dashboard.nav.profile'` inside `dashboardStrings` would double the prefix to
+`dashboard.dashboard.nav.profile` and also contains a literal dot the flatten
+script cannot parse. Nesting resolves to the same final dotted keys
+(`dashboard.nav.profile`, etc.) that later tasks call via `t(...)`. Also no
+`as const`: per src/ui/CLAUDE.md, adding `as const` to a catalog-domain object
+narrows its literal types and breaks the `en_XA` pseudo-locale.
 
 ```ts
 // English source strings for the player dashboard entry (dashboard.html).
 // Contributors add English only; the maintainer fills every locale at release.
 // See docs/i18n-scaling/translation-workflow.md.
+//
+// Assembled into `en` by ./index.ts under the `dashboard` namespace. Like
+// guide.ts and editor.ts this module carries NO per-locale blocks (no
+// `as const`), so a new dashboard string is an English-only add that
+// compiles; the translations live solely in the overlays.
 
 export const dashboardStrings = {
-  'dashboard.nav.profile': 'Profile',
-  'dashboard.nav.collection': 'Collection',
-  'dashboard.nav.leaderboard': 'Leaderboard',
-  'dashboard.nav.logout': 'Log out',
-  'dashboard.login.title': 'Sign in',
-  'dashboard.login.username': 'Username',
-  'dashboard.login.password': 'Password',
-  'dashboard.login.submit': 'Sign in',
-  'dashboard.login.registerPrompt': "Don't have an account?",
-  'dashboard.login.registerLink': 'Create one',
-  'dashboard.login.twoFactorLabel': '6-digit or recovery code',
-  'dashboard.login.twoFactorSubmit': 'Verify',
-  'dashboard.register.title': 'Create an account',
-  'dashboard.register.email': 'Email',
-  'dashboard.register.submit': 'Create account',
-  'dashboard.loggedOut.message': 'Sign in to view your account.',
-  'dashboard.profile.title': 'Profile',
-  'dashboard.profile.noCharacters': 'No characters yet.',
-  'dashboard.collection.title': 'Collection',
-  'dashboard.collection.empty': 'No deeds earned yet.',
-  'dashboard.collection.loadMore': 'Load more',
-  'dashboard.leaderboard.title': 'Leaderboard',
-  'dashboard.leaderboard.tabXp': 'Experience',
-  'dashboard.leaderboard.tabArena': 'Arena',
-  'dashboard.error.retry': 'Retry',
-  'dashboard.error.generic': 'Something went wrong.',
-} as const;
+  nav: {
+    profile: 'Profile',
+    collection: 'Collection',
+    leaderboard: 'Leaderboard',
+    logout: 'Log out',
+  },
+  login: {
+    title: 'Sign in',
+    username: 'Username',
+    password: 'Password',
+    submit: 'Sign in',
+    registerPrompt: "Don't have an account?",
+    registerLink: 'Create one',
+    twoFactorLabel: '6-digit or recovery code',
+    twoFactorSubmit: 'Verify',
+  },
+  register: {
+    title: 'Create an account',
+    email: 'Email',
+    submit: 'Create account',
+  },
+  loggedOut: {
+    message: 'Sign in to view your account.',
+  },
+  profile: {
+    title: 'Profile',
+    noCharacters: 'No characters yet.',
+  },
+  collection: {
+    title: 'Collection',
+    empty: 'No deeds earned yet.',
+    loadMore: 'Load more',
+  },
+  leaderboard: {
+    title: 'Leaderboard',
+    tabXp: 'Experience',
+    tabArena: 'Arena',
+  },
+  error: {
+    retry: 'Retry',
+    generic: 'Something went wrong.',
+  },
+};
 ```
+
+Every later task's `t('dashboard.<key>')` call (e.g. `t('dashboard.login.title')`,
+`t('dashboard.nav.profile')`) resolves against this nested shape unchanged;
+only the authoring shape in this file changed, not the final key strings.
 
 - [ ] **Step 3: Register it in the catalog barrel**
 
