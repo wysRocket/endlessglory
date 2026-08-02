@@ -114,6 +114,7 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/steam/status',
   '/api/welcome/flags',
   '/api/auth/firebase',
+  '/api/characters/:id/deeds',
 ]);
 
 // Every legacy /api ladder row (dispatcher === main handleApi), minus the
@@ -229,6 +230,7 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'POST', path: '/api/characters' },
     { method: 'GET', path: '/api/characters/:id/standing' },
     { method: 'GET', path: '/api/characters/:id/sheet' },
+    { method: 'GET', path: '/api/characters/:id/deeds' },
     { method: 'POST', path: '/api/characters/:id/rename' },
     { method: 'POST', path: '/api/characters/:id/takeover' },
     { method: 'DELETE', path: '/api/characters/:id' },
