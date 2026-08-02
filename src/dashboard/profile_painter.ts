@@ -4,6 +4,7 @@
 
 import type { Api } from '../net/online';
 import { userFacingApiError } from '../ui/api_error_i18n';
+import { esc } from '../ui/esc';
 import { t } from '../ui/i18n';
 import { profilePageModel } from './profile_view';
 
@@ -35,7 +36,7 @@ export class ProfilePainter {
           ${model.characters
             .map(
               (c) =>
-                `<li>${c.name}, level ${c.level} ${c.class}${c.online ? ' (online)' : ''}</li>`,
+                `<li>${esc(c.name)}, level ${c.level} ${esc(c.class)}${c.online ? ' (online)' : ''}</li>`,
             )
             .join('')}
         </ul>
