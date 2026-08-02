@@ -1116,10 +1116,12 @@ import { ProfilePainter } from './profile_painter';
 type Page = 'profile' | 'collection' | 'leaderboard';
 
 export class DashboardShell {
-  private readonly api = new Api();
   private page: Page = 'profile';
 
-  constructor(private readonly mount: HTMLElement) {}
+  constructor(
+    private readonly mount: HTMLElement,
+    private readonly api: Api = new Api(),
+  ) {}
 
   async start(): Promise<void> {
     const gate = await resolveAuthGate(this.api, isAuthError);
