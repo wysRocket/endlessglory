@@ -1465,6 +1465,20 @@ Finally, update the routes-count completeness test (around line 1203): the
 character domain now registers NINE routes, not eight, and the owned-paths
 list gets a new `'GET /api/characters/:id/deeds'` entry.
 
+**Also update the REPO-WIDE registry completeness inventory**,
+`tests/server/http/completeness.test.ts`, a SEPARATE file from the
+per-domain `tests/server/characters.test.ts` routes-count test above; the
+full gate's fresh vitest run is what caught this, not any per-domain check.
+Add `{ method: 'GET', path: '/api/characters/:id/deeds' }` to its
+`MIGRATED_ROUTES` array (near the other `/api/characters/:id/*` entries),
+AND add `'/api/characters/:id/deeds'` to its `REGISTRY_ONLY_PATHS` set: this
+is a genuinely new endpoint with no legacy `handleApi` ladder arm to retain,
+exactly the documented pattern already used for `/api/deeds/rarity`,
+`/api/welcome/flags`, and the other post-migration registry-only routes (do
+NOT add it only to `MIGRATED_ROUTES`, or the "must be a mainApi ladder
+route" assertion fails looking for a legacy arm that was never supposed to
+exist).
+
 - [ ] **Step 6: Verify**
 
 Run: `npx vitest run tests/server/characters.test.ts`
