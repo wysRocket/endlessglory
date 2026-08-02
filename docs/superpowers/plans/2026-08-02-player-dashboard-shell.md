@@ -1575,6 +1575,13 @@ repo's established way to fetch the account's character list, per
 type is a structural superset of `ProfileCharacter`, so it passes into
 `profilePageModel` with no cast needed.
 
+Character names are player-chosen at character creation, so they must be
+HTML-escaped before any `innerHTML` interpolation: `src/ui/CLAUDE.md`'s rule
+is "all HTML interpolation goes through `esc()`. Never `innerHTML` raw
+player/server text." Import `esc` from `../ui/esc` (the repo's one shared
+escaper, already used by `src/main.ts`'s own character list) and wrap `c.name`
+(and `c.class`, for consistency) before interpolating.
+
 Create `src/dashboard/profile_painter.ts`:
 
 ```ts
@@ -1584,6 +1591,7 @@ Create `src/dashboard/profile_painter.ts`:
 
 import type { Api } from '../net/online';
 import { userFacingApiError } from '../ui/api_error_i18n';
+import { esc } from '../ui/esc';
 import { t } from '../ui/i18n';
 import { profilePageModel } from './profile_view';
 
@@ -1613,7 +1621,10 @@ export class ProfilePainter {
         <h1 class="arc-title">${t('dashboard.profile.title')}</h1>
         <ul>
           ${model.characters
-            .map((c) => `<li>${c.name}, level ${c.level} ${c.class}${c.online ? ' (online)' : ''}</li>`)
+            .map(
+              (c) =>
+                `<li>${esc(c.name)}, level ${c.level} ${esc(c.class)}${c.online ? ' (online)' : ''}</li>`,
+            )
             .join('')}
         </ul>
       </div>
@@ -1863,7 +1874,19 @@ client guessing a different one."
 **Files:**
 - Create: `src/dashboard/leaderboard_view.ts`
 - Create: `src/dashboard/leaderboard_painter.ts`
+- Modify: `src/net/online.ts` (one new public `Api` method, `arenaLeaderboard`)
 - Test: `tests/dashboard_leaderboard_view.test.ts` (create)
+
+Note: like Task 7, do NOT call `this.api.get(...)` -- `Api.get`/`post`/
+`delete` are private. The XP tab reuses the EXISTING public
+`async leaderboard(scope, limit): Promise<LeaderboardEntry[]>` method (already
+used by the game's own home-page leaderboard widget); there is no equivalent
+public method for the arena ladder yet, so this task adds one,
+`arenaLeaderboard`, following `leaderboard()`'s exact shape and
+error-swallowing convention (returns `[]` on any failure rather than
+throwing, matching how a leaderboard widget degrades). Player character
+names in both tabs are player-chosen, so they need `esc()` at render time,
+same as Task 7's Profile page.
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1948,17 +1971,48 @@ Run: `npx vitest run tests/dashboard_leaderboard_view.test.ts`
 
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the painter**
+- [ ] **Step 5: Add Api.arenaLeaderboard()**
+
+Read the existing `async leaderboard(scope, limit): Promise<LeaderboardEntry[]>`
+method in `src/net/online.ts` (near line 784) to match its shape exactly. Add
+a new method directly after it:
+
+```ts
+// All-time Ashen Coliseum arena ladder for the dashboard's Leaderboard page.
+async arenaLeaderboard(limit = 100): Promise<ArenaLeaderRow[]> {
+  try {
+    const data = await this.get(`/api/arena/leaderboard?limit=${limit}`);
+    return data.leaders ?? [];
+  } catch {
+    return [];
+  }
+}
+```
+
+This needs an `ArenaLeaderRow` type. Reuse the server's own type if importable
+without a cycle (`import type { ArenaLeaderRow } from '../../server/db';` --
+check this doesn't create a browser-bundling problem, since `server/db.ts`
+has Node-only imports; if importing a server type into client code is
+unsafe or fails to build, define a local, narrower interface instead:
+`interface ArenaLeaderRow { name: string; class: string; level: number;
+rating: number; wins: number; losses: number; }`, matching the response
+shape `server/leaderboard.ts`'s `readArenaLeaderboard` actually returns).
+
+- [ ] **Step 6: Write the painter**
 
 Create `src/dashboard/leaderboard_painter.ts`:
 
 ```ts
-// DOM half of the Leaderboard page. Fetches /api/leaderboard and
-// /api/arena/leaderboard through the shared Api instance depending on the
-// active tab.
+// DOM half of the Leaderboard page. Fetches via the shared Api instance's
+// existing public leaderboard() method (XP tab) and the new arenaLeaderboard()
+// method (Arena tab) depending on the active tab. Both of these Api methods
+// already swallow their own errors and return [] on failure (matching the
+// game's own home-page leaderboard widget), so there is no thrown error for
+// this painter to catch; an empty result renders through the pure core's own
+// isEmpty state instead of a distinct error view.
 
 import type { Api } from '../net/online';
-import { userFacingApiError } from '../ui/api_error_i18n';
+import { esc } from '../ui/esc';
 import { t } from '../ui/i18n';
 import {
   type ArenaLeaderboardRow,
@@ -1981,16 +2035,24 @@ export class LeaderboardPainter {
 
   private async load(): Promise<void> {
     this.container.innerHTML = '<div class="arc-card">...</div>';
-    try {
-      if (this.tab === 'xp') {
-        const rows = (await this.api.get('/api/leaderboard')) as XpLeaderboardRow[];
-        this.renderXp(leaderboardPageModel('xp', rows));
-      } else {
-        const rows = (await this.api.get('/api/arena/leaderboard')) as ArenaLeaderboardRow[];
-        this.renderArena(leaderboardPageModel('arena', rows));
-      }
-    } catch (err) {
-      this.renderError(userFacingApiError(err));
+    if (this.tab === 'xp') {
+      const entries = await this.api.leaderboard('global', 100);
+      const rows: XpLeaderboardRow[] = entries.map((e) => ({
+        rank: e.rank,
+        name: e.name,
+        level: e.level,
+        lifetimeXp: e.lifetimeXp,
+      }));
+      this.renderXp(leaderboardPageModel('xp', rows));
+    } else {
+      const entries = await this.api.arenaLeaderboard(100);
+      const rows: ArenaLeaderboardRow[] = entries.map((e) => ({
+        name: e.name,
+        rating: e.rating,
+        wins: e.wins,
+        losses: e.losses,
+      }));
+      this.renderArena(leaderboardPageModel('arena', rows));
     }
   }
 
@@ -2008,7 +2070,7 @@ export class LeaderboardPainter {
     this.container.innerHTML = `
       ${this.tabs()}
       <div class="arc-card">
-        <ul>${model.rows.map((r) => `<li>${r.rank}. ${r.name}, level ${r.level}</li>`).join('')}</ul>
+        <ul>${model.rows.map((r) => `<li>${r.rank}. ${esc(r.name)}, level ${r.level}</li>`).join('')}</ul>
       </div>
     `;
     this.wireTabs();
@@ -2018,7 +2080,7 @@ export class LeaderboardPainter {
     this.container.innerHTML = `
       ${this.tabs()}
       <div class="arc-card">
-        <ul>${model.rows.map((r) => `<li>${r.name}, ${r.rating} rating (${r.wins}-${r.losses})</li>`).join('')}</ul>
+        <ul>${model.rows.map((r) => `<li>${esc(r.name)}, ${r.rating} rating (${r.wins}-${r.losses})</li>`).join('')}</ul>
       </div>
     `;
     this.wireTabs();
@@ -2032,22 +2094,19 @@ export class LeaderboardPainter {
       });
     });
   }
-
-  private renderError(message: string): void {
-    this.container.innerHTML = `
-      <div class="arc-card">
-        <p>${message}</p>
-        <button id="dashboard-leaderboard-retry">${t('dashboard.error.retry')}</button>
-      </div>
-    `;
-    this.container.querySelector('#dashboard-leaderboard-retry')?.addEventListener('click', () => {
-      void this.load();
-    });
-  }
 }
 ```
 
-- [ ] **Step 6: Verify the whole entry now typechecks end to end**
+Note: no `renderError`/retry UI here, unlike Profile and Collection. Both
+data calls degrade to an empty array on failure rather than throwing (matching
+`leaderboard()`'s established convention), so the pure core's `isEmpty`
+state is what a fetch failure actually renders as. If the implementer judges
+this UX gap (a real error rendering identically to "no scores yet") worth
+closing, that is a fair call to raise, but it is not a defect in THIS task:
+it is consistent with the existing `Api.leaderboard()` behavior this task
+reuses rather than replaces.
+
+- [ ] **Step 7: Verify the whole entry now typechecks end to end**
 
 Run: `npx tsc --noEmit`
 
@@ -2055,11 +2114,11 @@ Expected: no errors. This is the first point where `shell.ts` (task 5) has all
 three painters it references, so this is the real confirmation that tasks 1
 through 9 fit together.
 
-- [ ] **Step 7: Register the pure core**
+- [ ] **Step 8: Register the pure core**
 
 Add `'src/dashboard/leaderboard_view.ts',` to `UI_PURE_CORES`.
 
-- [ ] **Step 8: Run every dashboard test together**
+- [ ] **Step 9: Run every dashboard test together**
 
 ```bash
 npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/net_turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_auth_gate_core.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters.test.ts
@@ -2067,17 +2126,18 @@ npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts t
 
 Expected: every file PASSES.
 
-- [ ] **Step 9: Format and commit**
+- [ ] **Step 10: Format and commit**
 
 ```bash
-npx @biomejs/biome check --write src/dashboard/leaderboard_view.ts src/dashboard/leaderboard_painter.ts tests/dashboard_leaderboard_view.test.ts tests/architecture.test.ts
-git add src/dashboard/leaderboard_view.ts src/dashboard/leaderboard_painter.ts tests/dashboard_leaderboard_view.test.ts tests/architecture.test.ts
+npx @biomejs/biome check --write src/net/online.ts src/dashboard/leaderboard_view.ts src/dashboard/leaderboard_painter.ts tests/dashboard_leaderboard_view.test.ts tests/architecture.test.ts
+git add src/net/online.ts src/dashboard/leaderboard_view.ts src/dashboard/leaderboard_painter.ts tests/dashboard_leaderboard_view.test.ts tests/architecture.test.ts
 git commit -m "feat(dashboard): add the Leaderboard page
 
-Two tabs, XP and Arena, backed by the same /api/leaderboard and
-/api/arena/leaderboard endpoints the game's own high scores view already
-calls. This is the last page task; shell.ts now typechecks end to end with all
-three painters it references."
+Two tabs, XP and Arena. The XP tab reuses the existing public
+Api.leaderboard(); the Arena tab needed a new public Api.arenaLeaderboard()
+method, added here following leaderboard()'s exact shape and
+error-swallowing convention. This is the last page task; shell.ts now
+typechecks end to end with all three painters it references."
 ```
 
 ---
