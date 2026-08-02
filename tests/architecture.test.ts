@@ -225,6 +225,7 @@ const UI_PURE_CORES = [
   'src/dashboard/auth_gate_core.ts',
   'src/dashboard/profile_view.ts',
   'src/dashboard/collection_view.ts',
+  'src/dashboard/leaderboard_view.ts',
 ].map((rel) => join(repoRoot, rel));
 
 // Pure logic cores that live in src/render (the painter half is Three-side):

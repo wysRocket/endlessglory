@@ -290,6 +290,20 @@ export function isAuthError(err: unknown): boolean {
   return err instanceof ApiError && (err.status === 401 || err.status === 403);
 }
 
+// One ranked row of the all-time Ashen Coliseum arena ladder (dashboard's
+// Leaderboard page, Arena tab). Narrowed, client-local mirror of
+// server/db.ts's ArenaLeaderRow: defined here rather than imported, since
+// server/db.ts carries Node-only imports and importing from server/ into
+// client code risks a build/bundling problem.
+interface ArenaLeaderRow {
+  name: string;
+  class: PlayerClass;
+  level: number;
+  rating: number;
+  wins: number;
+  losses: number;
+}
+
 export class Api {
   private static readonly SESSION_KEY = 'woc_session';
   token: string | null = null;
@@ -802,6 +816,16 @@ export class Api {
       const data = await this.get(
         `/api/leaderboard?scope=${scope}&metric=lifetimeXp&limit=${limit}`,
       );
+      return data.leaders ?? [];
+    } catch {
+      return [];
+    }
+  }
+
+  // All-time Ashen Coliseum arena ladder for the dashboard's Leaderboard page.
+  async arenaLeaderboard(limit = 100): Promise<ArenaLeaderRow[]> {
+    try {
+      const data = await this.get(`/api/arena/leaderboard?limit=${limit}`);
       return data.leaders ?? [];
     } catch {
       return [];
