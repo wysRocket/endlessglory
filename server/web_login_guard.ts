@@ -26,18 +26,31 @@ export function isDesktopAppRequest(req: Pick<IncomingMessage, 'headers'>): bool
   return typeof origin === 'string' && DESKTOP_APP_ORIGINS.has(origin);
 }
 
-// The CORS reflection allow-list for /api/*: realm vhosts plus the native and
-// desktop app shells, whose pages are served from a non-site origin and so need
-// the browser's permission to call the API. Auth is a bearer token (no cookies),
-// so reflecting these specific origins is safe. Returns the origin to reflect,
-// or null when the request must get no CORS headers (same-origin pages and
-// unknown origins).
-export function allowedCorsOrigin(origin: unknown): string | null {
+// The CORS reflection allow-list for /api/*: realm vhosts, the native and
+// desktop app shells, and any extra WEB_ORIGINS entry, whose pages are served
+// from a non-site origin and so need the browser's permission to call the API.
+// Auth is a bearer token (no cookies), so reflecting these specific origins is
+// safe. Returns the origin to reflect, or null when the request must get no
+// CORS headers (same-origin pages and unknown origins).
+// WEB_ORIGINS (not REALM_ORIGINS) is the right place for a second public site
+// origin that is not an actual realm server (e.g. a static mirror of the game
+// client): REALM_DIRECTORY is served verbatim to players as the realm-picker
+// list (`GET /api/realms`), so listing a non-realm origin there would offer it
+// as a selectable, non-functional realm.
+export function allowedCorsOrigin(
+  origin: unknown,
+  env: NodeJS.ProcessEnv = process.env,
+): string | null {
   if (typeof origin !== 'string') return null;
+  const webOrigins = String(env.WEB_ORIGINS ?? '')
+    .split(',')
+    .map((s) => s.trim())
+    .filter(Boolean);
   if (
     REALM_ORIGINS.has(origin) ||
     NATIVE_APP_ORIGINS.has(origin) ||
-    DESKTOP_APP_ORIGINS.has(origin)
+    DESKTOP_APP_ORIGINS.has(origin) ||
+    webOrigins.includes(origin)
   ) {
     return origin;
   }

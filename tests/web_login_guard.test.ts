@@ -137,4 +137,23 @@ describe('API CORS reflection allow-list (allowedCorsOrigin)', () => {
     expect(allowedCorsOrigin(undefined)).toBeNull();
     expect(allowedCorsOrigin('')).toBeNull();
   });
+
+  it('reflects a WEB_ORIGINS entry (a second public site origin that is not an actual realm)', () => {
+    expect(
+      allowedCorsOrigin('https://endless-glory.vercel.app', {
+        WEB_ORIGINS: 'https://endless-glory.vercel.app,https://endlessglory.vercel.app',
+      } as any),
+    ).toBe('https://endless-glory.vercel.app');
+    expect(
+      allowedCorsOrigin('https://endlessglory.vercel.app', {
+        WEB_ORIGINS: 'https://endless-glory.vercel.app,https://endlessglory.vercel.app',
+      } as any),
+    ).toBe('https://endlessglory.vercel.app');
+    expect(
+      allowedCorsOrigin('https://evil.example.com', {
+        WEB_ORIGINS: 'https://endless-glory.vercel.app',
+      } as any),
+    ).toBeNull();
+    expect(allowedCorsOrigin('https://endless-glory.vercel.app')).toBeNull();
+  });
 });
