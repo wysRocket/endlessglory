@@ -37,7 +37,7 @@ convention). Keep new endpoints in this same minimal style: validate input, one 
   string for the `endless-glory-auth` project.
 - `FIREBASE_SERVICE_ACCOUNT_JSON`: the `firebase-adminsdk` service-account key for the
   `endless-glory` Firebase project (same project as the client's `VITE_FIREBASE_*`
-  vars) — required for `verifyFirebaseIdToken` to verify Google sign-in tokens.
+  vars), required for `verifyFirebaseIdToken` to verify Google sign-in tokens.
 
 ## Do not
 - Do not point this at `worldofclaudecraft.com`'s database or reuse its `DATABASE_URL`:
