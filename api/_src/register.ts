@@ -10,9 +10,15 @@ import {
   offensiveName,
   validPassword,
   validUsernameShape,
-} from '../server/auth';
-import { createAccount, findAccountByUsername, saveToken } from './_lib/db';
-import { bodyOf, type FnRequest, type FnResponse, jsonError, methodNotAllowed } from './_lib/http';
+} from '../../server/auth.js';
+import { createAccount, findAccountByUsername, saveToken } from './_lib/db.js';
+import {
+  bodyOf,
+  type FnRequest,
+  type FnResponse,
+  jsonError,
+  methodNotAllowed,
+} from './_lib/http.js';
 
 export default async function handler(req: FnRequest, res: FnResponse): Promise<void> {
   if (req.method !== 'POST') return methodNotAllowed(res);

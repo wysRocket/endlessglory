@@ -22,15 +22,35 @@ accounts table does not have.
 - Reused verbatim (pure, dependency-free): `server/auth.ts` (hashPassword,
   verifyPassword, newToken, the validators) and `server/firebase_admin.ts`
   (verifyFirebaseIdToken). Never duplicate this logic here.
-- Reimplemented locally: `_lib/db.ts` (a minimal accounts + auth_tokens store against
-  `AUTH_DATABASE_URL`, NOT `server/db.ts`'s pool/schema) and `_lib/http.ts` (a tiny
-  request/response helper; no `@vercel/node` or `server/http/` RouteDef pipeline).
+- Reimplemented locally: `_src/_lib/db.ts` (a minimal accounts + auth_tokens store
+  against `AUTH_DATABASE_URL`, NOT `server/db.ts`'s pool/schema) and `_src/_lib/http.ts`
+  (a tiny request/response helper; no `@vercel/node` or `server/http/` RouteDef
+  pipeline).
+
+## Build shape: source in `_src/`, bundled output at the routed path
+Source lives under `api/_src/` (a `_`-prefixed directory, which Vercel's file-based
+routing never auto-routes). `scripts/build_api.mjs` (run by `npm run build:api`, chained
+into `npm run build`) esbuild-BUNDLES each entry (`bundle:true`, inlining every
+dependency) into the actual routed file Vercel deploys: `api/_src/register.ts` to
+`api/register.js`, `api/_src/login.ts` to `api/login.js`,
+`api/_src/auth/firebase.ts` to `api/auth/firebase.js`. Those three `api/*.js` files are
+gitignored generated output, same as `dist-server/`: never hand-edit them, and never
+commit them.
+
+Full bundling (not Vercel's own default per-file transpile) is required here, not a
+style choice: Vercel's Node runtime transpiles each `api/*.ts` file individually without
+bundling `node_modules`, and `firebase-admin` pulls in `jwks-rsa`, which does a plain
+CommonJS `require()` of the ESM-only `jose` package, a crash
+(`ERR_REQUIRE_ESM`) that only a build-time bundler can resolve (mirrors why
+`scripts/build_server.mjs` bundles the real game server the same way).
 
 ## Adding a route
-A new `api/<name>.ts` (or `api/<domain>/<name>.ts`) file is auto-routed by Vercel to
-`/api/<name>`. Files/directories under `_lib/` are never routed (Vercel's `_`-prefix
-convention). Keep new endpoints in this same minimal style: validate input, one or two
-`_lib/db.ts` calls, respond with the exact shape `src/net/online.ts` expects.
+A new `api/_src/<name>.ts` (or `api/_src/<domain>/<name>.ts`) source file needs a
+matching entry added to the `ENTRIES` list in `scripts/build_api.mjs`, which then
+produces its routed `api/<name>.js` counterpart. Files/directories under `_lib/` are
+never routed (Vercel's `_`-prefix convention) and need no `ENTRIES` entry. Keep new
+endpoints in this same minimal style: validate input, one or two `_lib/db.ts` calls,
+respond with the exact shape `src/net/online.ts` expects.
 
 ## Env vars (Vercel production only, never in `.env.example`: these are Vercel-only)
 - `AUTH_DATABASE_URL`: the Supabase pooled (port 6543, transaction mode) connection

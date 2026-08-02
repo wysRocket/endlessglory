@@ -8,6 +8,10 @@ node_modules
 dist/
 dist-env/
 dist-server/
+# esbuild-bundled Vercel auth functions (scripts/build_api.mjs); source is api/_src/
+api/register.js
+api/login.js
+api/auth/firebase.js
 release/
 release-steam/
 # generated main-process runtime bundles (scripts/electron-vendor.mjs)

@@ -2,9 +2,15 @@
 // Minimal subset of server/auth_routes.ts's loginHandler: username + password only, no
 // per-account throttle, TOTP, or moderation lock (none of that state exists in this
 // small accounts table). Reuses the pure helpers from server/auth.ts verbatim.
-import { newToken, verifyPassword } from '../server/auth';
-import { findAccountByUsername, saveToken, touchLogin } from './_lib/db';
-import { bodyOf, type FnRequest, type FnResponse, jsonError, methodNotAllowed } from './_lib/http';
+import { newToken, verifyPassword } from '../../server/auth.js';
+import { findAccountByUsername, saveToken, touchLogin } from './_lib/db.js';
+import {
+  bodyOf,
+  type FnRequest,
+  type FnResponse,
+  jsonError,
+  methodNotAllowed,
+} from './_lib/http.js';
 
 export default async function handler(req: FnRequest, res: FnResponse): Promise<void> {
   if (req.method !== 'POST') return methodNotAllowed(res);

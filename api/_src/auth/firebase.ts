@@ -4,10 +4,16 @@
 // provisioning a fresh account on first sign-in. No Discord/Apple provider-subject
 // matching and no moderation lock (neither exists in this small accounts table).
 import { randomBytes } from 'node:crypto';
-import { hashPassword, newToken, offensiveName } from '../../server/auth';
-import { verifyFirebaseIdToken } from '../../server/firebase_admin';
-import { accountForFirebaseUid, createAccount, saveToken } from '../_lib/db';
-import { bodyOf, type FnRequest, type FnResponse, jsonError, methodNotAllowed } from '../_lib/http';
+import { hashPassword, newToken, offensiveName } from '../../../server/auth.js';
+import { verifyFirebaseIdToken } from '../../../server/firebase_admin.js';
+import { accountForFirebaseUid, createAccount, saveToken } from '../_lib/db.js';
+import {
+  bodyOf,
+  type FnRequest,
+  type FnResponse,
+  jsonError,
+  methodNotAllowed,
+} from '../_lib/http.js';
 
 // The username a fresh Firebase signup starts with: the email local part, kept to a
 // valid username shape, falling back to a random name when too short or offensive
