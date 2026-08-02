@@ -27,6 +27,7 @@ import {
   setCharactersDbForTests,
 } from '../../server/characters';
 import type { AccountModerationStatus, CharacterRow } from '../../server/db';
+import { DEEDS_PAGE_SIZE } from '../../server/deeds_db';
 import { compose } from '../../server/http/compose';
 import {
   type GameMetricsCounters,
@@ -466,6 +467,51 @@ describe('owner sheet handler', () => {
     expect(res.status).toBe(200);
     expect(bodyRecord(res.body).rank).toBeNull();
     expect(bodyRecord(res.body).guild).toBeNull();
+  });
+});
+
+// ---------------------------------------------------------------------------
+// Owner deeds handler (GET /api/characters/:id/deeds): the dashboard's Collection page.
+// ---------------------------------------------------------------------------
+
+describe('owner deeds handler', () => {
+  it('200s a page of deeds from deedsPageForCharacter, body shape { deeds }', async () => {
+    const page = [
+      { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
+      { deedId: 'first_kill', earnedAt: '2026-07-01T09:00:00.000Z' },
+    ];
+    setCharactersDbForTests({ deedsPageForCharacter: async () => page });
+    const row = charRow({ id: 3 });
+    const res = await callHandler('GET', '/api/characters/:id/deeds', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(row),
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ deeds: page });
+  });
+
+  it('threads the before query param through as the deedsPageForCharacter third argument', async () => {
+    let capturedCharacterId: number | undefined;
+    let capturedLimit: number | undefined;
+    let capturedBefore: string | undefined;
+    setCharactersDbForTests({
+      deedsPageForCharacter: async (characterId, limit, before) => {
+        capturedCharacterId = characterId;
+        capturedLimit = limit;
+        capturedBefore = before;
+        return [];
+      },
+    });
+    const row = charRow({ id: 5 });
+    const res = await callHandler('GET', '/api/characters/:id/deeds', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(row),
+      query: { before: '2026-07-01T09:00:00.000Z' },
+    });
+    expect(res.status).toBe(200);
+    expect(capturedCharacterId).toBe(5);
+    expect(capturedLimit).toBe(DEEDS_PAGE_SIZE);
+    expect(capturedBefore).toBe('2026-07-01T09:00:00.000Z');
   });
 });
 
@@ -1051,6 +1097,12 @@ describe('BOLA cross-account 404 (full route chain)', () => {
     expect(r.body).toEqual({ error: 'character not found', code: 'character.not_found' });
   });
 
+  it('owner deeds 404s character-not-found, handler unreached', async () => {
+    const r = await runRoute('GET', '/api/characters/:id/deeds', { params: { id: '1' } });
+    expect(r).toMatchObject({ status: 404, reached: false });
+    expect(r.body).toEqual({ error: 'character not found', code: 'character.not_found' });
+  });
+
   it('rename 404s character-not-found, handler unreached', async () => {
     const r = await runRoute('POST', '/api/characters/:id/rename', {
       params: { id: '1' },
@@ -1189,8 +1241,8 @@ describe('character-mutation limiters (newLimiterCharacterMutations 429)', () =>
 // ---------------------------------------------------------------------------
 
 describe('routes table', () => {
-  it('registers the eight character routes on the api surface', () => {
-    expect(routes).toHaveLength(8);
+  it('registers the nine character routes on the api surface', () => {
+    expect(routes).toHaveLength(9);
     for (const r of routes) {
       expect(r.surface).toBe('api');
       expect(typeof r.handler).toBe('function');
@@ -1201,6 +1253,7 @@ describe('routes table', () => {
     const ownedPaths = [
       'GET /api/characters/:id/standing',
       'GET /api/characters/:id/sheet',
+      'GET /api/characters/:id/deeds',
       'POST /api/characters/:id/rename',
       'POST /api/characters/:id/takeover',
       'DELETE /api/characters/:id',

@@ -7,6 +7,7 @@
 //   GET    /api/characters                full-session character list (byte-identical body)
 //   POST   /api/characters                create a character (capped)
 //   GET    /api/characters/:id/sheet      the OWNER character sheet
+//   GET    /api/characters/:id/deeds      paginated owned-character deed history
 //   GET    /api/characters/:id/standing   lifetime-XP standing
 //   POST   /api/characters/:id/rename     moderator-sanctioned rename
 //   POST   /api/characters/:id/takeover   free a stale live session
@@ -61,7 +62,7 @@ import {
   renameCharacter,
   scopeAllowsMutation,
 } from './db';
-import { recentDeedsForCharacter } from './deeds_db';
+import { DEEDS_PAGE_SIZE, deedsPageForCharacter, recentDeedsForCharacter } from './deeds_db';
 import { ctxAccountId } from './http/context';
 import { gameMetricsCounters } from './http/game_signals';
 import { withBody } from './http/middleware/body';
@@ -75,6 +76,7 @@ import {
 import { requireOwned } from './http/middleware/require_owned';
 import type { Ctx, Middleware, RouteDef } from './http/types';
 import { isUniqueViolation, json, moderationErrorBody } from './http_util';
+import { firstQueryValue } from './leaderboard';
 import { REALM } from './realm';
 
 // ---------------------------------------------------------------------------
@@ -204,6 +206,7 @@ const REAL_CHARACTERS_DB = {
   guildNameForCharacter,
   lifetimeXpRankForCharacter,
   recentDeedsForCharacter,
+  deedsPageForCharacter,
 };
 let charactersDb = REAL_CHARACTERS_DB;
 
@@ -461,6 +464,19 @@ async function ownerSheetHandler(ctx: Ctx): Promise<void> {
   );
 }
 
+/** GET /api/characters/:id/deeds: a paginated page of the owned character's earned
+ *  deeds for the player dashboard's Collection page, newest first. The in-game deeds
+ *  board reads a live WebSocket snapshot (deedsEarned) this REST-only surface has no
+ *  access to; this is the only REST-facing full listing (the sheet's recentDeeds strip
+ *  caps at SHEET_RECENT_DEEDS = 5). */
+async function ownerDeedsHandler(ctx: Ctx): Promise<void> {
+  const row = ownedCharacter(ctx);
+  const limit = Number(firstQueryValue(ctx.query.limit)) || DEEDS_PAGE_SIZE;
+  const before = firstQueryValue(ctx.query.before);
+  const deeds = await charactersDb.deedsPageForCharacter(row.id, limit, before);
+  json(ctx.res, 200, { deeds });
+}
+
 /** POST /api/characters/:id/rename: moderator-sanctioned rename (force_rename gated). */
 async function renameHandler(ctx: Ctx): Promise<void> {
   const rt = useRuntime();
@@ -601,6 +617,14 @@ export const routes: RouteDef[] = [
     surface: 'api',
     middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
     handler: ownerSheetHandler,
+    meta: OWNED_CHARACTER_META,
+  },
+  {
+    method: 'GET',
+    path: '/api/characters/:id/deeds',
+    surface: 'api',
+    middleware: [readGuard, requireOwnedCharacter(CHARACTER_NOT_FOUND)],
+    handler: ownerDeedsHandler,
     meta: OWNED_CHARACTER_META,
   },
   {

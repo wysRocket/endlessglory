@@ -137,6 +137,40 @@ export async function recentDeedsForCharacter(
   }));
 }
 
+/** Page size for the player dashboard's Collection page (deedsPageForCharacter). */
+export const DEEDS_PAGE_SIZE = 20;
+
+/** One page of a character's earned deeds, newest first, for the player dashboard's
+ *  Collection page. Same ordering convention as recentDeedsForCharacter
+ *  (earned_at DESC, id DESC id-tiebreak); `before` pages backward from a prior
+ *  page's last earnedAt. */
+export async function deedsPageForCharacter(
+  characterId: number,
+  limit: number,
+  before?: string,
+): Promise<RecentDeedRow[]> {
+  const boundedLimit = Math.max(1, Math.min(DEEDS_PAGE_SIZE, limit));
+  const res = before
+    ? await pool.query(
+        `SELECT deed_id, earned_at FROM character_deeds
+         WHERE character_id = $1 AND earned_at < $2
+         ORDER BY earned_at DESC, id DESC
+         LIMIT $3`,
+        [characterId, before, boundedLimit],
+      )
+    : await pool.query(
+        `SELECT deed_id, earned_at FROM character_deeds
+         WHERE character_id = $1
+         ORDER BY earned_at DESC, id DESC
+         LIMIT $2`,
+        [characterId, boundedLimit],
+      );
+  return res.rows.map((row) => ({
+    deedId: row.deed_id,
+    earnedAt: row.earned_at instanceof Date ? row.earned_at.toISOString() : String(row.earned_at),
+  }));
+}
+
 /** Every deed id the account has earned on any character, deduped. Feeds the
  *  Steam reconcile-on-link push (server/steam/mirror.ts): the server store is
  *  canonical and Steam mirrors a subset, so this read is the whole sync. */
