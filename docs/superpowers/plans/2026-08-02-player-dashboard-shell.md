@@ -2083,11 +2083,6 @@ import {
 
 export class LeaderboardPainter {
   private tab: LeaderboardTab = 'xp';
-  // Same in-flight guard CollectionPainter uses for its load-more button: a
-  // second tab click while a fetch is still in flight is ignored rather than
-  // racing a second load() (which could otherwise let a stale response for an
-  // abandoned tab overwrite the tab the player switched to).
-  private loading = false;
 
   constructor(
     private readonly container: HTMLElement,
@@ -2099,31 +2094,36 @@ export class LeaderboardPainter {
   }
 
   private async load(): Promise<void> {
-    if (this.loading) return;
-    this.loading = true;
-    try {
-      this.container.innerHTML = '<div class="arc-card">...</div>';
-      if (this.tab === 'xp') {
-        const entries = await this.api.leaderboard('global', 100);
-        const rows: XpLeaderboardRow[] = entries.map((e) => ({
-          rank: e.rank,
-          name: e.name,
-          level: e.level,
-          lifetimeXp: e.lifetimeXp,
-        }));
-        this.renderXp(leaderboardPageModel('xp', rows));
-      } else {
-        const entries = await this.api.arenaLeaderboard(100);
-        const rows: ArenaLeaderboardRow[] = entries.map((e) => ({
-          name: e.name,
-          rating: e.rating,
-          wins: e.wins,
-          losses: e.losses,
-        }));
-        this.renderArena(leaderboardPageModel('arena', rows));
-      }
-    } finally {
-      this.loading = false;
+    // Discard-stale-response, not a blocking in-flight guard: a blocking
+    // guard here would silently drop a tab switch that arrives while the
+    // PREVIOUS tab's fetch is still in flight, leaving that tab's button
+    // stuck disabled with no way to retry. Instead every click starts its
+    // own fetch immediately; when a fetch resolves, it renders only if
+    // this.tab still matches the tab it was fetching for, so an outdated
+    // response for a tab the player has since left never overwrites what
+    // they are now looking at.
+    const requestedTab = this.tab;
+    this.container.innerHTML = '<div class="arc-card">...</div>';
+    if (requestedTab === 'xp') {
+      const entries = await this.api.leaderboard('global', 100);
+      if (this.tab !== requestedTab) return;
+      const rows: XpLeaderboardRow[] = entries.map((e) => ({
+        rank: e.rank,
+        name: e.name,
+        level: e.level,
+        lifetimeXp: e.lifetimeXp,
+      }));
+      this.renderXp(leaderboardPageModel('xp', rows));
+    } else {
+      const entries = await this.api.arenaLeaderboard(100);
+      if (this.tab !== requestedTab) return;
+      const rows: ArenaLeaderboardRow[] = entries.map((e) => ({
+        name: e.name,
+        rating: e.rating,
+        wins: e.wins,
+        losses: e.losses,
+      }));
+      this.renderArena(leaderboardPageModel('arena', rows));
     }
   }
 
