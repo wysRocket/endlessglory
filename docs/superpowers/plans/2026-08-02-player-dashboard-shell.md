@@ -1815,6 +1815,7 @@ export class CollectionPainter {
   private before: string | undefined;
   private accumulated: EarnedDeed[] = [];
   private characterId: number | undefined;
+  private loading = false;
 
   constructor(
     private readonly container: HTMLElement,
@@ -1827,6 +1828,12 @@ export class CollectionPainter {
   }
 
   private async loadPage(): Promise<void> {
+    // Guards against a double-click on "Load more": without this, two
+    // concurrent calls would both read the same this.before, both fetch the
+    // identical page, and both append it independently, visibly duplicating
+    // rows.
+    if (this.loading) return;
+    this.loading = true;
     try {
       if (this.characterId === undefined) {
         const characters = await this.api.characters();
@@ -1845,6 +1852,8 @@ export class CollectionPainter {
       this.render(collectionPageModel(this.accumulated));
     } catch (err) {
       this.renderError(userFacingApiError(err));
+    } finally {
+      this.loading = false;
     }
   }
 
