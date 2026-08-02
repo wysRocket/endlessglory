@@ -944,16 +944,38 @@ what the form should show given its state."
 ### Task 5: The shell (auth gate and nav)
 
 **Files:**
+- Create: `src/dashboard/auth_gate_core.ts`
 - Create: `src/dashboard/shell.ts`
-- Test: `tests/dashboard_shell.test.ts` (create)
+- Test: `tests/dashboard_auth_gate_core.test.ts` (create)
+
+Note: this task splits the auth gate decision into its own file rather than
+keeping it inline in `shell.ts`, for two independent reasons discovered while
+implementing:
+
+1. **ESM static imports resolve eagerly.** `shell.ts` imports the three page
+   painters (`./collection_painter`, `./leaderboard_painter`,
+   `./profile_painter`), which do not exist until Tasks 7 to 9. A test that
+   imports `shell.ts` directly (even to reach only `resolveAuthGate`) would
+   fail with `Cannot find module './collection_painter'` regardless of
+   whether the test ever touches that binding: JavaScript module resolution
+   requires every static import specifier to resolve before the importing
+   module's body runs. Splitting the gate into its own file with no forward
+   references means the test can import it in isolation.
+2. **The pure-core architecture guard forbids a `net/` import.** A module
+   registered in `UI_PURE_CORES` (`tests/architecture.test.ts`) may not import
+   the `net/` layer. The gate's auth-vs-transient classification depends on
+   `isAuthError` from `src/net/online.ts`, so `isAuthError` is INJECTED as a
+   parameter rather than imported directly: `shell.ts` (not a registered pure
+   core) imports the real one and passes it in; tests pass their own.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `tests/dashboard_shell.test.ts`:
+Create `tests/dashboard_auth_gate_core.test.ts`:
 
 ```ts
-import { describe, expect, it, vi } from 'vitest';
-import { resolveAuthGate } from '../src/dashboard/shell';
+import { describe, expect, it } from 'vitest';
+import { resolveAuthGate } from '../src/dashboard/auth_gate_core';
+import { ApiError, isAuthError } from '../src/net/online';
 
 function fakeApi(overrides: Partial<{ token: string | null; restoreSession(): boolean; getAccount(): Promise<unknown> }>) {
   return {
@@ -967,22 +989,22 @@ function fakeApi(overrides: Partial<{ token: string | null; restoreSession(): bo
 describe('dashboard auth gate', () => {
   it('shows the login form when there is no session to restore', async () => {
     const api = fakeApi({ restoreSession: () => false });
-    expect(await resolveAuthGate(api as never)).toBe('login');
+    expect(await resolveAuthGate(api as never, isAuthError)).toBe('login');
   });
 
   it('shows the shell when restore succeeds and the server confirms it', async () => {
     const api = fakeApi({ restoreSession: () => true });
-    expect(await resolveAuthGate(api as never)).toBe('authenticated');
+    expect(await resolveAuthGate(api as never, isAuthError)).toBe('authenticated');
   });
 
   it('falls back to login when the server rejects the restored token (401)', async () => {
     const api = fakeApi({
       restoreSession: () => true,
       getAccount: async () => {
-        throw Object.assign(new Error('unauthorized'), { status: 401 });
+        throw new ApiError('unauthorized', 401);
       },
     });
-    expect(await resolveAuthGate(api as never)).toBe('login');
+    expect(await resolveAuthGate(api as never, isAuthError)).toBe('login');
   });
 
   it('stays authenticated on a transient error, matching loadAccountPortal in src/main.ts', async () => {
@@ -992,43 +1014,58 @@ describe('dashboard auth gate', () => {
         throw new Error('network blip, no status');
       },
     });
-    expect(await resolveAuthGate(api as never)).toBe('authenticated');
+    expect(await resolveAuthGate(api as never, isAuthError)).toBe('authenticated');
   });
 });
 ```
 
+Note the 401 test constructs a real `ApiError` (`new ApiError('unauthorized',
+401)`), not a plain `Error` with a bolted-on `.status` property: `isAuthError`
+in `src/net/online.ts` checks `err instanceof ApiError`, so a plain `Error`
+would never satisfy it regardless of a `.status` field, and the test would
+wrongly pass through the transient branch.
+
 - [ ] **Step 2: Run it and confirm it fails**
 
-Run: `npx vitest run tests/dashboard_shell.test.ts`
+Run: `npx vitest run tests/dashboard_auth_gate_core.test.ts`
 
-Expected: FAIL, `Cannot find module '../src/dashboard/shell'`.
+Expected: FAIL, `Cannot find module '../src/dashboard/auth_gate_core'`.
 
-- [ ] **Step 3: Write the pure gate function and the shell class**
+- [ ] **Step 3: Write the pure gate function**
 
-Create `src/dashboard/shell.ts`:
+Create `src/dashboard/auth_gate_core.ts`:
 
 ```ts
-// The dashboard's auth gate and page nav. Mirrors loadAccountPortal's pattern in
-// src/main.ts exactly: restore, revalidate server-side, and on an AUTH error
-// (401/403) clear the session and show login; on a TRANSIENT error, stay
-// authenticated with cached identity rather than bouncing a valid session.
-
-import { Api, isAuthError } from '../net/online';
-import { LoginPainter } from './login_painter';
-import { CollectionPainter } from './collection_painter';
-import { LeaderboardPainter } from './leaderboard_painter';
-import { ProfilePainter } from './profile_painter';
-import { t } from '../ui/i18n';
+// Pure auth-gate decision for the dashboard shell. Mirrors loadAccountPortal's
+// pattern in src/main.ts exactly: restore, revalidate server-side, and on an
+// AUTH error (401/403) clear the session and show login; on a TRANSIENT error,
+// stay authenticated with cached identity rather than bouncing a valid session.
+//
+// Lives in its own zero-dependency module (not inline in shell.ts) so tests can
+// import it without pulling in shell.ts's other static imports (the three page
+// painters), which do not exist until later tasks in this plan land: ESM static
+// imports resolve eagerly regardless of which bindings a caller actually reads,
+// so a test importing shell.ts directly would fail to resolve those modules
+// even though it never uses them.
+//
+// The auth-vs-transient classifier is INJECTED, not imported from net/online:
+// this file is a registered UI_PURE_CORES module (tests/architecture.test.ts),
+// which forbids a pure core from importing the net/ layer. shell.ts passes the
+// real isAuthError in; tests pass a fake.
 
 export type AuthGateResult = 'login' | 'authenticated';
 
-/** Pure decision: given an Api-shaped client, should the shell show the login
- *  form or the authenticated pages. Takes an interface subset, not the
- *  concrete Api class, so it is testable with a fake. */
-export async function resolveAuthGate(api: {
-  restoreSession(): boolean;
-  getAccount(): Promise<unknown>;
-}): Promise<AuthGateResult> {
+/** Pure decision: given an Api-shaped client and an auth-error classifier,
+ *  should the shell show the login form or the authenticated pages. Takes an
+ *  interface subset, not the concrete Api class, so it is testable with a
+ *  fake. */
+export async function resolveAuthGate(
+  api: {
+    restoreSession(): boolean;
+    getAccount(): Promise<unknown>;
+  },
+  isAuthError: (err: unknown) => boolean,
+): Promise<AuthGateResult> {
   if (!api.restoreSession()) return 'login';
   try {
     await api.getAccount();
@@ -1039,6 +1076,42 @@ export async function resolveAuthGate(api: {
     return 'authenticated';
   }
 }
+```
+
+- [ ] **Step 4: Run the test and confirm it passes**
+
+Run: `npx vitest run tests/dashboard_auth_gate_core.test.ts`
+
+Expected: PASS, 4 tests.
+
+- [ ] **Step 5: Register the pure core**
+
+Add `'src/dashboard/auth_gate_core.ts',` to `UI_PURE_CORES` in
+`tests/architecture.test.ts`, alongside `'src/dashboard/login_view.ts'` from
+Task 4.
+
+Run: `npx vitest run tests/architecture.test.ts`
+
+Expected: PASS. If it fails with `src/dashboard/auth_gate_core.ts imports
+'../net/online' (net)`, that means `isAuthError` is imported directly instead
+of taking it as a parameter; re-check the file matches Step 3 exactly.
+
+- [ ] **Step 6: Write the shell class**
+
+Create `src/dashboard/shell.ts`:
+
+```ts
+// The dashboard's auth gate and page nav. The gate decision itself is the pure
+// resolveAuthGate function in ./auth_gate_core; this file is the DOM-touching
+// shell that acts on it.
+
+import { Api, isAuthError } from '../net/online';
+import { t } from '../ui/i18n';
+import { resolveAuthGate } from './auth_gate_core';
+import { CollectionPainter } from './collection_painter';
+import { LeaderboardPainter } from './leaderboard_painter';
+import { LoginPainter } from './login_painter';
+import { ProfilePainter } from './profile_painter';
 
 type Page = 'profile' | 'collection' | 'leaderboard';
 
@@ -1049,7 +1122,7 @@ export class DashboardShell {
   constructor(private readonly mount: HTMLElement) {}
 
   async start(): Promise<void> {
-    const gate = await resolveAuthGate(this.api);
+    const gate = await resolveAuthGate(this.api, isAuthError);
     if (gate === 'login') {
       this.renderLoginOnly();
       return;
@@ -1102,32 +1175,19 @@ This references `ProfilePainter`, `CollectionPainter`, `LeaderboardPainter`
 from tasks 7 through 9. It will not typecheck until those exist; that is
 expected, same as task 1's forward reference to this file.
 
-- [ ] **Step 4: Run the gate test**
+- [ ] **Step 7: Verify**
 
-Run: `npx vitest run tests/dashboard_shell.test.ts`
+Run: `npx tsc --noEmit`
 
-Expected: PASS, 4 tests. This test imports only `resolveAuthGate`, a named
-export, so it does not require the page painters to exist or typecheck; Vitest
-transforms the file it is asked to import without executing unrelated import
-statements it does not reach in the test's own call graph being wrong would
-show as a module resolution error, not a type error, so if this step fails
-with a resolution error naming `./profile_painter` or similar, that confirms
-task 5 is correctly blocked on tasks 7 to 9, not broken.
+Expected: exactly 3 errors, one per missing painter module (`./collection_painter`,
+`./leaderboard_painter`, `./profile_painter`), nothing else. The Task 1 error
+about `./shell` is gone now that `shell.ts` exists.
 
-- [ ] **Step 5: Register the pure core**
-
-In `tests/architecture.test.ts`'s `UI_PURE_CORES` array, this file is NOT
-added: `shell.ts` is not itself DOM-free (it constructs painters and touches
-`HTMLElement`). Only `resolveAuthGate` inside it is pure, and it is covered
-directly by `tests/dashboard_shell.test.ts` without needing the
-`UI_PURE_CORES` registration, which exists to catch UNTESTED pure cores, not to
-gate every file that happens to contain one pure function among impure ones.
-
-- [ ] **Step 6: Commit**
+- [ ] **Step 8: Commit**
 
 ```bash
-npx @biomejs/biome check --write src/dashboard/shell.ts tests/dashboard_shell.test.ts
-git add src/dashboard/shell.ts tests/dashboard_shell.test.ts
+npx @biomejs/biome check --write src/dashboard/auth_gate_core.ts src/dashboard/shell.ts tests/dashboard_auth_gate_core.test.ts tests/architecture.test.ts
+git add src/dashboard/auth_gate_core.ts src/dashboard/shell.ts tests/dashboard_auth_gate_core.test.ts tests/architecture.test.ts
 git commit -m "feat(dashboard): add the shell, auth gate, and nav
 
 resolveAuthGate mirrors loadAccountPortal's exact pattern from src/main.ts:
@@ -1135,9 +1195,20 @@ restore, revalidate, and only an auth error (401/403) clears the session and
 falls back to login; a transient error keeps the session, since it may still
 be valid.
 
-References the three page painters added in the next three tasks; this
-commit does not yet typecheck standalone, which is expected and matches how
-task 1 referenced this file before it existed."
+Lives in its own module, src/dashboard/auth_gate_core.ts, rather than inline
+in shell.ts, for two reasons: ESM static imports resolve eagerly regardless
+of which bindings a caller reads, so a test importing shell.ts directly would
+fail on its three not-yet-built page painter imports even though the test
+never touches them; and the pure-core architecture guard
+(tests/architecture.test.ts) forbids a registered UI_PURE_CORES module from
+importing the net/ layer, so the auth-vs-transient classifier (isAuthError)
+is injected as a parameter rather than imported directly, with shell.ts
+supplying the real one and tests supplying their own.
+
+shell.ts itself still references the three page painters added in the next
+three tasks; this commit does not yet typecheck standalone beyond those three
+expected forward-reference errors, matching how Task 1 referenced this file
+before it existed."
 ```
 
 ---
@@ -1857,7 +1928,7 @@ Add `'src/dashboard/leaderboard_view.ts',` to `UI_PURE_CORES`.
 - [ ] **Step 8: Run every dashboard test together**
 
 ```bash
-npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/net_turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_shell.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters_deeds.test.ts
+npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/net_turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_auth_gate_core.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters_deeds.test.ts
 ```
 
 Expected: every file PASSES.
