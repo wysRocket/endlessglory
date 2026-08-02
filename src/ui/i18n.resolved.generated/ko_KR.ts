@@ -4066,46 +4066,46 @@ export const ko_KR: EnTranslations = {
   },
   "dashboard": {
     "nav": {
-      "profile": "Profile",
-      "collection": "Collection",
-      "leaderboard": "Leaderboard",
+      "profile": "프로필",
+      "collection": "컬렉션",
+      "leaderboard": "순위표",
       "logout": "Log out"
     },
     "login": {
       "title": "Sign in",
-      "username": "Username",
-      "password": "Password",
+      "username": "사용자 이름",
+      "password": "비밀번호",
       "submit": "Sign in",
-      "registerPrompt": "Don't have an account?",
-      "registerLink": "Create one",
-      "twoFactorLabel": "6-digit or recovery code",
-      "twoFactorSubmit": "Verify"
+      "registerPrompt": "계정이 없으신가요?",
+      "registerLink": "계정 만들기",
+      "twoFactorLabel": "6자리 코드 또는 복구 코드",
+      "twoFactorSubmit": "인증"
     },
     "register": {
-      "title": "Create an account",
-      "email": "Email",
-      "submit": "Create account"
+      "title": "계정 생성",
+      "email": "이메일",
+      "submit": "계정 생성"
     },
     "loggedOut": {
-      "message": "Sign in to view your account."
+      "message": "계정을 보려면 로그인하세요."
     },
     "profile": {
-      "title": "Profile",
-      "noCharacters": "No characters yet."
+      "title": "프로필",
+      "noCharacters": "아직 캐릭터가 없습니다."
     },
     "collection": {
-      "title": "Collection",
-      "empty": "No deeds earned yet.",
-      "loadMore": "Load more"
+      "title": "컬렉션",
+      "empty": "아직 획득한 업적이 없습니다.",
+      "loadMore": "더 보기"
     },
     "leaderboard": {
-      "title": "Leaderboard",
-      "tabXp": "Experience",
-      "tabArena": "Arena"
+      "title": "순위표",
+      "tabXp": "경험치",
+      "tabArena": "투기장"
     },
     "error": {
-      "retry": "Retry",
-      "generic": "Something went wrong."
+      "retry": "다시 시도",
+      "generic": "문제가 발생했습니다."
     }
   },
   "skinEvent": {

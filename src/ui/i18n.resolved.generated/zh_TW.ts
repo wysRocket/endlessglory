@@ -4066,46 +4066,46 @@ export const zh_TW: EnTranslations = {
   },
   "dashboard": {
     "nav": {
-      "profile": "Profile",
-      "collection": "Collection",
-      "leaderboard": "Leaderboard",
+      "profile": "資料",
+      "collection": "收藏",
+      "leaderboard": "排行榜",
       "logout": "Log out"
     },
     "login": {
       "title": "Sign in",
-      "username": "Username",
-      "password": "Password",
+      "username": "使用者名稱",
+      "password": "密碼",
       "submit": "Sign in",
-      "registerPrompt": "Don't have an account?",
-      "registerLink": "Create one",
-      "twoFactorLabel": "6-digit or recovery code",
-      "twoFactorSubmit": "Verify"
+      "registerPrompt": "還沒有帳號？",
+      "registerLink": "立即建立",
+      "twoFactorLabel": "6 位數驗證碼或救援碼",
+      "twoFactorSubmit": "驗證"
     },
     "register": {
-      "title": "Create an account",
-      "email": "Email",
-      "submit": "Create account"
+      "title": "建立帳號",
+      "email": "電子郵件",
+      "submit": "建立帳號"
     },
     "loggedOut": {
-      "message": "Sign in to view your account."
+      "message": "請登入以查看你的帳號。"
     },
     "profile": {
-      "title": "Profile",
-      "noCharacters": "No characters yet."
+      "title": "資料",
+      "noCharacters": "尚無角色。"
     },
     "collection": {
-      "title": "Collection",
-      "empty": "No deeds earned yet.",
-      "loadMore": "Load more"
+      "title": "收藏",
+      "empty": "尚未獲得任何功績。",
+      "loadMore": "載入更多"
     },
     "leaderboard": {
-      "title": "Leaderboard",
-      "tabXp": "Experience",
-      "tabArena": "Arena"
+      "title": "排行榜",
+      "tabXp": "經驗值",
+      "tabArena": "競技場"
     },
     "error": {
-      "retry": "Retry",
-      "generic": "Something went wrong."
+      "retry": "重試",
+      "generic": "發生錯誤。"
     }
   },
   "skinEvent": {

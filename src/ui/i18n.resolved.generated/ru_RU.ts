@@ -4066,46 +4066,46 @@ export const ru_RU: EnTranslations = {
   },
   "dashboard": {
     "nav": {
-      "profile": "Profile",
-      "collection": "Collection",
-      "leaderboard": "Leaderboard",
+      "profile": "Профиль",
+      "collection": "Коллекция",
+      "leaderboard": "Таблица лидеров",
       "logout": "Log out"
     },
     "login": {
       "title": "Sign in",
-      "username": "Username",
-      "password": "Password",
+      "username": "Имя пользователя",
+      "password": "Пароль",
       "submit": "Sign in",
-      "registerPrompt": "Don't have an account?",
-      "registerLink": "Create one",
-      "twoFactorLabel": "6-digit or recovery code",
-      "twoFactorSubmit": "Verify"
+      "registerPrompt": "Нет аккаунта?",
+      "registerLink": "Создать",
+      "twoFactorLabel": "6-значный код или код восстановления",
+      "twoFactorSubmit": "Подтвердить"
     },
     "register": {
-      "title": "Create an account",
-      "email": "Email",
-      "submit": "Create account"
+      "title": "Создать аккаунт",
+      "email": "Эл. почта",
+      "submit": "Создать аккаунт"
     },
     "loggedOut": {
-      "message": "Sign in to view your account."
+      "message": "Войдите, чтобы увидеть свой аккаунт."
     },
     "profile": {
-      "title": "Profile",
-      "noCharacters": "No characters yet."
+      "title": "Профиль",
+      "noCharacters": "Пока нет персонажей."
     },
     "collection": {
-      "title": "Collection",
-      "empty": "No deeds earned yet.",
-      "loadMore": "Load more"
+      "title": "Коллекция",
+      "empty": "Пока не получено ни одного деяния.",
+      "loadMore": "Загрузить еще"
     },
     "leaderboard": {
-      "title": "Leaderboard",
-      "tabXp": "Experience",
-      "tabArena": "Arena"
+      "title": "Таблица лидеров",
+      "tabXp": "Опыт",
+      "tabArena": "Арена"
     },
     "error": {
-      "retry": "Retry",
-      "generic": "Something went wrong."
+      "retry": "Повторить",
+      "generic": "Произошла ошибка."
     }
   },
   "skinEvent": {

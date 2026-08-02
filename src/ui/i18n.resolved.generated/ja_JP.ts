@@ -4066,46 +4066,46 @@ export const ja_JP: EnTranslations = {
   },
   "dashboard": {
     "nav": {
-      "profile": "Profile",
-      "collection": "Collection",
-      "leaderboard": "Leaderboard",
+      "profile": "プロフィール",
+      "collection": "コレクション",
+      "leaderboard": "ランキング",
       "logout": "Log out"
     },
     "login": {
       "title": "Sign in",
-      "username": "Username",
-      "password": "Password",
+      "username": "ユーザー名",
+      "password": "パスワード",
       "submit": "Sign in",
-      "registerPrompt": "Don't have an account?",
-      "registerLink": "Create one",
-      "twoFactorLabel": "6-digit or recovery code",
-      "twoFactorSubmit": "Verify"
+      "registerPrompt": "アカウントをお持ちでない方は",
+      "registerLink": "新規作成",
+      "twoFactorLabel": "6桁のコードまたは復旧コード",
+      "twoFactorSubmit": "認証"
     },
     "register": {
-      "title": "Create an account",
-      "email": "Email",
-      "submit": "Create account"
+      "title": "アカウント作成",
+      "email": "メールアドレス",
+      "submit": "アカウントを作成"
     },
     "loggedOut": {
-      "message": "Sign in to view your account."
+      "message": "アカウントを表示するにはログインしてください。"
     },
     "profile": {
-      "title": "Profile",
-      "noCharacters": "No characters yet."
+      "title": "プロフィール",
+      "noCharacters": "キャラクターがまだいません。"
     },
     "collection": {
-      "title": "Collection",
-      "empty": "No deeds earned yet.",
-      "loadMore": "Load more"
+      "title": "コレクション",
+      "empty": "まだ功績を獲得していません。",
+      "loadMore": "さらに読み込む"
     },
     "leaderboard": {
-      "title": "Leaderboard",
-      "tabXp": "Experience",
-      "tabArena": "Arena"
+      "title": "ランキング",
+      "tabXp": "経験値",
+      "tabArena": "アリーナ"
     },
     "error": {
-      "retry": "Retry",
-      "generic": "Something went wrong."
+      "retry": "再試行",
+      "generic": "エラーが発生しました。"
     }
   },
   "skinEvent": {
