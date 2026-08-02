@@ -14,6 +14,7 @@ export class CollectionPainter {
   private before: string | undefined;
   private accumulated: EarnedDeed[] = [];
   private characterId: number | undefined;
+  private loading = false;
 
   constructor(
     private readonly container: HTMLElement,
@@ -26,6 +27,8 @@ export class CollectionPainter {
   }
 
   private async loadPage(): Promise<void> {
+    if (this.loading) return;
+    this.loading = true;
     try {
       if (this.characterId === undefined) {
         const characters = await this.api.characters();
@@ -44,6 +47,8 @@ export class CollectionPainter {
       this.render(collectionPageModel(this.accumulated));
     } catch (err) {
       this.renderError(userFacingApiError(err));
+    } finally {
+      this.loading = false;
     }
   }
 
