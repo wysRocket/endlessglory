@@ -20,12 +20,12 @@ import {
   waterLevelAt,
   zoneBiomeAt,
 } from '../sim/world';
+import { ACTIVE_VISUAL_THEME } from '../visual_theme';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
+import { foliagePaletteForTheme } from './emberwood/palette';
 import { configureMaskedDoubleSidedVegetationMaterial, GFX, sharedUniforms } from './gfx';
 import { grassTuftTexture } from './textures';
-import { ACTIVE_VISUAL_THEME } from '../visual_theme';
-import { foliagePaletteForTheme } from './emberwood/palette';
 
 // Vegetation: trees, rocks, ground dressing and the grass ring.
 //
@@ -1056,7 +1056,9 @@ const DRESS_DENSITY: Record<BiomeId, number> = {
   peaks: 0.15,
   beach: 0.1,
   desert: 0.07,
-  volcano: 0.05,
+  // A lava/volcanic wasteland grows no bushes/ferns/mushrooms: generateDecorations
+  // already restricts this biome to rock-only, and ground dressing must match.
+  volcano: 0,
   cave: 0.08,
 };
 const DRESS_DENSITY_LOW_SCALE = 1.24;
@@ -1081,7 +1083,7 @@ function dressKindFor(biome: BiomeId, r: number): DressKind {
   }
   if (biome === 'beach' || biome === 'desert') return 'bush';
   if (biome === 'cave') return r < 0.5 ? 'mushroom' : 'fern';
-  if (biome === 'volcano') return 'bush';
+  // volcano has no branch: DRESS_DENSITY.volcano is 0, so this is never reached for it.
   return r < 0.62 ? 'bush' : 'fern';
 }
 
@@ -1447,9 +1449,12 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
     for (let i = i0; i <= i1 && n < maxChunkCount; i++) {
       for (let j = j0; j <= j1 && n < maxChunkCount; j++) {
         const r = hashAt(i, j, 0);
-        if (r > (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW)) continue;
         const x = i * step + (hashAt(i, j, 1) - 0.5) * step * 1.4;
         const z = j * step + (hashAt(i, j, 2) - 0.5) * step * 1.4;
+        const biome = biomeAt(x, z);
+        // A lava/volcanic wasteland grows no grass: bare ash and rock only.
+        if (biome === 'volcano') continue;
+        if (r > (lush ? GRASS_DENSITY_HIGH : GRASS_DENSITY_LOW)) continue;
         if (x < minX || x >= maxX || z < minZ || z >= maxZ) continue;
         if (Math.abs(x) > WORLD_MAX_X - 16 || z < WORLD_MIN_Z + 16 || z > WORLD_MAX_Z - 16)
           continue;
@@ -1471,7 +1476,7 @@ function buildGrassRing(parent: THREE.Group, seed: number): GrassRing {
         q.setFromAxisAngle(up, r * 12.4);
         m.compose(v.set(x, h, z), q, sv.set(s, s, s));
         im.setMatrixAt(n, m);
-        c.setHex(GRASS_TINT[biomeAt(x, z)]);
+        c.setHex(GRASS_TINT[biome]);
         c.offsetHSL(
           (hashAt(i, j, 3) - 0.5) * 0.05,
           (hashAt(i, j, 4) - 0.5) * 0.12,
