@@ -720,6 +720,19 @@ export class Api {
     return data.characters;
   }
 
+  // One page of a character's earned deeds for the dashboard's Collection page
+  // (GET /api/characters/:id/deeds, task 6). Unlike leaderboard()/
+  // arenaLeaderboard(), this PROPAGATES a thrown error: the Collection page's
+  // retry-on-error UI depends on it, matching characters()'s own behavior.
+  async characterDeeds(
+    characterId: number,
+    before?: string,
+  ): Promise<{ deedId: string; earnedAt: string; cursor: string }[]> {
+    const query = before ? `?before=${encodeURIComponent(before)}` : '';
+    const data = await this.get(`/api/characters/${characterId}/deeds${query}`);
+    return data.deeds ?? [];
+  }
+
   async createCharacter(name: string, cls: PlayerClass, skin = 0): Promise<void> {
     await this.post('/api/characters', { name, class: cls, skin });
   }
