@@ -1682,7 +1682,17 @@ with the same retry-on-failure pattern the shell's other pages will share."
 **Files:**
 - Create: `src/dashboard/collection_view.ts`
 - Create: `src/dashboard/collection_painter.ts`
+- Modify: `src/net/online.ts` (two new public `Api` methods: `characterDeeds`,
+  reusing the already-public `characters`)
 - Test: `tests/dashboard_collection_view.test.ts` (create)
+
+Note: like Task 7, do NOT call `this.api.get(...)` directly -- `Api.get`/
+`post`/`delete` are private. Use the existing public `characters()` method
+for the character list, and add a new public `characterDeeds(characterId,
+before?)` method wrapping the Task 6 endpoint (unlike Task 9's leaderboard
+methods, this one should PROPAGATE a thrown error rather than swallow it,
+since the Collection page's own retry-on-error UI depends on it, matching
+`characters()`'s own behavior).
 
 - [ ] **Step 1: Write the failing test**
 
@@ -1763,24 +1773,48 @@ Run: `npx vitest run tests/dashboard_collection_view.test.ts`
 
 Expected: PASS, 3 tests.
 
-- [ ] **Step 5: Write the painter**
+- [ ] **Step 5: Add Api.characterDeeds()**
+
+Read the existing `async characters(): Promise<CharacterSummary[]>` method in
+`src/net/online.ts` (near line 717) to match its shape. Add a new method near
+it:
+
+```ts
+// One page of a character's earned deeds for the dashboard's Collection page
+// (GET /api/characters/:id/deeds, task 6). Unlike leaderboard()/
+// arenaLeaderboard(), this PROPAGATES a thrown error: the Collection page's
+// retry-on-error UI depends on it, matching characters()'s own behavior.
+async characterDeeds(
+  characterId: number,
+  before?: string,
+): Promise<{ deedId: string; earnedAt: string; cursor: string }[]> {
+  const query = before ? `?before=${encodeURIComponent(before)}` : '';
+  const data = await this.get(`/api/characters/${characterId}/deeds${query}`);
+  return data.deeds ?? [];
+}
+```
+
+- [ ] **Step 6: Write the painter**
 
 Create `src/dashboard/collection_painter.ts`:
 
 ```ts
-// DOM half of the Collection page. Fetches GET /api/characters/:id/deeds (task
-// 6) through the shared Api instance for the account's first character (the
-// dashboard shows one collection per account for now; a character switcher is
-// a later refinement, not required by the spec).
+// DOM half of the Collection page. Fetches the account's characters via the
+// existing public characters() method, then pages deeds for the first one via
+// the new characterDeeds() method (the dashboard shows one collection per
+// account for now; a character switcher is a later refinement, not required
+// by the spec).
 
 import type { Api } from '../net/online';
 import { userFacingApiError } from '../ui/api_error_i18n';
+import { esc } from '../ui/esc';
 import { t } from '../ui/i18n';
 import { type EarnedDeed, collectionPageModel } from './collection_view';
 
 export class CollectionPainter {
-  private before: string | null = null;
+  private before: string | undefined;
   private accumulated: EarnedDeed[] = [];
+  private characterId: number | undefined;
 
   constructor(
     private readonly container: HTMLElement,
@@ -1794,20 +1828,20 @@ export class CollectionPainter {
 
   private async loadPage(): Promise<void> {
     try {
-      const characters = (await this.api.get('/api/me/characters')) as { id: number }[];
-      if (characters.length === 0) {
-        this.render(collectionPageModel([]));
-        return;
+      if (this.characterId === undefined) {
+        const characters = await this.api.characters();
+        if (characters.length === 0) {
+          this.render(collectionPageModel([]));
+          return;
+        }
+        this.characterId = characters[0].id;
       }
-      const query = this.before ? `?before=${encodeURIComponent(this.before)}` : '';
-      const page = (await this.api.get(
-        `/api/characters/${characters[0].id}/deeds${query}`,
-      )) as { deeds: EarnedDeed[] };
-      this.accumulated = [...this.accumulated, ...page.deeds];
+      const page = await this.api.characterDeeds(this.characterId, this.before);
+      this.accumulated = [...this.accumulated, ...page];
       // The opaque cursor, not earnedAt: a same-timestamp batch grant (a
       // dungeon clear awarding several deeds at once) would otherwise let an
       // earnedAt-only cursor skip the rest of that cluster on the next page.
-      if (page.deeds.length > 0) this.before = page.deeds[page.deeds.length - 1].cursor;
+      if (page.length > 0) this.before = page[page.length - 1].cursor;
       this.render(collectionPageModel(this.accumulated));
     } catch (err) {
       this.renderError(userFacingApiError(err));
@@ -1822,7 +1856,7 @@ export class CollectionPainter {
     this.container.innerHTML = `
       <div class="arc-card">
         <h1 class="arc-title">${t('dashboard.collection.title')}</h1>
-        <ul>${model.deeds.map((d) => `<li>${d.deedId}, ${d.earnedAt}</li>`).join('')}</ul>
+        <ul>${model.deeds.map((d) => `<li>${esc(d.deedId)}, ${esc(d.earnedAt)}</li>`).join('')}</ul>
         ${model.canLoadMore ? `<button id="dashboard-collection-more">${t('dashboard.collection.loadMore')}</button>` : ''}
       </div>
     `;
@@ -1845,26 +1879,36 @@ export class CollectionPainter {
 }
 ```
 
-- [ ] **Step 6: Verify**
+`deedId`/`earnedAt` are content-defined identifiers (deed catalog ids, ISO
+timestamps), not player-chosen text, so escaping them is defensive
+consistency with the rest of the dashboard's painters rather than a fix for
+an exploitable path; still use `esc()` so the convention is uniform across
+every dashboard page.
+
+- [ ] **Step 7: Verify**
 
 Run: `npx tsc --noEmit`
 
-- [ ] **Step 7: Register the pure core**
+Expected: exactly 1 error remains (`src/dashboard/shell.ts`'s
+`./leaderboard_painter` import, Task 9's job), down from 2.
+
+- [ ] **Step 8: Register the pure core**
 
 Add `'src/dashboard/collection_view.ts',` to `UI_PURE_CORES`.
 
-- [ ] **Step 8: Run and commit**
+- [ ] **Step 9: Run and commit**
 
 ```bash
 npx vitest run tests/architecture.test.ts tests/dashboard_collection_view.test.ts
-npx @biomejs/biome check --write src/dashboard/collection_view.ts src/dashboard/collection_painter.ts tests/dashboard_collection_view.test.ts tests/architecture.test.ts
-git add src/dashboard/collection_view.ts src/dashboard/collection_painter.ts tests/dashboard_collection_view.test.ts tests/architecture.test.ts
+npx @biomejs/biome check --write src/net/online.ts src/dashboard/collection_view.ts src/dashboard/collection_painter.ts tests/dashboard_collection_view.test.ts tests/architecture.test.ts
+git add src/net/online.ts src/dashboard/collection_view.ts src/dashboard/collection_painter.ts tests/dashboard_collection_view.test.ts tests/architecture.test.ts
 git commit -m "feat(dashboard): add the Collection page
 
-Consumes the new GET /api/characters/:id/deeds endpoint from task 6, paging by
-the earned_at cursor the server returns. canLoadMore is inferred from a full
-page coming back, matching the server's own page-size cap rather than the
-client guessing a different one."
+Consumes the new GET /api/characters/:id/deeds endpoint from task 6 via a new
+Api.characterDeeds() method, paging by the opaque cursor the server returns
+(not earned_at alone, which would skip rows inside a same-timestamp batch
+grant). canLoadMore is inferred from a full page coming back, matching the
+server's own page-size cap rather than the client guessing a different one."
 ```
 
 ---
