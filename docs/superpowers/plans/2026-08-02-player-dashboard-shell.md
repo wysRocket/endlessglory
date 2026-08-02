@@ -1262,37 +1262,83 @@ Add, alongside `recentDeedsForCharacter`:
 /** Page size for the player dashboard's Collection page (deedsPageForCharacter). */
 export const DEEDS_PAGE_SIZE = 20;
 
+/** One row of a Collection page, plus an opaque `cursor` the caller passes back
+ *  as `before` to fetch the next page. */
+export interface DeedsPageRow extends RecentDeedRow {
+  cursor: string;
+}
+
+/** Encodes a (earned_at, id) pair into the opaque cursor string. ISO 8601
+ *  timestamps never contain an underscore, so a single split is unambiguous. */
+function encodeDeedsCursor(earnedAtIso: string, id: number): string {
+  return `${earnedAtIso}_${id}`;
+}
+
+/** Decodes a cursor from encodeDeedsCursor. Returns null for a malformed
+ *  cursor (a missing/garbled `before` query param degrades to the first
+ *  page rather than throwing). */
+function decodeDeedsCursor(cursor: string): { earnedAt: string; id: number } | null {
+  const sep = cursor.lastIndexOf('_');
+  if (sep < 0) return null;
+  const id = Number(cursor.slice(sep + 1));
+  if (!Number.isInteger(id)) return null;
+  return { earnedAt: cursor.slice(0, sep), id };
+}
+
 /** One page of a character's earned deeds, newest first, for the player dashboard's
  *  Collection page. Same ordering convention as recentDeedsForCharacter
  *  (earned_at DESC, id DESC id-tiebreak); `before` pages backward from a prior
- *  page's last earnedAt. */
+ *  page's last row's cursor.
+ *
+ *  The cursor carries BOTH earned_at and id, not earned_at alone:
+ *  insertCharacterDeeds writes a multi-deed grant (e.g. a dungeon clear
+ *  awarding several deeds at once) in one statement, so every row in that
+ *  batch shares the exact same earned_at (TIMESTAMPTZ DEFAULT now(), one
+ *  statement-time value for the whole INSERT). An earned_at-only cursor
+ *  landing a page boundary inside such a cluster would exclude the WHOLE
+ *  timestamp value on the next page, silently dropping the remaining rows
+ *  in that batch. The composite (earned_at, id) < (cursorEarnedAt, cursorId)
+ *  predicate resumes exactly where the previous page stopped instead. */
 export async function deedsPageForCharacter(
   characterId: number,
   limit: number,
   before?: string,
-): Promise<RecentDeedRow[]> {
-  const boundedLimit = Math.max(1, Math.min(DEEDS_PAGE_SIZE, limit));
-  const res = before
+): Promise<DeedsPageRow[]> {
+  const boundedLimit = Math.max(1, Math.min(DEEDS_PAGE_SIZE, Math.trunc(limit) || DEEDS_PAGE_SIZE));
+  const cursor = before ? decodeDeedsCursor(before) : null;
+  const res = cursor
     ? await pool.query(
-        `SELECT deed_id, earned_at FROM character_deeds
-         WHERE character_id = $1 AND earned_at < $2
+        `SELECT id, deed_id, earned_at FROM character_deeds
+         WHERE character_id = $1 AND (earned_at, id) < ($2, $3)
          ORDER BY earned_at DESC, id DESC
-         LIMIT $3`,
-        [characterId, before, boundedLimit],
+         LIMIT $4`,
+        [characterId, cursor.earnedAt, cursor.id, boundedLimit],
       )
     : await pool.query(
-        `SELECT deed_id, earned_at FROM character_deeds
+        `SELECT id, deed_id, earned_at FROM character_deeds
          WHERE character_id = $1
          ORDER BY earned_at DESC, id DESC
          LIMIT $2`,
         [characterId, boundedLimit],
       );
-  return res.rows.map((row) => ({
-    deedId: row.deed_id,
-    earnedAt: row.earned_at instanceof Date ? row.earned_at.toISOString() : String(row.earned_at),
-  }));
+  return res.rows.map((row) => {
+    const earnedAt =
+      row.earned_at instanceof Date ? row.earned_at.toISOString() : String(row.earned_at);
+    return { deedId: row.deed_id, earnedAt, cursor: encodeDeedsCursor(earnedAt, row.id) };
+  });
 }
 ```
+
+Note: an earlier version of this function used an `earned_at`-only cursor.
+Code review caught a real bug in that design: `insertCharacterDeeds` writes a
+multi-deed grant (a dungeon clear awarding several deeds at once) in ONE
+statement, so every row in that batch shares the exact same `earned_at`,
+which the id-only tiebreak inside a single page handles, but an earned_at-only
+CURSOR between pages does not: a page boundary landing inside such a cluster
+would silently drop the remaining same-timestamp rows on the next page. The
+opaque `cursor` field above (encoding both `earned_at` and `id`) is what the
+dashboard's Collection page (Task 8) reads and passes back as `before`, not
+`earnedAt` alone.
 
 - [ ] **Step 3: Register it in server/characters.ts's charactersDb bundle**
 
@@ -1350,8 +1396,8 @@ Add a new `describe('owner deeds handler', ...)` block near
 describe('owner deeds handler', () => {
   it('200s a page of deeds from deedsPageForCharacter, body shape { deeds }', async () => {
     const page = [
-      { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
-      { deedId: 'first_kill', earnedAt: '2026-07-01T09:00:00.000Z' },
+      { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z', cursor: 'c1' },
+      { deedId: 'first_kill', earnedAt: '2026-07-01T09:00:00.000Z', cursor: 'c2' },
     ];
     setCharactersDbForTests({ deedsPageForCharacter: async () => page });
     const row = charRow({ id: 3 });
@@ -1634,8 +1680,8 @@ describe('dashboard collection view', () => {
 
   it('lists deeds newest first, as the server already returns them', () => {
     const deeds: EarnedDeed[] = [
-      { deedId: 'first_blood', earnedAt: '2026-01-01T00:00:00Z' },
-      { deedId: 'dungeon_delver', earnedAt: '2026-01-02T00:00:00Z' },
+      { deedId: 'first_blood', earnedAt: '2026-01-01T00:00:00Z', cursor: '2026-01-01T00:00:00Z_1' },
+      { deedId: 'dungeon_delver', earnedAt: '2026-01-02T00:00:00Z', cursor: '2026-01-02T00:00:00Z_2' },
     ];
     const model = collectionPageModel(deeds);
     expect(model.isEmpty).toBe(false);
@@ -1646,6 +1692,7 @@ describe('dashboard collection view', () => {
     const fullPage = Array.from({ length: 20 }, (_, i) => ({
       deedId: `deed_${i}`,
       earnedAt: '2026-01-01T00:00:00Z',
+      cursor: `2026-01-01T00:00:00Z_${i}`,
     }));
     expect(collectionPageModel(fullPage, 20).canLoadMore).toBe(true);
     expect(collectionPageModel(fullPage.slice(0, 5), 20).canLoadMore).toBe(false);
@@ -1672,6 +1719,7 @@ Create `src/dashboard/collection_view.ts`:
 export interface EarnedDeed {
   deedId: string;
   earnedAt: string;
+  cursor: string;
 }
 
 export interface CollectionPageModel {
@@ -1736,7 +1784,10 @@ export class CollectionPainter {
         `/api/characters/${characters[0].id}/deeds${query}`,
       )) as { deeds: EarnedDeed[] };
       this.accumulated = [...this.accumulated, ...page.deeds];
-      if (page.deeds.length > 0) this.before = page.deeds[page.deeds.length - 1].earnedAt;
+      // The opaque cursor, not earnedAt: a same-timestamp batch grant (a
+      // dungeon clear awarding several deeds at once) would otherwise let an
+      // earnedAt-only cursor skip the rest of that cluster on the next page.
+      if (page.deeds.length > 0) this.before = page.deeds[page.deeds.length - 1].cursor;
       this.render(collectionPageModel(this.accumulated));
     } catch (err) {
       this.renderError(userFacingApiError(err));
