@@ -1218,72 +1218,96 @@ before it existed."
 ### Task 6: New server endpoint, GET /api/characters/:id/deeds
 
 **Files:**
-- Modify: `server/characters.ts`
-- Test: `tests/server/characters_deeds.test.ts` (create)
+- Modify: `server/deeds_db.ts` (new query function; this is the deeds SQL boundary)
+- Modify: `server/characters.ts` (new route + handler + charactersDb registration)
+- Modify: `tests/server/characters.test.ts` (new describe blocks)
+
+Two corrections to how this task was originally scoped, both required by this
+repo's own stated conventions (`server/CLAUDE.md`):
+
+1. **SQL lives only in `db.ts` and `*_db.ts`.** `server/characters.ts` is a
+   logic module and must carry zero raw SQL. The new query is a new function,
+   `deedsPageForCharacter`, in `server/deeds_db.ts` (the deeds domain's
+   existing SQL boundary, already home to `recentDeedsForCharacter`), not
+   inline in the route handler.
+2. **This domain's route tests live in ONE file**, `tests/server/characters.test.ts`,
+   which already covers every character route (list, sheet, standing, rename,
+   delete, BOLA, rate limits) as describe blocks sharing local helpers
+   (`callHandler`, `runRoute`, `charRow`, `stateWith`, `setCharactersDbForTests`).
+   The new route's tests are new describe blocks in that same file, not a new
+   `characters_deeds.test.ts`.
 
 - [ ] **Step 1: Read the existing owned-character route to match its shape exactly**
 
-Run: `sed -n '590,608p' server/characters.ts` and read the full
-`requireOwnedCharacter` function (`grep -n "function requireOwnedCharacter" -A 15 server/characters.ts`)
-so the new route's middleware matches this file's own convention rather than
-inventing a new one.
+Read `server/deeds_db.ts`'s `recentDeedsForCharacter` function and
+`RecentDeedRow` interface (the ordering convention: `ORDER BY earned_at DESC,
+id DESC`, id breaks same-timestamp ties). Read `server/characters.ts`'s
+`REAL_CHARACTERS_DB`/`charactersDb`/`setCharactersDbForTests` (around line
+194), `ownedCharacter(ctx)` (around line 225), `requireOwnedCharacter` (around
+line 327), `CHARACTER_NOT_FOUND`, `OWNED_CHARACTER_META`, `readGuard`, and the
+existing `/api/characters/:id/sheet` route entry plus `ownerSheetHandler`
+(around line 441). Read `server/leaderboard.ts`'s
+`firstQueryValue(value: string | string[] | undefined): string | undefined`,
+the established convention for reading a query param. Read
+`tests/server/characters.test.ts`'s `describe('owner sheet handler', ...)`
+block (around line 413), the BOLA 404 block (around line 1048), and the
+routes-count completeness test (around line 1203) -- these are the exact
+patterns the new tests follow.
 
-- [ ] **Step 2: Write the failing test**
+- [ ] **Step 2: Add the query function to server/deeds_db.ts**
 
-Create `tests/server/characters_deeds.test.ts` using this repo's `FakeDb`
-helper pattern (see `tests/server/helpers/`):
+Add, alongside `recentDeedsForCharacter`:
 
 ```ts
-import { describe, expect, it } from 'vitest';
-import { fakeCtx, fakeDb, fakeHttp } from './helpers';
-import { routes } from '../../server/characters';
+/** Page size for the player dashboard's Collection page (deedsPageForCharacter). */
+export const DEEDS_PAGE_SIZE = 20;
 
-describe('GET /api/characters/:id/deeds', () => {
-  it('returns the owning account a page of that character\'s earned deeds, newest first', async () => {
-    const db = fakeDb({
-      characterDeeds: [
-        { characterId: 1, deedId: 'first_blood', earnedAt: '2026-01-01T00:00:00Z' },
-        { characterId: 1, deedId: 'dungeon_delver', earnedAt: '2026-01-02T00:00:00Z' },
-      ],
-    });
-    const route = routes.find((r) => r.path === '/api/characters/:id/deeds' && r.method === 'GET');
-    expect(route, 'route must be registered').toBeDefined();
-    const ctx = fakeCtx({ db, params: { id: '1' }, accountId: 1, query: { limit: '10' } });
-    const res = fakeHttp();
-    await route!.handler(ctx, res);
-    expect(res.statusCode).toBe(200);
-    const body = JSON.parse(res.body);
-    expect(body.deeds[0].deedId).toBe('dungeon_delver');
-    expect(body.deeds[1].deedId).toBe('first_blood');
-  });
-
-  it('answers not found for a character the caller does not own', async () => {
-    const db = fakeDb({ characterDeeds: [] });
-    const route = routes.find((r) => r.path === '/api/characters/:id/deeds' && r.method === 'GET');
-    const ctx = fakeCtx({ db, params: { id: '999' }, accountId: 1, query: {} });
-    const res = fakeHttp();
-    await route!.handler(ctx, res);
-    expect(res.statusCode).toBe(404);
-  });
-});
+/** One page of a character's earned deeds, newest first, for the player dashboard's
+ *  Collection page. Same ordering convention as recentDeedsForCharacter
+ *  (earned_at DESC, id DESC id-tiebreak); `before` pages backward from a prior
+ *  page's last earnedAt. */
+export async function deedsPageForCharacter(
+  characterId: number,
+  limit: number,
+  before?: string,
+): Promise<RecentDeedRow[]> {
+  const boundedLimit = Math.max(1, Math.min(DEEDS_PAGE_SIZE, limit));
+  const res = before
+    ? await pool.query(
+        `SELECT deed_id, earned_at FROM character_deeds
+         WHERE character_id = $1 AND earned_at < $2
+         ORDER BY earned_at DESC, id DESC
+         LIMIT $3`,
+        [characterId, before, boundedLimit],
+      )
+    : await pool.query(
+        `SELECT deed_id, earned_at FROM character_deeds
+         WHERE character_id = $1
+         ORDER BY earned_at DESC, id DESC
+         LIMIT $2`,
+        [characterId, boundedLimit],
+      );
+  return res.rows.map((row) => ({
+    deedId: row.deed_id,
+    earnedAt: row.earned_at instanceof Date ? row.earned_at.toISOString() : String(row.earned_at),
+  }));
+}
 ```
 
-The exact shape of `fakeCtx`/`fakeDb`/`fakeHttp` and what fields they accept
-must be confirmed against `tests/server/helpers/index.ts` before writing this;
-if their signatures differ from what is shown here, adjust the test to match
-the real helpers rather than inventing a different fake.
+- [ ] **Step 3: Register it in server/characters.ts's charactersDb bundle**
 
-- [ ] **Step 3: Run it and confirm it fails**
+Merge into the existing `import { recentDeedsForCharacter } from './deeds_db';`:
 
-Run: `npx vitest run tests/server/characters_deeds.test.ts`
+```ts
+import { DEEDS_PAGE_SIZE, deedsPageForCharacter, recentDeedsForCharacter } from './deeds_db';
+```
 
-Expected: FAIL, either a module resolution error or a `route` being `undefined`
-depending on how the test file resolves before the route exists.
+Add `deedsPageForCharacter` to `REAL_CHARACTERS_DB`, alongside
+`recentDeedsForCharacter`.
 
-- [ ] **Step 4: Add the route**
+- [ ] **Step 4: Add the route and handler in server/characters.ts**
 
-In `server/characters.ts`, find the existing `/api/characters/:id/sheet` route
-entry inside the `routes` array and add a new entry directly after it:
+Add a new route entry directly after the `/api/characters/:id/sheet` entry:
 
 ```ts
   {
@@ -1296,60 +1320,107 @@ entry inside the `routes` array and add a new entry directly after it:
   },
 ```
 
-This mirrors the sheet route's middleware exactly: same `readGuard`, same
-`requireOwnedCharacter` owner check, same `CHARACTER_NOT_FOUND` body, same
-`OWNED_CHARACTER_META`. Then add the handler function. Find where
-`ownerSheetHandler` is defined in this file and add `ownerDeedsHandler` near
-it:
+Import `firstQueryValue` from `./leaderboard` (confirm first, via
+`grep -n "from './characters'" server/leaderboard.ts`, that `leaderboard.ts`
+does not import from `characters.ts`, so this does not create an import
+cycle; it does not). Add the handler near `ownerSheetHandler`:
 
 ```ts
-const DEEDS_PAGE_SIZE = 20;
-
-async function ownerDeedsHandler(ctx: RouteContext, res: http.ServerResponse): Promise<void> {
+/** GET /api/characters/:id/deeds: a paginated page of the owned character's earned
+ *  deeds for the player dashboard's Collection page, newest first. The in-game deeds
+ *  board reads a live WebSocket snapshot (deedsEarned) this REST-only surface has no
+ *  access to; this is the only REST-facing full listing (the sheet's recentDeeds strip
+ *  caps at SHEET_RECENT_DEEDS = 5). */
+async function ownerDeedsHandler(ctx: Ctx): Promise<void> {
   const row = ownedCharacter(ctx);
-  const limit = Math.min(DEEDS_PAGE_SIZE, Number(ctx.query.limit) || DEEDS_PAGE_SIZE);
-  const before = typeof ctx.query.before === 'string' ? ctx.query.before : null;
-  const rows = await ctx.db.query<{ deed_id: string; earned_at: string }>(
-    before
-      ? `SELECT deed_id, earned_at FROM character_deeds
-         WHERE character_id = $1 AND earned_at < $2
-         ORDER BY earned_at DESC LIMIT $3`
-      : `SELECT deed_id, earned_at FROM character_deeds
-         WHERE character_id = $1
-         ORDER BY earned_at DESC LIMIT $2`,
-    before ? [row.id, before, limit] : [row.id, limit],
-  );
-  json(res, 200, {
-    deeds: rows.rows.map((r) => ({ deedId: r.deed_id, earnedAt: r.earned_at })),
-  });
+  const limit = Number(firstQueryValue(ctx.query.limit)) || DEEDS_PAGE_SIZE;
+  const before = firstQueryValue(ctx.query.before);
+  const deeds = await charactersDb.deedsPageForCharacter(row.id, limit, before);
+  json(ctx.res, 200, { deeds });
 }
 ```
 
-The exact accessor for "the owned character the requireOwnedCharacter loader
-stashed" (referred to here as `ownedCharacter(ctx)`) and the exact shape of
-`ctx.db.query` must be confirmed against how `ownerSheetHandler` itself reads
-that same stashed row and issues its own query; match that convention exactly
-rather than the illustrative names above if they differ (search
-`grep -n "ownerSheetHandler" -A 10 server/characters.ts`).
+- [ ] **Step 5: Write the tests in tests/server/characters.test.ts**
 
-- [ ] **Step 5: Run the test and confirm it passes**
+Add a new `describe('owner deeds handler', ...)` block near
+`describe('owner sheet handler', ...)`, using `callHandler`/`charRow`/
+`stateWith`/`setCharactersDbForTests`:
 
-Run: `npx vitest run tests/server/characters_deeds.test.ts`
+```ts
+describe('owner deeds handler', () => {
+  it('200s a page of deeds from deedsPageForCharacter, body shape { deeds }', async () => {
+    const page = [
+      { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
+      { deedId: 'first_kill', earnedAt: '2026-07-01T09:00:00.000Z' },
+    ];
+    setCharactersDbForTests({ deedsPageForCharacter: async () => page });
+    const row = charRow({ id: 3 });
+    const res = await callHandler('GET', '/api/characters/:id/deeds', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(row),
+    });
+    expect(res.status).toBe(200);
+    expect(res.body).toEqual({ deeds: page });
+  });
 
-Expected: PASS, 2 tests.
+  it('threads the before query param through as the deedsPageForCharacter third argument', async () => {
+    let capturedCharacterId: number | undefined;
+    let capturedLimit: number | undefined;
+    let capturedBefore: string | undefined;
+    setCharactersDbForTests({
+      deedsPageForCharacter: async (characterId, limit, before) => {
+        capturedCharacterId = characterId;
+        capturedLimit = limit;
+        capturedBefore = before;
+        return [];
+      },
+    });
+    const row = charRow({ id: 5 });
+    const res = await callHandler('GET', '/api/characters/:id/deeds', {
+      account: { accountId: 7, scope: 'full' },
+      state: stateWith(row),
+      query: { before: '2026-07-01T09:00:00.000Z' },
+    });
+    expect(res.status).toBe(200);
+    expect(capturedCharacterId).toBe(5);
+    expect(capturedLimit).toBe(DEEDS_PAGE_SIZE);
+    expect(capturedBefore).toBe('2026-07-01T09:00:00.000Z');
+  });
+});
+```
 
-- [ ] **Step 6: Verify against the full server suite for this domain**
+Add a BOLA test mirroring the existing "owner sheet 404s character-not-found"
+block (around line 1048):
 
-Run: `npx vitest run tests/server/characters.test.ts tests/server/characters_deeds.test.ts`
+```ts
+it('owner deeds 404s character-not-found, handler unreached', async () => {
+  const r = await runRoute('GET', '/api/characters/:id/deeds', { params: { id: '1' } });
+  expect(r).toMatchObject({ status: 404, reached: false });
+  expect(r.body).toEqual({ error: 'character not found', code: 'character.not_found' });
+});
+```
 
-Expected: both PASS. This confirms the new route did not disturb the existing
-sheet/rename routes in the same file.
+Finally, update the routes-count completeness test (around line 1203): the
+character domain now registers NINE routes, not eight, and the owned-paths
+list gets a new `'GET /api/characters/:id/deeds'` entry.
+
+- [ ] **Step 6: Verify**
+
+Run: `npx vitest run tests/server/characters.test.ts`
+
+Expected: the WHOLE file passes (not just the new tests: the routes-array
+change could subtly break an existing count/enumeration assertion).
+
+Run: `npx tsc --noEmit`
+
+Expected: the same 3 pre-existing expected errors from earlier tasks
+(`src/dashboard/shell.ts`'s three missing painter imports), nothing new.
 
 - [ ] **Step 7: Format and commit**
 
 ```bash
-npx @biomejs/biome check --write server/characters.ts tests/server/characters_deeds.test.ts
-git add server/characters.ts tests/server/characters_deeds.test.ts
+npx @biomejs/biome check --write server/deeds_db.ts server/characters.ts tests/server/characters.test.ts
+git add server/deeds_db.ts server/characters.ts tests/server/characters.test.ts
 git commit -m "feat(server): add GET /api/characters/:id/deeds
 
 The dashboard's Collection page needs a full, paginated deed listing; the only
@@ -1357,11 +1428,12 @@ existing REST-facing deeds data is the character sheet's 5 most recent
 entries, and the in-game deeds board itself reads a live WebSocket snapshot a
 standalone dashboard has no access to.
 
-Mirrors the sheet route's owner-gated shape exactly (same requireOwnedCharacter
-guard, same not-found body) and queries the already-indexed character_deeds
-table (character_deeds_character_earned on character_id, earned_at desc), so
-this is additive read access over existing persisted data, not a new
-subsystem."
+Adds deedsPageForCharacter to the deeds SQL boundary (server/deeds_db.ts),
+mirroring recentDeedsForCharacter's ordering convention with an added before
+cursor, and a new owner-gated route in server/characters.ts mirroring the
+existing sheet route's middleware shape exactly. Tests land as new describe
+blocks in the existing tests/server/characters.test.ts, matching this
+domain's one-file-per-module test convention rather than a new file."
 ```
 
 ---
@@ -1930,7 +2002,7 @@ Add `'src/dashboard/leaderboard_view.ts',` to `UI_PURE_CORES`.
 - [ ] **Step 8: Run every dashboard test together**
 
 ```bash
-npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/net_turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_auth_gate_core.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters_deeds.test.ts
+npx vitest run tests/architecture.test.ts tests/dashboard_entry_wiring.test.ts tests/net_turnstile.test.ts tests/dashboard_login_view.test.ts tests/dashboard_auth_gate_core.test.ts tests/dashboard_profile_view.test.ts tests/dashboard_collection_view.test.ts tests/dashboard_leaderboard_view.test.ts tests/server/characters.test.ts
 ```
 
 Expected: every file PASSES.
