@@ -2042,14 +2042,21 @@ async arenaLeaderboard(limit = 100): Promise<ArenaLeaderRow[]> {
 }
 ```
 
-This needs an `ArenaLeaderRow` type. Reuse the server's own type if importable
-without a cycle (`import type { ArenaLeaderRow } from '../../server/db';` --
-check this doesn't create a browser-bundling problem, since `server/db.ts`
-has Node-only imports; if importing a server type into client code is
-unsafe or fails to build, define a local, narrower interface instead:
-`interface ArenaLeaderRow { name: string; class: string; level: number;
-rating: number; wins: number; losses: number; }`, matching the response
-shape `server/leaderboard.ts`'s `readArenaLeaderboard` actually returns).
+This needs an `ArenaLeaderRow` type. NEVER import a type from `server/` into
+client code (`server/db.ts` has Node-only imports; a client-side import risks
+a bundling problem). Define a LOCAL interface in `src/net/online.ts` instead,
+matching `server/db.ts`'s own `ArenaLeaderRow` field names exactly (confirmed
+by reading it, not guessing): `interface ArenaLeaderRow { name: string; class:
+PlayerClass; level: number; rating: number; wins: number; losses: number; }`
+(the field is `class`, not `cls`; `PlayerClass` is already imported in this
+file).
+
+Note: `server/leaderboard.ts`'s `readArenaLeaderboard` reads only a `format`
+query param and always ranks with the fixed `ARENA_LEADERBOARD_LIMIT = 20`; it
+does not read a `limit` query param at all. So `?limit=${limit}` above is
+harmlessly ignored server-side today. That is a pre-existing server-side gap
+from Task 6, out of this task's scope; implement the client method as
+specified rather than silently expanding scope to patch the server route.
 
 - [ ] **Step 6: Write the painter**
 
@@ -2076,6 +2083,11 @@ import {
 
 export class LeaderboardPainter {
   private tab: LeaderboardTab = 'xp';
+  // Same in-flight guard CollectionPainter uses for its load-more button: a
+  // second tab click while a fetch is still in flight is ignored rather than
+  // racing a second load() (which could otherwise let a stale response for an
+  // abandoned tab overwrite the tab the player switched to).
+  private loading = false;
 
   constructor(
     private readonly container: HTMLElement,
@@ -2087,25 +2099,31 @@ export class LeaderboardPainter {
   }
 
   private async load(): Promise<void> {
-    this.container.innerHTML = '<div class="arc-card">...</div>';
-    if (this.tab === 'xp') {
-      const entries = await this.api.leaderboard('global', 100);
-      const rows: XpLeaderboardRow[] = entries.map((e) => ({
-        rank: e.rank,
-        name: e.name,
-        level: e.level,
-        lifetimeXp: e.lifetimeXp,
-      }));
-      this.renderXp(leaderboardPageModel('xp', rows));
-    } else {
-      const entries = await this.api.arenaLeaderboard(100);
-      const rows: ArenaLeaderboardRow[] = entries.map((e) => ({
-        name: e.name,
-        rating: e.rating,
-        wins: e.wins,
-        losses: e.losses,
-      }));
-      this.renderArena(leaderboardPageModel('arena', rows));
+    if (this.loading) return;
+    this.loading = true;
+    try {
+      this.container.innerHTML = '<div class="arc-card">...</div>';
+      if (this.tab === 'xp') {
+        const entries = await this.api.leaderboard('global', 100);
+        const rows: XpLeaderboardRow[] = entries.map((e) => ({
+          rank: e.rank,
+          name: e.name,
+          level: e.level,
+          lifetimeXp: e.lifetimeXp,
+        }));
+        this.renderXp(leaderboardPageModel('xp', rows));
+      } else {
+        const entries = await this.api.arenaLeaderboard(100);
+        const rows: ArenaLeaderboardRow[] = entries.map((e) => ({
+          name: e.name,
+          rating: e.rating,
+          wins: e.wins,
+          losses: e.losses,
+        }));
+        this.renderArena(leaderboardPageModel('arena', rows));
+      }
+    } finally {
+      this.loading = false;
     }
   }
 
