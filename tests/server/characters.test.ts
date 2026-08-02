@@ -477,8 +477,8 @@ describe('owner sheet handler', () => {
 describe('owner deeds handler', () => {
   it('200s a page of deeds from deedsPageForCharacter, body shape { deeds }', async () => {
     const page = [
-      { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z' },
-      { deedId: 'first_kill', earnedAt: '2026-07-01T09:00:00.000Z' },
+      { deedId: 'prog_veteran', earnedAt: '2026-07-08T10:00:00.000Z', cursor: 'c1' },
+      { deedId: 'first_kill', earnedAt: '2026-07-01T09:00:00.000Z', cursor: 'c2' },
     ];
     setCharactersDbForTests({ deedsPageForCharacter: async () => page });
     const row = charRow({ id: 3 });

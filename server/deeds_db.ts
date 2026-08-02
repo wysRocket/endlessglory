@@ -140,35 +140,70 @@ export async function recentDeedsForCharacter(
 /** Page size for the player dashboard's Collection page (deedsPageForCharacter). */
 export const DEEDS_PAGE_SIZE = 20;
 
+/** One row of a Collection page, plus an opaque `cursor` the caller passes back
+ *  as `before` to fetch the next page. */
+export interface DeedsPageRow extends RecentDeedRow {
+  cursor: string;
+}
+
+/** Encodes a (earned_at, id) pair into the opaque cursor string. ISO 8601
+ *  timestamps never contain an underscore, so a single split is unambiguous. */
+function encodeDeedsCursor(earnedAtIso: string, id: number): string {
+  return `${earnedAtIso}_${id}`;
+}
+
+/** Decodes a cursor from encodeDeedsCursor. Returns null for a malformed
+ *  cursor (a missing/garbled `before` query param degrades to the first
+ *  page rather than throwing). */
+function decodeDeedsCursor(cursor: string): { earnedAt: string; id: number } | null {
+  const sep = cursor.lastIndexOf('_');
+  if (sep < 0) return null;
+  const id = Number(cursor.slice(sep + 1));
+  if (!Number.isInteger(id)) return null;
+  return { earnedAt: cursor.slice(0, sep), id };
+}
+
 /** One page of a character's earned deeds, newest first, for the player dashboard's
  *  Collection page. Same ordering convention as recentDeedsForCharacter
  *  (earned_at DESC, id DESC id-tiebreak); `before` pages backward from a prior
- *  page's last earnedAt. */
+ *  page's last row's cursor.
+ *
+ *  The cursor carries BOTH earned_at and id, not earned_at alone:
+ *  insertCharacterDeeds writes a multi-deed grant (e.g. a dungeon clear
+ *  awarding several deeds at once) in one statement, so every row in that
+ *  batch shares the exact same earned_at (TIMESTAMPTZ DEFAULT now(), one
+ *  statement-time value for the whole INSERT). An earned_at-only cursor
+ *  landing a page boundary inside such a cluster would exclude the WHOLE
+ *  timestamp value on the next page, silently dropping the remaining rows
+ *  in that batch. The composite (earned_at, id) < (cursorEarnedAt, cursorId)
+ *  predicate resumes exactly where the previous page stopped instead. */
 export async function deedsPageForCharacter(
   characterId: number,
   limit: number,
   before?: string,
-): Promise<RecentDeedRow[]> {
-  const boundedLimit = Math.max(1, Math.min(DEEDS_PAGE_SIZE, limit));
-  const res = before
+): Promise<DeedsPageRow[]> {
+  const boundedLimit = Math.max(1, Math.min(DEEDS_PAGE_SIZE, Math.trunc(limit) || DEEDS_PAGE_SIZE));
+  const cursor = before ? decodeDeedsCursor(before) : null;
+  const res = cursor
     ? await pool.query(
-        `SELECT deed_id, earned_at FROM character_deeds
-         WHERE character_id = $1 AND earned_at < $2
+        `SELECT id, deed_id, earned_at FROM character_deeds
+         WHERE character_id = $1 AND (earned_at, id) < ($2, $3)
          ORDER BY earned_at DESC, id DESC
-         LIMIT $3`,
-        [characterId, before, boundedLimit],
+         LIMIT $4`,
+        [characterId, cursor.earnedAt, cursor.id, boundedLimit],
       )
     : await pool.query(
-        `SELECT deed_id, earned_at FROM character_deeds
+        `SELECT id, deed_id, earned_at FROM character_deeds
          WHERE character_id = $1
          ORDER BY earned_at DESC, id DESC
          LIMIT $2`,
         [characterId, boundedLimit],
       );
-  return res.rows.map((row) => ({
-    deedId: row.deed_id,
-    earnedAt: row.earned_at instanceof Date ? row.earned_at.toISOString() : String(row.earned_at),
-  }));
+  return res.rows.map((row) => {
+    const earnedAt =
+      row.earned_at instanceof Date ? row.earned_at.toISOString() : String(row.earned_at);
+    return { deedId: row.deed_id, earnedAt, cursor: encodeDeedsCursor(earnedAt, row.id) };
+  });
 }
 
 /** Every deed id the account has earned on any character, deduped. Feeds the

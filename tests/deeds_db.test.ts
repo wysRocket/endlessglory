@@ -35,7 +35,9 @@ vi.mock('pg', () => ({
 import { ELIGIBLE_ACCOUNT_SQL } from '../server/db';
 import {
   DEED_RARITY_MIN_LEVEL,
+  DEEDS_PAGE_SIZE,
   deedRarityCounts,
+  deedsPageForCharacter,
   getDeedBroadcasts,
   insertCharacterDeed,
   insertCharacterDeeds,
@@ -161,6 +163,89 @@ describe('recentDeedsForCharacter', () => {
     } as never);
     const rows = await recentDeedsForCharacter(42, 5);
     expect(rows).toEqual([{ deedId: 'prog_veteran', earnedAt: '2026-07-08 10:00:00+00' }]);
+  });
+});
+
+describe('deedsPageForCharacter', () => {
+  it('reads the first page with no cursor and computes a composite cursor per row', async () => {
+    const earned = new Date('2026-07-08T10:00:00.000Z');
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ id: 501, deed_id: 'prog_veteran', earned_at: earned }],
+    } as never);
+    const rows = await deedsPageForCharacter(42, 5);
+    expect(rows).toEqual([
+      {
+        deedId: 'prog_veteran',
+        earnedAt: '2026-07-08T10:00:00.000Z',
+        cursor: '2026-07-08T10:00:00.000Z_501',
+      },
+    ]);
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toContain('WHERE character_id = $1');
+    expect(sql).not.toContain('AND (earned_at, id) <');
+    expect(sql).toContain('ORDER BY earned_at DESC, id DESC');
+    expect(sql).toContain('LIMIT $2');
+    expect(params).toEqual([42, 5]);
+  });
+
+  it('pages with a composite (earned_at, id) predicate, not earned_at alone', async () => {
+    dbMock.query.mockResolvedValueOnce({ rows: [] } as never);
+    await deedsPageForCharacter(42, 5, '2026-07-08T10:00:00.000Z_501');
+    const [sql, params] = dbMock.query.mock.calls[0];
+    expect(sql).toContain('AND (earned_at, id) < ($2, $3)');
+    expect(params).toEqual([42, '2026-07-08T10:00:00.000Z', 501, 5]);
+  });
+
+  it('a same-timestamp batch grant (a dungeon clear awarding several deeds at once) does not lose rows across a page boundary', async () => {
+    // insertCharacterDeeds writes a multi-deed grant in ONE statement, so every
+    // row shares the exact same earned_at. Simulate paging with limit=1 through
+    // three same-timestamp rows (ids 100, 99, 98) and confirm each page's
+    // WHERE predicate correctly excludes only rows already returned, not the
+    // whole timestamp.
+    const t = new Date('2026-07-08T10:00:00.000Z');
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ id: 100, deed_id: 'a', earned_at: t }],
+    } as never);
+    const page1 = await deedsPageForCharacter(42, 1);
+    expect(page1[0].cursor).toBe('2026-07-08T10:00:00.000Z_100');
+
+    dbMock.query.mockResolvedValueOnce({
+      rows: [{ id: 99, deed_id: 'b', earned_at: t }],
+    } as never);
+    const page2 = await deedsPageForCharacter(42, 1, page1[0].cursor);
+    const [, page2Params] = dbMock.query.mock.calls[1];
+    // The cursor value passed to SQL is the SAME timestamp as row 100's, so an
+    // earned_at-only predicate would have excluded row 99 too; the id half of
+    // the composite predicate is what still finds it.
+    expect(page2Params).toEqual([42, '2026-07-08T10:00:00.000Z', 100, 1]);
+    expect(page2[0].deedId).toBe('b');
+  });
+
+  it('clamps limit into [1, DEEDS_PAGE_SIZE], rejecting negative, zero, NaN, oversized, and fractional values', async () => {
+    const cases: Array<[number, number]> = [
+      [-5, 1],
+      [0, DEEDS_PAGE_SIZE],
+      [Number.NaN, DEEDS_PAGE_SIZE],
+      [9999, DEEDS_PAGE_SIZE],
+      [5.9, 5],
+    ];
+    for (const [input, expected] of cases) {
+      dbMock.query.mockResolvedValueOnce({ rows: [] } as never);
+      await deedsPageForCharacter(42, input);
+      const [, params] = dbMock.query.mock.calls.at(-1) as [string, unknown[]];
+      expect(params.at(-1)).toBe(expected);
+    }
+  });
+
+  it('a malformed cursor (no underscore, or a non-numeric id half) falls back to the first page', async () => {
+    dbMock.query.mockResolvedValue({ rows: [] } as never);
+    await deedsPageForCharacter(42, 5, 'not-a-cursor');
+    let [sql] = dbMock.query.mock.calls.at(-1) as [string];
+    expect(sql).not.toContain('AND (earned_at, id) <');
+
+    await deedsPageForCharacter(42, 5, '2026-07-08T10:00:00.000Z_notanumber');
+    [sql] = dbMock.query.mock.calls.at(-1) as [string];
+    expect(sql).not.toContain('AND (earned_at, id) <');
   });
 });
 
