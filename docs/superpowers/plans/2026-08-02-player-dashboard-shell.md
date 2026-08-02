@@ -536,6 +536,21 @@ stays covered by manual verification as it always has been."
 **Files:**
 - Create: `src/ui/i18n.catalog/dashboard.ts`
 - Modify: `src/ui/i18n.catalog/index.ts`
+- Modify: `src/ui/i18n.locales/zh_CN.ts`, `zh_TW.ts`, `ja_JP.ts`, `ko_KR.ts`, `ru_RU.ts`
+
+Note: this task's original pass missed the M16 rule (root CLAUDE.md): "a new
+English value that is wordy (a run of 4+ consecutive lowercase letters after
+stripping `{tokens}`, i.e. most real prose) also needs its five non-Latin
+fills (`zh_CN`/`zh_TW`/`ja_JP`/`ko_KR`/`ru_RU`) in the SAME change, or the
+always-on `tests/i18n_completeness.test.ts` reds even at PR tier." Every
+review of Task 3 (spec compliance and code quality) missed this too; it
+surfaced only when the full gate's vitest run reached this test. 23 of the
+25 keys below trip the "wordy" heuristic (the two "Sign in" values were
+exempted by the catalog's existing same-as-English-elsewhere check) and
+need real translations added to all five locale overlay files in the SAME
+commit as the catalog domain itself, not deferred to the maintainer. Do not
+repeat this omission: run `npx vitest run tests/i18n_completeness.test.ts`
+before considering this task done, not just the dashboard-specific tests.
 
 - [ ] **Step 1: Look at the pattern being followed**
 
