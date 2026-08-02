@@ -1567,16 +1567,25 @@ Expected: PASS, 2 tests.
 
 - [ ] **Step 5: Write the painter**
 
+Note: `Api.get`/`Api.post`/`Api.delete` (`src/net/online.ts`) are all `private`,
+not callable from outside the `Api` class. Use the existing PUBLIC
+`async characters(): Promise<CharacterSummary[]>` method instead (this is the
+repo's established way to fetch the account's character list, per
+`src/net/CLAUDE.md`: "`Api.characters()` lists the realm's chars"). Its return
+type is a structural superset of `ProfileCharacter`, so it passes into
+`profilePageModel` with no cast needed.
+
 Create `src/dashboard/profile_painter.ts`:
 
 ```ts
-// DOM half of the Profile page. Fetches /api/me/characters via the shared Api
-// instance and renders through profilePageModel.
+// DOM half of the Profile page. Fetches the account's characters via the shared
+// Api instance's existing public characters() method and renders through
+// profilePageModel.
 
 import type { Api } from '../net/online';
 import { userFacingApiError } from '../ui/api_error_i18n';
 import { t } from '../ui/i18n';
-import { type ProfileCharacter, profilePageModel } from './profile_view';
+import { profilePageModel } from './profile_view';
 
 export class ProfilePainter {
   constructor(
@@ -1587,7 +1596,7 @@ export class ProfilePainter {
   async mount(): Promise<void> {
     this.container.innerHTML = '<div class="arc-card">...</div>';
     try {
-      const characters = (await this.api.get('/api/me/characters')) as ProfileCharacter[];
+      const characters = await this.api.characters();
       this.render(profilePageModel(characters));
     } catch (err) {
       this.renderError(userFacingApiError(err));
