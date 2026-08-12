@@ -239,9 +239,13 @@ const UI_PURE_CORES = [
 // terrain_region_core (editor partial-rebuild chunk/texel selection math) and
 // water_core (the shore-depth sample shared by build + editor setLevel) follow
 // the same contract for the map editor's realtime terrain/water edits.
+// house_style_core (the roster-wide surface/palette normalization the character
+// material funnel applies) is the same shape: plain numbers in, plain numbers
+// out, with the three.js writes left to its thin consumer in characters/assets.
 const RENDER_PURE_CORES = [
   'src/render/cast_bar.ts',
   'src/render/fishing_bobber_core.ts',
+  'src/render/house_style_core.ts',
   'src/render/stations_core.ts',
   'src/render/delve_interactable_visibility_core.ts',
   'src/render/nameplate_view.ts',
