@@ -11,6 +11,11 @@
 import * as THREE from 'three';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
 import { loadGltf } from '../../render/assets/loader';
+import {
+  DEFAULT_TEMPLATE_TINT_STRENGTH,
+  type HouseMaterialRole,
+} from '../../render/house_style_core';
+import { applyHouseStyleMaterial, applyTemplateTint } from '../../render/house_style_material';
 import type { GuideModelSpec } from '../content.generated';
 
 export interface BuiltModel {
@@ -136,29 +141,37 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     if (fix.rotZ) node.rotateZ(fix.rotZ);
   }
 
-  // Subtle tint toward the entity color (matching the renderer's gentle lerp, not a hard
-  // multiply that muddies the hand-painted textures). Clone each source material once.
-  if (tint !== null) {
-    const strength = spec.tintStrength ?? 0.4;
-    const tintColor = new THREE.Color(tint);
-    const cloned = new Map<THREE.Material, THREE.Material>();
-    const tintOne = (mat: THREE.Material): THREE.Material => {
-      let next = cloned.get(mat);
+  // Materials: the subtle template tint (bodies only) plus the roster-wide house
+  // surface style, both taken VERBATIM from the renderer's shared modules
+  // (src/render/house_style_material.ts over the pure src/render/house_style_core.ts)
+  // rather than reimplemented here. This viewer also bakes the committed Dungeon
+  // Finder mob portraits and the wiki model stills, so a hand-rolled second copy
+  // of the policy is exactly how a creature ends up looking one way in game and
+  // another way in its own portrait. Clone each source material once per role:
+  // SkeletonUtils.clone SHARES materials with the cached GLTF.
+  {
+    const strength = spec.tintStrength ?? DEFAULT_TEMPLATE_TINT_STRENGTH;
+    const cloned = new Map<string, THREE.Material>();
+    const styleOne = (mat: THREE.Material, role: HouseMaterialRole): THREE.Material => {
+      const cacheKey = `${mat.uuid}|${role}`;
+      let next = cloned.get(cacheKey);
       if (!next) {
         next = mat.clone();
-        const std = next as THREE.MeshStandardMaterial;
-        if (std.color) std.color.lerp(tintColor, strength);
-        cloned.set(mat, next);
+        // Attached weapons/props keep their own colour, exactly as in game.
+        if (role === 'body') applyTemplateTint(next, tint, strength);
+        applyHouseStyleMaterial(next, role);
+        cloned.set(cacheKey, next);
         ownedMaterials.push(next);
       }
       return next;
     };
     model.traverse((o) => {
       const mesh = o as THREE.Mesh;
-      if (!mesh.isMesh || !o.userData.bodyMesh) return;
+      if (!mesh.isMesh) return;
+      const role: HouseMaterialRole = o.userData.bodyMesh ? 'body' : 'weapon';
       mesh.material = Array.isArray(mesh.material)
-        ? mesh.material.map(tintOne)
-        : tintOne(mesh.material);
+        ? mesh.material.map((m) => styleOne(m, role))
+        : styleOne(mesh.material, role);
     });
   }
 
@@ -197,7 +210,8 @@ export async function buildModel(spec: GuideModelSpec, tint: number | null): Pro
     mixer?.stopAllAction();
     mixer = null;
     // Geometries/materials from the GLTF are a shared, never-disposed cache (loadGltf
-    // memoizes the GLTF), so we only dispose the material clones WE created for the tint.
+    // memoizes the GLTF), so we only dispose the material clones WE created for the
+    // tint + house style pass.
     for (const mat of ownedMaterials) mat.dispose();
     ownedMaterials.length = 0;
     // SkeletonUtils.clone gave this build its OWN skeletons; three allocates a per-skeleton

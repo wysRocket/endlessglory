@@ -4934,6 +4934,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Pastel de Miel Conjurado',
   'entities.items.conjured_bread4.name': 'Pan de Festín Conjurado',
   'entities.items.glimmerfin_koi.name': 'Koi de aletas brillantes',
+  'entities.items.ironreel_fishing_rod.name': 'Caña de carrete de hierro',
+  'entities.items.silverstream_fishing_rod.name': 'Caña del arroyo plateado',
   'entities.items.raw_bog_eel.name': 'Anguila de ciénaga cruda',
   'entities.items.raw_frostgill_trout.name': 'Trucha de agallas gélidas cruda',
   'entities.items.raw_marsh_pike.name': 'Lucio de marisma crudo',
@@ -7814,11 +7816,9 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'La tienda de Credits no está disponible en este momento. Tu saldo y tus compras no se verán afectados; vuelve a intentarlo dentro de poco.',
   'hudChrome.credits.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Recolectar: obtén materiales de artesanía de este cadáver (piel, colmillos, seda y componentes similares), por separado del botín. Cualquiera puede recolectarlo, pero solo un jugador puede recolectar cada cadáver.',
   'hudChrome.deeds.openBookHint': 'Abrir el Libro de Gestas',
-  'hudChrome.loot.takeAllTooltip':
-    'Recoger todos: recoge todas las monedas y objetos de esta ventana de botín.',
   'hudChrome.statInfo.desc.warfare':
     'Aumenta un {increase}% el daño infligido a jugadores y reduce un {reduction}% el daño recibido de jugadores.',
   'hudChrome.statInfo.names.warfare': 'Pericia bélica',
@@ -8297,21 +8297,8 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleAutomatic': 'Automático',
   'hudChrome.partyFrames.styleClassic': 'Marcos de grupo clásicos',
   'hudChrome.partyFrames.styleRaid': 'Marcos de banda',
-  'apiError.welcome.invalid_input': 'Entrada no válida.',
-  'welcome.back': 'Te damos la bienvenida de nuevo, {name}',
-  'welcome.level': 'Nivel {level}',
-  'welcome.lastPlayed': 'Última partida: {when}',
-  'welcome.continue': 'Entrar al Mundo',
-  'welcome.continueHint': 'Pulsa Enter para continuar, Esc para omitir',
-  'welcome.continueHintTouch': 'Toca para continuar',
-  'welcome.discord.title': 'La comunidad vive en Discord',
-  'welcome.discord.sub':
-    'Avances de parches, eventos, chat con los desarrolladores y 2 espacios extra en el banco al vincular tu cuenta de Discord.',
-  'welcome.discord.join': 'Únete a nuestro Discord',
-  'welcome.chest.ready': 'Cofre de recompensas diarias listo',
-  'welcome.armory.cta': 'Entrar al Mundo y explorar la Armería',
-  'welcome.news.new': 'Nuevo',
-  'welcome.news.viewAll': 'Ver todas las actualizaciones en GitHub',
+  'news.new': 'Nuevo',
+  'news.viewAll': 'Ver todas las actualizaciones en GitHub',
   'entities.letters.heroic_marks_reward.sender': 'Intendente heroico',
   'entities.letters.heroic_marks_reward.subject': 'Tus Marcas heroicas',
   'entities.letters.heroic_marks_reward.body':
@@ -8564,7 +8551,6 @@ export const es: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Pasatiempo: {craft}',
   'hudChrome.professions.identityHeader': 'Identidad',
   'hudChrome.professions.majorsLabel': 'Mayores: {a} y {b}',
-  'hudChrome.professions.nextUnlockMax': 'En máxima habilidad',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} apunta a Specialized: bajan los costes de materiales',
   'hudChrome.professions.nextUnlockTier':

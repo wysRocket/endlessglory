@@ -2750,6 +2750,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Upiorna esencja',
   'entities.items.glacier_melt.name': 'Lodowcowa roztopa',
   'entities.items.glimmerfin_koi.name': 'Lśniącopłetwy karp koi',
+  'entities.items.ironreel_fishing_rod.name': 'Wędka z żelaznym kołowrotkiem',
+  'entities.items.silverstream_fishing_rod.name': 'Wędka srebrnego strumienia',
   'entities.items.glowing_wax.name': 'Świecący wosk',
   'entities.items.gnarled_staff.name': 'Kostur z bagiennego dębu',
   'entities.items.gorraks_cleaver.name': 'Tasak Gorraka',
@@ -7694,11 +7696,9 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'Sklep Credits jest obecnie niedostępny. Nie ma to wpływu na Twoje saldo i zakupy; sprawdź ponownie wkrótce.',
   'hudChrome.credits.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Żniwa: zbierz materiały rzemieślnicze z tych zwłok (skórę, kły, jedwab i podobne elementy), oddzielnie od wszelkich łupów. Każdy może zbierać plony; tylko jeden gracz może zebrać dane zwłoki.',
   'hudChrome.deeds.openBookHint': 'Otwórz Księgę Czynów',
-  'hudChrome.loot.takeAllTooltip':
-    'Weź Wszystkie: zbierz wszystkie monety i przedmioty w tym oknie łupów.',
   'hudChrome.statInfo.desc.warfare':
     'Zwiększa obrażenia zadawane graczom o {increase}% i zmniejsza obrażenia otrzymywane od graczy o {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Działania wojenne',
@@ -8181,21 +8181,8 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleRaid': 'Ramki rajdu',
   'hudChrome.partyFrames.unlock': 'Przenieś ramki grupy i rajdu',
   'hudChrome.partyFrames.width': 'Szerokość ramki',
-  'apiError.welcome.invalid_input': 'Nieprawidłowe dane.',
-  'welcome.back': 'Witaj ponownie, {name}',
-  'welcome.level': 'Poziom {level}',
-  'welcome.lastPlayed': 'Ostatnio w grze: {when}',
-  'welcome.continue': 'Wejdź do świata',
-  'welcome.continueHint': 'Enter, aby kontynuować, Esc, aby pominąć',
-  'welcome.continueHintTouch': 'Dotknij, aby kontynuować',
-  'welcome.discord.title': 'Społeczność żyje na Discordzie',
-  'welcome.discord.sub':
-    'Zapowiedzi aktualizacji, wydarzenia, czat z twórcami i 2 dodatkowe miejsca w banku za połączenie konta z Discordem.',
-  'welcome.discord.join': 'Dołącz do naszego Discorda',
-  'welcome.chest.ready': 'Dzienna skrzynia jest gotowa',
-  'welcome.armory.cta': 'Wejdź i przejrzyj Zbrojownię',
-  'welcome.news.new': 'Nowe',
-  'welcome.news.viewAll': 'Zobacz wszystkie aktualizacje na GitHubie',
+  'news.new': 'Nowe',
+  'news.viewAll': 'Zobacz wszystkie aktualizacje na GitHubie',
   'entities.letters.heroic_marks_reward.sender': 'Heroiczny kwatermistrz',
   'entities.letters.heroic_marks_reward.subject': 'Twoje heroiczne znaki',
   'entities.letters.heroic_marks_reward.body':
@@ -8450,7 +8437,6 @@ export const pl_PL: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Zajęcie dodatkowe: {craft}',
   'hudChrome.professions.identityHeader': 'Tożsamość',
   'hudChrome.professions.majorsLabel': 'Kierunki: {a} i {b}',
-  'hudChrome.professions.nextUnlockMax': 'Przy maksymalnych umiejętnościach',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} wskazuje na Specjalistyczne: spadają koszty materiałów',
   'hudChrome.professions.nextUnlockTier':

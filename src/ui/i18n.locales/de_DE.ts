@@ -4963,6 +4963,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Herbeigezauberter Honigkuchen',
   'entities.items.conjured_bread4.name': 'Herbeigezauberter Festschmauslaib',
   'entities.items.glimmerfin_koi.name': 'Schimmerflossen-Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Eisenrollen-Angelrute',
+  'entities.items.silverstream_fishing_rod.name': 'Silberbach-Angelrute',
   'entities.items.raw_bog_eel.name': 'Roher Mooraal',
   'entities.items.raw_frostgill_trout.name': 'Rohe Frostkiemen-Forelle',
   'entities.items.raw_marsh_pike.name': 'Roher Sumpfhecht',
@@ -7853,11 +7855,9 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'Der Credits-Shop ist derzeit nicht verfügbar. Dein Guthaben und deine Käufe bleiben davon unberührt. Bitte versuche es gleich noch einmal.',
   'hudChrome.credits.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Verwerten: Sammle Handwerksmaterialien aus diesem Kadaver (Haut, Fangzahn, Seide und ähnliche Komponenten), unabhängig von der Beute. Jeder kann Kadaver verwerten, aber einen bestimmten Kadaver darf nur ein Spieler verwerten.',
   'hudChrome.deeds.openBookHint': 'Buch der Taten öffnen',
-  'hudChrome.loot.takeAllTooltip':
-    'Alles nehmen: Sammle alle Münzen und Gegenstände in diesem Beutefenster.',
   'hudChrome.statInfo.desc.warfare':
     'Erhöht den Spielern zugefügten Schaden um {increase}% und verringert von Spielern erlittenen Schaden um {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Kriegsführung',
@@ -8312,21 +8312,8 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleRaid': 'Schlachtzugsrahmen',
   'hudChrome.partyFrames.unlock': 'Gruppen- und Schlachtzugsrahmen verschieben',
   'hudChrome.partyFrames.width': 'Rahmenbreite',
-  'apiError.welcome.invalid_input': 'Ungültige Eingabe.',
-  'welcome.back': 'Willkommen zurück, {name}',
-  'welcome.level': 'Stufe {level}',
-  'welcome.lastPlayed': 'Zuletzt gespielt: {when}',
-  'welcome.continue': 'Welt betreten',
-  'welcome.continueHint': 'Enter zum Fortfahren, Esc zum Überspringen',
-  'welcome.continueHintTouch': 'Tippe, um fortzufahren',
-  'welcome.discord.title': 'Die Gemeinschaft lebt auf Discord',
-  'welcome.discord.sub':
-    'Patch-Vorschauen, Events, Entwicklerchat und 2 Bonusfächer in der Bank, wenn du dein Discord-Konto verknüpfst.',
-  'welcome.discord.join': 'Tritt unserem Discord bei',
-  'welcome.chest.ready': 'Truhe der täglichen Belohnungen ist bereit',
-  'welcome.armory.cta': 'Welt betreten und die Waffenkammer durchstöbern',
-  'welcome.news.new': 'Neu',
-  'welcome.news.viewAll': 'Alle Updates auf GitHub ansehen',
+  'news.new': 'Neu',
+  'news.viewAll': 'Alle Updates auf GitHub ansehen',
   'entities.letters.heroic_marks_reward.sender': 'Heroischer Quartiermeister',
   'entities.letters.heroic_marks_reward.subject': 'Deine heroischen Marken',
   'entities.letters.heroic_marks_reward.body':
@@ -8583,7 +8570,6 @@ export const de_DE: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identität',
   'hudChrome.professions.majorsLabel': 'Hauptfächer: {a} und {b}',
-  'hudChrome.professions.nextUnlockMax': 'Mit maximalem Können',
   'hudChrome.professions.nextUnlockSpecialized':
     'Noch {points} Punkte bis zur Spezialisierung: Materialkosten sinken',
   'hudChrome.professions.nextUnlockTier':

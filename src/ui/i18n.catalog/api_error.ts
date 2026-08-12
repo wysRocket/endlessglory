@@ -183,9 +183,6 @@ export const apiErrorStrings = {
   wallet: {
     handoff_invalid: 'That wallet authorization expired or could not be verified. Try again.',
   },
-  welcome: {
-    invalid_input: 'Invalid input.',
-  },
   // firebase_auth: the Firebase ID token exchange (server/firebase_auth.ts). The
   // reason is deliberately not disclosed (expired, malformed, or wrong project all
   // read the same to the player); the detail stays in the server log.

@@ -192,7 +192,6 @@ export const ERROR_CODES = deepFreeze({
   'steam.upstream': { params: [] },
   // wallet: the desktop browser handoff was malformed, expired, or mismatched.
   'wallet.handoff_invalid': { params: [] },
-  'welcome.invalid_input': { params: [] },
   // firebase_auth: the Firebase ID token failed verification (expired, malformed,
   // wrong project). 401.
   'firebase_auth.invalid_token': { params: [] },

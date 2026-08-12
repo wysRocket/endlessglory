@@ -95,6 +95,13 @@ const actionBarControllerTs = readFileSync(
   new URL('../src/ui/hud/action_bar/action_bar_controller.ts', import.meta.url),
   'utf8',
 ).replace(/\r\n/g, '\n');
+// The per-form storage key scheme (incl. the `_seeded` / `_blank_v1` markers) is
+// shared with the layout-sync module so server-restore writes cannot drift from
+// the keys the controller loads.
+const actionBarLayoutSyncTs = readFileSync(
+  new URL('../src/ui/hud/action_bar/action_bar_layout_sync.ts', import.meta.url),
+  'utf8',
+).replace(/\r\n/g, '\n');
 // The Esc options menu was extracted to options_view.ts (the declarative menu
 // model) + options_window.ts (the painter); the menu guard reads the
 // model rather than the old inline hud.ts main-menu builder.
@@ -549,6 +556,11 @@ describe('client HTML shell', () => {
     expect(cmStart).toBeGreaterThan(-1);
     expect(cmBody).toContain("case 'char-window':");
     expect(cmBody).toContain('this.charWindow.close();');
+    // The inspect window gained its focus trap in the showcase extraction; Escape
+    // (closeAll -> closeManagedWindow) must route through the painter too, not the
+    // default inline hide, or the trap's focus-return never fires on keyboard close.
+    expect(cmBody).toContain("case 'inspect-window':");
+    expect(cmBody).toContain('this.inspectWindow.close();');
     // The sibling cold windows route the same way; lock the family so a future case is not
     // left on an inline hide that drops focus.
     expect(cmBody).toContain('this.socialWindow.close();');
@@ -860,7 +872,7 @@ describe('client HTML shell', () => {
   it('keeps the desktop character roster readable inside a centered cinematic stage', () => {
     expect(shellCss).toContain('--cs-stage-gutter: max(26px, calc((100vw - 1780px) / 2));');
     expect(shellCss).toContain('--cs-roster-width: clamp(340px, 28vw, 440px);');
-    expect(shellCss).toContain('--cs-details-width: var(--cs-roster-width);');
+    expect(shellCss).toContain('--cs-details-width: clamp(380px, 30vw, 720px);');
     expect(shellCss).toContain(
       '@media (min-width: 861px) {\n    #offline-select.cs-wow,\n    body:not(.mobile-touch) :is(#charselect-panel, #charcreate-panel).cs-wow {',
     );
@@ -874,22 +886,23 @@ describe('client HTML shell', () => {
       'body:not(.mobile-touch) #charselect-panel.cs-wow #char-list .char-name {\n      overflow-wrap: anywhere;',
     );
     expect(shellCss).toContain(
-      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-grid {\n      grid-template-columns: minmax(0, 1fr);',
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-panel {\n      position: absolute;\n      left: clamp(24px, 2vw, 48px);',
     );
     expect(shellCss).toContain(
-      'overflow-y: auto;\n      scrollbar-width: thin;\n      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;',
+      'scrollbar-width: thin;\n      scrollbar-color: color-mix(in srgb, var(--scrollbar-thumb) 42%, transparent) transparent;',
     );
     expect(shellCss).toContain(
-      'body:not(.mobile-touch) #charselect-panel.cs-wow .class-details-panel::-webkit-scrollbar {\n      width: 6px;',
-    );
-    expect(shellCss).toContain(
-      'body:not(.mobile-touch) #charselect-panel.cs-wow .details-gear-row .badge {\n      padding: 0;\n      border: 0;\n      border-radius: 0;\n      background: none;\n      text-transform: none;',
+      'body:not(.mobile-touch) #charselect-panel.cs-wow .cs-news-feed::-webkit-scrollbar {\n      width: 6px;',
     );
     expect(shellCss).toContain('font-size: clamp(13px, 0.72vw, 15px);');
     expect(characterPreviewTs).toContain('const LIVE_PREVIEW_X = 0;');
-    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, 1.45, 5.1);');
+    // The self character-sheet framing (x=0, y=1.45, z=5.1, aimed at y=1.3) now
+    // lives in the pure preview_framing.ts constants and is applied on construction;
+    // the exact numbers are pinned decisively in tests/preview_framing.test.ts.
+    expect(characterPreviewTs).toContain('this.applyFraming(PREVIEW_FRAMING.sheet);');
+    expect(characterPreviewTs).toContain('this.camera.position.set(LIVE_PREVIEW_X, f.y, f.z);');
     expect(characterPreviewTs).toContain(
-      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, 1.3, 0));',
+      'this.camera.lookAt(new THREE.Vector3(LIVE_PREVIEW_X, f.lookY, 0));',
     );
   });
 
@@ -1381,7 +1394,7 @@ describe('client HTML shell', () => {
     // zero layout height, so only the panel's own top/bottom padding is left.
     expect(shellCss).toContain('height: min(560px, calc(var(--app-vh) - 20px));');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: grid;\n      grid-template-columns: minmax(120px, 0.54fr) minmax(0, 1.46fr);',
+      'body.mobile-touch #charselect-panel .cs-detail-col {\n      display: flex;\n      flex-direction: column;',
     );
     expect(shellCss).toContain(
       'body.mobile-touch #charselect-panel #char-list {\n      overflow-y: auto;\n      scrollbar-gutter: stable;\n      scrollbar-width: auto;',
@@ -1390,17 +1403,17 @@ describe('client HTML shell', () => {
       'body.mobile-touch #charselect-panel #char-list::-webkit-scrollbar {\n      width: 8px;',
     );
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details {\n      box-sizing: border-box;\n      min-height: 0;\n      overflow-y: auto;',
+      'body.mobile-touch #charselect-panel #charselect-news {\n      grid-column: 1 / -1;',
     );
     expect(shellCss).toContain('scrollbar-gutter: stable;\n      scrollbar-width: auto;');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid {\n      display: flex;\n      flex-direction: column;',
+      'body.mobile-touch #charselect-panel {\n      height: auto;\n      overflow: visible;',
     );
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details .details-spells-list {\n      display: grid;\n      grid-template-columns: minmax(0, 1fr);',
+      'body.mobile-touch #charselect-panel .cs-news-feed {\n    flex: none;\n    min-height: 0;\n    overflow: visible;',
     );
     // charselect's columns stay overflow:hidden (their #char-list and
-    // #charselect-class-details CHILDREN scroll); charcreate's columns hold a
+    // .cs-news-feed CHILDREN scroll); charcreate's columns hold a
     // single tall flow with no inner scroll container, so THEY scroll instead
     // (overflow-y: auto), or the Create button clips off with no way to reach it.
     expect(shellCss).toContain(
@@ -1506,10 +1519,10 @@ describe('client HTML shell', () => {
     );
   });
 
-  it('stacks selected character details on mobile', () => {
-    expect(html).toContain('id="charselect-class-details"');
+  it('stacks the character-select news panel on mobile', () => {
+    expect(html).toContain('id="charselect-news"');
     expect(shellCss).toContain(
-      'body.mobile-touch #charselect-panel #charselect-class-details .class-details-grid,\n  body.mobile-touch #charselect-panel #online-class-details .class-details-grid {\n    display: flex;\n    flex-direction: column;',
+      'body.mobile-touch #charselect-panel #charselect-news {\n    flex: none;\n    width: 100%;',
     );
   });
 
@@ -1712,7 +1725,7 @@ describe('client HTML shell', () => {
 
   it('keeps the World Market to one scroll container with browse filters below the tabs', () => {
     expect(componentsCss).toContain(
-      '#market-window {\n    width: 560px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
+      '#market-window {\n    width: 860px;\n    height: min(640px, calc(85vh - 24px));\n    display: none;\n    flex-direction: column;\n    overflow: hidden;',
     );
     expect(componentsCss).toContain(
       '#market-body {\n    overflow-y: auto;\n    flex: 1;\n    min-height: 0;',
@@ -1720,27 +1733,61 @@ describe('client HTML shell', () => {
     expect(componentsCss).toContain(
       '.mkt-page {\n    display: flex;\n    align-items: center;\n    justify-content: space-between;',
     );
-    // On mobile the Market takes the full available height (not the vendor's 58vh
-    // cap) so its tall stacked-filter header cannot squeeze the listing body flat,
-    // and #market-body keeps a min-height floor; the window itself stays
-    // overflow:hidden so #market-body remains the single scroll container.
+    // On mobile the search box lives above #market-body in `.mkt-controls`, a
+    // fourth stacked chrome row (tabs + controls + body). Reviewed regression on
+    // PR #2107: with the window clipped via overflow:hidden and #market-body as
+    // the only scroller, a tall controls row (the subtype filter's third menu)
+    // could push the body's content past the window's bottom edge with no way to
+    // reach it. The window now scrolls the whole sheet (tabs, controls, and the
+    // listing body together) instead of clipping, and #market-body sizes to its
+    // natural content height rather than flexing to fill a fixed remainder.
     expect(hudMobileCss).toContain(
-      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow: hidden;',
+      'body.mobile-touch #market-window {\n    max-height: calc(var(--app-vh) / var(--ui-scale, 1) - 20px);\n    overflow-y: auto;\n    overflow-x: hidden;',
     );
-    expect(hudMobileCss).toContain('body.mobile-touch #market-body {\n    min-height: 96px;');
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch #market-body {\n    flex: none;\n    overflow-y: visible;\n    min-height: 0;',
+    );
     expect(marketWindowTs).toContain('buildMarketView'); // pagination + filtering delegated to the core
     expect(marketWindowTs).toContain('this.browsePage');
     expect(marketWindowTs).toContain('data-market-page="prev"');
     expect(marketWindowTs).toContain('data-market-page="next"');
     expect(marketWindowTs).toContain('itemUi.market.pageRange');
-    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
-    expect(marketWindowTs).toContain("class=\"mkt-filters${hasSubtype ? ' has-subtype' : ''}\"");
+    expect(marketWindowTs).toContain('class="mkt-filters"');
     // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
     expect(marketWindowTs).toContain('data-market-filter-menu="${menu}"');
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'itemType'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'subtype'/);
     expect(marketWindowTs).toMatch(/this\.renderMarketFilterMenu\(\s*'rarity'/);
     expect(marketWindowTs).not.toContain('<select data-market-filter=');
+    // The load-bearing claim of the landscape refactor: `.mkt-controls` (search +
+    // filters) is a SIBLING of `#market-body`, positioned above it, not nested
+    // inside it (round 4 review, finding 4). A regression that renested the
+    // controls back inside #market-body would silently break the mobile
+    // sheet-scroll fix (hud.mobile.css keys off this exact sibling shape) with no
+    // other test catching it. controlsHtml (built with `.mkt-controls` as its own
+    // top-level div) is spliced into el.innerHTML as a sibling ahead of the
+    // `#market-body` div, never inside it.
+    expect(marketWindowTs).toContain('`<div class="mkt-controls">`');
+    const markupIdx = marketWindowTs.indexOf('el.innerHTML =');
+    const controlsHtmlIdx = marketWindowTs.indexOf('controlsHtml +', markupIdx);
+    const bodyIdx = marketWindowTs.indexOf('<div id="market-body">', markupIdx);
+    expect(controlsHtmlIdx).toBeGreaterThan(markupIdx);
+    expect(bodyIdx).toBeGreaterThan(controlsHtmlIdx);
+    // biome-ignore lint/suspicious/noTemplateCurlyInString: asserting the source literally contains this template expression
+    expect(marketWindowTs).toContain('value="${esc(this.searchQuery)}"');
+    // .mkt-list is the grid the listing cards render into; a deletion of the
+    // multi-column landscape grid would otherwise go undetected.
+    expect(componentsCss).toContain('.mkt-list {');
+    expect(marketWindowTs).toContain("list.className = 'mkt-list';");
+    // Mobile stacks the controls row to one column (the flex-basis-neutralizing
+    // fix depends on this direction flip actually happening) and forces the
+    // listing grid back to a single column instead of relying on auto-fill alone.
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mkt-controls {\n    flex-direction: column;\n    align-items: stretch;',
+    );
+    expect(hudMobileCss).toContain(
+      'body.mobile-touch .mkt-list {\n    grid-template-columns: 1fr;',
+    );
   });
 
   it('keeps the mobile bar at top-left and leaves low-frequency actions in the More tray', () => {
@@ -2101,7 +2148,10 @@ describe('client HTML shell', () => {
   });
 
   it('migrates a pre-existing form bar at most once via a per-form seeded marker', () => {
-    expect(actionBarControllerTs).toContain('_seeded');
+    // The `_seeded` marker suffix lives in the shared key-scheme module; the
+    // controller gates seeding on it via formBarSeededKey.
+    expect(actionBarLayoutSyncTs).toContain('_seeded');
+    expect(actionBarControllerTs).toContain('actionBarFormSeededKey(this.slotMapKey(form))');
     expect(actionBarControllerTs).toContain('shouldSeedFormBar(parsed, normalActions, false)');
   });
 

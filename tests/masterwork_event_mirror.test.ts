@@ -4,7 +4,7 @@
 // online ClientWorld rebuilds lastMasterwork from the event stream alone, so
 // a dead stub (an applyMasterworkEvent the events loop never calls, or a
 // mirror field nothing assigns) fails here.
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import { ClientWorld } from '../src/net/online';
 import { Sim } from '../src/sim/sim';
 import type { SimEvent } from '../src/sim/types';
@@ -18,6 +18,17 @@ import type { SimEvent } from '../src/sim/types';
 // shared rng stream. Seed-hunting a probabilistic proc is the anti-pattern;
 // the fix is a bounded retry (mirrors tests/parity/scenarios.ts
 // professionsCraft's fix for the identical class of bug).
+// Each proc test drives a BOUNDED RETRY that rebuilds a full Sim until the
+// capped 0.15 masterwork chance fires, so its cost is a small multiple of Sim
+// construction rather than a fixed one. That fits comfortably in vitest's 5s
+// default when the file runs alone (the whole file takes about 3s), but not
+// when the suite shards and several workers contend for the same cores: the
+// two proc tests then time out at exactly 5000ms while asserting nothing new.
+// Raising the ceiling for this file keeps the retry honest instead of trading
+// it for a hunted seed, which the comment above explains is the anti-pattern
+// this file exists to avoid.
+vi.setConfig({ testTimeout: 30_000 });
+
 const PROC_SEED = 18;
 const RECIPE_ID = 'recipe_eastbrook_ritual_vestments';
 const ITEM_ID = 'eastbrook_ritual_vestments';

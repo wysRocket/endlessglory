@@ -4930,6 +4930,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Bolo de Mel Conjurado',
   'entities.items.conjured_bread4.name': 'Pão de Banquete Conjurado',
   'entities.items.glimmerfin_koi.name': 'Koi de nadadeiras cintilantes',
+  'entities.items.ironreel_fishing_rod.name': 'Vara com molinete de ferro',
+  'entities.items.silverstream_fishing_rod.name': 'Vara do riacho prateado',
   'entities.items.raw_bog_eel.name': 'Enguia de brejo crua',
   'entities.items.raw_frostgill_trout.name': 'Truta de guelras gélidas crua',
   'entities.items.raw_marsh_pike.name': 'Lúcio de pântano cru',
@@ -7788,11 +7790,9 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'A loja Credits não está disponível no momento. Seu saldo e suas compras não serão afetados. Tente novamente em breve.',
   'hudChrome.credits.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Coleta: obtenha deste cadáver materiais de criação (couro, presas, seda e componentes semelhantes), separados do saque. Qualquer pessoa pode coletar, mas cada cadáver só pode ser coletado por um jogador.',
   'hudChrome.deeds.openBookHint': 'Abra o Livro dos Feitos',
-  'hudChrome.loot.takeAllTooltip':
-    'Pegar tudo: colete todas as moedas e os itens desta janela de saque.',
   'hudChrome.statInfo.desc.warfare':
     'Aumenta o dano causado aos jogadores em {increase}% e reduz o dano recebido dos jogadores em {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Guerra',
@@ -8243,21 +8243,8 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleRaid': 'Quadros de raide',
   'hudChrome.partyFrames.unlock': 'Mover quadros de grupo e raide',
   'hudChrome.partyFrames.width': 'Largura do quadro',
-  'apiError.welcome.invalid_input': 'Entrada inválida.',
-  'welcome.back': 'Que bom ter você de volta, {name}',
-  'welcome.level': 'Nível {level}',
-  'welcome.lastPlayed': 'Última vez em jogo: {when}',
-  'welcome.continue': 'Entrar no mundo',
-  'welcome.continueHint': 'Pressione Enter para continuar, Esc para pular',
-  'welcome.continueHintTouch': 'Toque para continuar',
-  'welcome.discord.title': 'A comunidade vive no Discord',
-  'welcome.discord.sub':
-    'Prévias de patches, eventos, bate-papo com os desenvolvedores e 2 espaços bônus no banco ao vincular sua conta do Discord.',
-  'welcome.discord.join': 'Entre no nosso Discord',
-  'welcome.chest.ready': 'Baú de Recompensas Diárias pronto',
-  'welcome.armory.cta': 'Entrar no mundo e explorar o Arsenal',
-  'welcome.news.new': 'Novo',
-  'welcome.news.viewAll': 'Ver todas as atualizações no GitHub',
+  'news.new': 'Novo',
+  'news.viewAll': 'Ver todas as atualizações no GitHub',
   'entities.letters.heroic_marks_reward.sender': 'Intendente heroico',
   'entities.letters.heroic_marks_reward.subject': 'Suas Marcas heroicas',
   'entities.letters.heroic_marks_reward.body':
@@ -8511,7 +8498,6 @@ export const pt_BR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Passatempo: {craft}',
   'hudChrome.professions.identityHeader': 'Identidade',
   'hudChrome.professions.majorsLabel': 'Majores: {a} e {b}',
-  'hudChrome.professions.nextUnlockMax': 'Na habilidade máxima',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} aponta para Specialized: queda nos custos de materiais',
   'hudChrome.professions.nextUnlockTier':

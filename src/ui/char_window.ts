@@ -18,10 +18,10 @@
 // raw hex sits in this painter.
 
 import { audio } from '../game/audio';
-import type { GatheringProfessionId } from '../sim/content/professions';
 import { ITEMS } from '../sim/data';
 import type { EquipSlot } from '../sim/types';
 import type { IWorld } from '../world_api';
+import { STAT_PANELS } from './char_stats_view';
 import { buildPaperdollView, type PaperdollSlot } from './char_view';
 import { markDialogRoot } from './dialog_root';
 import { classDisplayName, itemDisplayName } from './entity_i18n';
@@ -33,6 +33,7 @@ import { iconDataUrl, QUALITY_COLOR } from './icons';
 import type { ItemDragState } from './item_drag_state';
 import type { PainterHostPresentation } from './painter_host';
 import { hydratePortraits, portraitChipHtml } from './portrait_chip';
+import { qualityGlowShadow } from './quality_glow';
 import { tSim } from './sim_i18n';
 import type { StatId } from './stat_tooltip';
 import { svgIcon } from './ui_icons';
@@ -104,29 +105,6 @@ export function hobbyCraftText(craftId: string | null): string {
   return craftNameText(craftId);
 }
 
-// The character-sheet stat cells, primaries down the left column and derived
-// stats down the right (the CSS grid wraps two per row). The HUD builds each cell
-// from the unit-tested stat_tooltip_view model, so the order is the only stat
-// concern this painter owns.
-const STAT_GRID: readonly StatId[] = [
-  'str',
-  'armor',
-  'agi',
-  'attackPower',
-  'sta',
-  'dps',
-  'int',
-  'critChance',
-  'spi',
-  'dodge',
-  'parry',
-  'spellPower',
-  'critRating',
-  'hasteRating',
-  'hitRating',
-  'warfare',
-];
-
 /**
  * Hud-supplied glue. Composes the shared PainterHostPresentation bag
  * (icon/tooltip) and adds the character-sheet surface: world reads, the localized
@@ -170,14 +148,15 @@ export interface CharWindowDeps extends PainterHostPresentation {
   showError(text: string): void;
 }
 
-// Maps each gathering profession id to its hud_chrome display-name key (issue 1124).
-const GATHERING_PROFESSION_LABEL_KEY: Record<
-  GatheringProfessionId,
-  'hudChrome.gathering.mining' | 'hudChrome.gathering.logging' | 'hudChrome.gathering.herbalism'
-> = {
+// Maps each gathering profession id to its hud_chrome display-name key (issue
+// 1124). String-keyed like the sibling professions_window.ts GATHERING_NAME_KEYS
+// (and this file's CRAFT_NAME_KEYS): an id with no key here renders no row
+// (fishing landed with Professions 2.0 Phase 11).
+const GATHERING_PROFESSION_LABEL_KEY: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
   herbalism: 'hudChrome.gathering.herbalism',
+  fishing: 'hudChrome.gathering.fishing',
 };
 
 const SHARE_GLYPH =
@@ -239,7 +218,18 @@ export class CharWindow {
       </div>
       <div class="equip-col equip-col-right" id="equip-col-right"></div>
     </div>`;
-    html += `<div class="char-stats">${STAT_GRID.map((stat) => this.deps.statCellHtml(stat)).join('')}</div>`;
+    // Stats as the showcase layout: five primary tiles, then the Offense and
+    // Defense panels. The partition + heading keys come from the char_stats_view
+    // pure core; each cell is the same unit-tested stat_tooltip_view cell (colon
+    // dropped, since flex layout separates label from value in tiles and panels).
+    html += `<div class="stat-panels">${STAT_PANELS.map((panel) => {
+      const cells = panel.stats.map((stat) => this.deps.statCellHtml(stat)).join('');
+      const title = panel.titleKey
+        ? `<div class="sp-title">${esc(t(panel.titleKey as TranslationKey))}</div>`
+        : '';
+      const cls = panel.kind === 'tiles' ? 'stat-panel attrs-tiles' : 'stat-panel';
+      return `<div class="${cls}">${title}${cells}</div>`;
+    }).join('')}</div>`;
     html += this.deps.talentSummaryHtml();
     html += this.deps.progressionHtml(p.level);
     html += this.gatheringHtml(world);
@@ -264,7 +254,7 @@ export class CharWindow {
     for (const cell of view.left) leftCol?.appendChild(this.buildSlotRow(cell));
     for (const cell of view.right) rightCol?.appendChild(this.buildSlotRow(cell));
 
-    for (const cell of el.querySelectorAll<HTMLElement>('.char-stats [data-stat]')) {
+    for (const cell of el.querySelectorAll<HTMLElement>('.stat-panels [data-stat]')) {
       const stat = cell.dataset.stat as StatId;
       // Resolve the tooltip lazily, on show, so the breakdown reflects the
       // player's current stats at the moment they hover, not at render time.
@@ -282,10 +272,11 @@ export class CharWindow {
   private gatheringHtml(world: IWorld): string {
     const rows = buildGatheringProficiencyRows(world);
     const items = rows
-      .map(
-        (r) =>
-          `<span>${esc(t(GATHERING_PROFESSION_LABEL_KEY[r.professionId]))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`,
-      )
+      .map((r) => {
+        const key = GATHERING_PROFESSION_LABEL_KEY[r.professionId];
+        if (key === undefined) return '';
+        return `<span>${esc(t(key))}: <b>${formatNumber(r.value, { maximumFractionDigits: 0 })}</b></span>`;
+      })
       .join('');
     return `<div class="char-progression"><div class="cp-title">${esc(t('hudChrome.gathering.title'))}</div><div class="char-stats cp-stats">${items}</div></div>`;
   }
@@ -311,6 +302,9 @@ export class CharWindow {
     row.innerHTML = `${icon}
         <div><div class="slot-name">${esc(this.deps.slotName(slot))}</div><div class="slot-item" style="color:${qColor}">${item ? esc(itemDisplayName(item)) : esc(t('itemUi.equipment.empty'))}</div></div>`;
     if (item) {
+      // Soft glow in the item's quality color (derived, no getComputedStyle).
+      const iconEl = row.querySelector<HTMLImageElement>('.item-icon');
+      if (iconEl) iconEl.style.boxShadow = qualityGlowShadow(qColor);
       this.deps.attachTooltip(row, () => {
         // Own worn copy's per-copy lines (seal, enchanted marker, maker's mark):
         // the self entity mirror carries equippedInstances in both worlds.

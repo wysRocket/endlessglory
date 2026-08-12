@@ -2727,6 +2727,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Spøgelsesagtig Essens',
   'entities.items.glacier_melt.name': 'Gletsjersmeltevand',
   'entities.items.glimmerfin_koi.name': 'Glimtfinne-Koi',
+  'entities.items.ironreel_fishing_rod.name': 'Fiskestang med jernhjul',
+  'entities.items.silverstream_fishing_rod.name': 'Sølvbæk-fiskestang',
   'entities.items.glowing_wax.name': 'Glødende Voks',
   'entities.items.gnarled_staff.name': 'Moseeg-Stav',
   'entities.items.gorraks_cleaver.name': 'Gorraks Kløver',
@@ -7635,10 +7637,9 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'Credits-butikken er ikke tilgængelig lige nu. Din saldo og dine køb er ikke påvirket. Prøv igen om lidt.',
   'hudChrome.credits.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Høst: Saml håndværksmaterialer fra dette lig (skind, hugtænder, silke og lignende dele), uafhængigt af dets bytte. Alle kan høste, men hvert lig kan kun høstes af én spiller.',
   'hudChrome.deeds.openBookHint': 'Åbn Bedrifternes Bog',
-  'hudChrome.loot.takeAllTooltip': 'Tag alt: Saml alle mønter og genstande i dette byttevindue.',
   'hudChrome.statInfo.desc.warfare':
     'Øger skade givet til spillere med {increase}% og reducerer skade modtaget fra spillere med {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Krigsførelse',
@@ -8120,21 +8121,8 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleRaid': 'Raidrammer',
   'hudChrome.partyFrames.unlock': 'Flyt gruppe- og raidrammer',
   'hudChrome.partyFrames.width': 'Rammebredde',
-  'apiError.welcome.invalid_input': 'Ugyldig indtastning.',
-  'welcome.back': 'Velkommen tilbage, {name}',
-  'welcome.level': 'Niveau {level}',
-  'welcome.lastPlayed': 'Sidst spillet: {when}',
-  'welcome.continue': 'Træd ind i verden',
-  'welcome.continueHint': 'Enter for at fortsætte, Esc for at springe over',
-  'welcome.continueHintTouch': 'Tryk for at fortsætte',
-  'welcome.discord.title': 'Fællesskabet lever på Discord',
-  'welcome.discord.sub':
-    'Forhåndsvisninger af patches, begivenheder, udviklerchat og 2 bonuspladser i banken, når du forbinder din Discord-konto.',
-  'welcome.discord.join': 'Tilslut dig vores Discord',
-  'welcome.chest.ready': 'Kisten med daglige belønninger er klar',
-  'welcome.armory.cta': 'Træd ind i verden, og udforsk Våbenhuset',
-  'welcome.news.new': 'Ny',
-  'welcome.news.viewAll': 'Se alle opdateringer på GitHub',
+  'news.new': 'Ny',
+  'news.viewAll': 'Se alle opdateringer på GitHub',
   'entities.letters.heroic_marks_reward.sender': 'Heroisk kvartermester',
   'entities.letters.heroic_marks_reward.subject': 'Dine heroiske mærker',
   'entities.letters.heroic_marks_reward.body':
@@ -8391,7 +8379,6 @@ export const da_DK: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobby: {craft}',
   'hudChrome.professions.identityHeader': 'Identitet',
   'hudChrome.professions.majorsLabel': 'Hovedfag: {a} og {b}',
-  'hudChrome.professions.nextUnlockMax': 'Ved maksimal dygtighed',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} point til Specialiseret: materialeomkostningerne falder',
   'hudChrome.professions.nextUnlockTier':
