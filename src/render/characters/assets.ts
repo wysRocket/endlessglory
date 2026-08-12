@@ -15,6 +15,8 @@ import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
+import { DEFAULT_TEMPLATE_TINT_STRENGTH } from '../house_style_core';
+import { applyHouseStyleMaterial, applyTemplateTint } from '../house_style_material';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
@@ -35,8 +37,6 @@ import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
-
-const DEFAULT_TINT_STRENGTH = 0.4;
 
 // KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
 // lone child node. handslot.r/l children in the character glbs carry the
@@ -814,7 +814,6 @@ export function setWeaponsStowed(
 
 const matCache = new Map<string, THREE.Material>();
 const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
-const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
 type MaterialRole = 'body' | 'weapon';
@@ -875,11 +874,7 @@ export function tintedMaterial(
       });
     }
   }
-  if (tint !== null) {
-    // subtle pull toward the template color — hard multiplies turn the
-    // hand-painted textures muddy
-    mat.color.lerp(tintScratch.set(tint), strength);
-  }
+  applyTemplateTint(mat, tint, strength);
   if (skinTex) mat.map = skinTex; // alternate body atlas, same UVs as the default
   // Emissive glow map (mech epics): standard tier only - Lambert/Basic don't
   // glow, and adding a map where none existed needs a shader recompile.
@@ -890,6 +885,15 @@ export function tintedMaterial(
     sm.emissiveIntensity = 1.0;
     sm.needsUpdate = true;
   }
+  // House style: the roster-wide surface/palette normalization, shared verbatim
+  // with the guide viewer (house_style_material.ts). It runs AFTER the per-entity
+  // tint (so a loud template colour cannot walk the palette straight back out of
+  // band) and BEFORE the two role-specific readability offsets below, which are
+  // bounded departures that derive their emissive from the final colour. See the
+  // ordering note in house_style_core.ts. It adds NO new input to the cache key
+  // above: the plan is a pure function of the source material, the tint, the
+  // tier, and the role, every one of which the key already carries.
+  applyHouseStyleMaterial(mat, role);
   if (role === 'weapon') applyWeaponMaterialPolish(mat);
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   matCache.set(key, mat);
@@ -911,7 +915,7 @@ export function applyMaterials(
   emisTex: THREE.Texture | null = null,
 ): void {
   const tint = tintFor(def, entityColor);
-  const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
+  const strength = def.tintStrength ?? DEFAULT_TEMPLATE_TINT_STRENGTH;
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -944,7 +948,7 @@ export function tintedFarMaterials(
   srcMats: THREE.Material[],
 ): THREE.Material[] {
   const tint = tintFor(def, entityColor);
-  const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
+  const strength = def.tintStrength ?? DEFAULT_TEMPLATE_TINT_STRENGTH;
   return srcMats.map((m) => tintedMaterial(m, tint, strength));
 }
 
