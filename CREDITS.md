@@ -1,21 +1,35 @@
 # Asset Credits
 
-Bundled third-party art assets are CC0 (public domain dedication) except the
-three.js water normal maps (MIT), the guide webfonts (SIL OFL 1.1), and the
-CraftPix skill-icon packs. The CraftPix
+Most bundled third-party art assets are CC0 (public domain dedication). The
+exceptions are the three.js water normal maps (MIT), the guide webfonts (SIL
+OFL 1.1), the CraftPix skill-icon packs, and the paid KayKit character packs
+that every player model and four skeleton enemies are built from. The CraftPix
 icon packs were **purchased by the Levy Street account (callum@levystreet.com)**
 and are used under the CraftPix premium royalty-free license. Attribution is
 provided as a courtesy.
 
+Some shipped models have provenance that could not be established from this
+repository, and two of them are open compliance questions rather than paperwork.
+They are recorded under **Unresolved provenance** below rather than assigned a
+license, and should be settled before the next commercial release.
+
 | Assets | Author | Source | License |
 |---|---|---|---|
-| EndlessGlory Emberwood Chronicle Eastbrook art | EndlessGlory | Project-owned original work | Project asset |
-| Character models + animations (knight, mage, rogue, barbarian, hooded rogue), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 |
-| Skeleton character models + animations, bone weapons | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0 | CC0 1.0 |
+| Emberwood Eastbrook buildings and props (`emberwood/eastbrook/*.glb`) | Quaternius | Re-exports of the Quaternius village and props packs credited below, not original work: `eastbrook/house_c.glb` still carries the pack mesh name `House_4` and is vertex-identical to `props/house_3.glb`. The commit that shipped them (`2c029be8d`) calls them "model placeholders (copied CC0)" | CC0 1.0 |
+| Emberwood foliage (`emberwood/foliage/*.glb`) | Quaternius | Re-exports of the Stylized Nature MegaKit credited below; `foliage/oak_1.glb` carries node `CommonTree_1` and is vertex-identical to `foliage/oak_1.glb` | CC0 1.0 |
+| Emberwood weapons (`emberwood/weapons/{shield,staff,sword}.glb`) | Kay Lousberg (KayKit) | Re-exports of the CC0 Adventurers pack credited below; `sword.glb` root node is `sword_1handed`, material `knight_texture` | CC0 1.0 |
+| Emberwood NPC visuals rethemed from KayKit bodies (`emberwood/npcs/emberwood_{barbarian,guard,knight,mage,npc_woman,paladin,priest,ranger,rogue}.glb`) | Kay Lousberg (KayKit) | Retextured from the paid Adventurers 2.0 pack by `scripts/retheme_openmmo_npc.py`; each carries the KayKit `Rig_Medium` armature | Paid pack, terms not recorded in-repo (see Unresolved provenance) |
+| Character models + animations (`chars/players/mage_classic.glb`), weapons/shields | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Adventures-1.0 | CC0 1.0 |
+| Skeleton enemy models (`chars/enemies/{skeleton_mage,skeleton_minion}.glb`), bone weapons | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Character-Pack-Skeletons-1.0 | CC0 1.0 |
+| Skeleton enemy models (`chars/enemies/{necromancer,skeleton_golem,skeleton_rogue,skeleton_warrior}.glb`) | Kay Lousberg (KayKit) | KayKit Skeletons 1.1, per `scripts/assets/specs/skeletons_v2.json` | Paid pack, terms not recorded in-repo (see Unresolved provenance) |
+| Kawaii player and NPC bodies (`kawaii/{druid,hunter,mage,mob_hallow,npc_armorer,npc_dealer,npc_foreman,npc_paladin,npc_smith,paladin,priest,rogue,shaman,warlock,warrior,warrior_attack,warrior_walk}.glb`) | World of ClaudeCraft | Project-generated via Meshy AI. `kawaii/warrior.glb` matches the Meshy signature documented at `scripts/_bake_meshy_scale.mjs` (Armature root at scale 0.01 over centimetre space) and the already-credited `creatures/yumi_cat.glb`; the other 16 are Meshy meshes re-rigged onto that skeleton by `scripts/rig_kawaii_char.py` | Meshy plan coverage unconfirmed for these files (see Unresolved provenance) |
 | Dungeon modular kit (walls, floors, pillars, torches, banners, chests, furniture) | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Dungeon-Remastered-1.0 | CC0 1.0 |
 | Graveyard/crypt props, dead trees, lanterns | Kay Lousberg (KayKit) | https://github.com/KayKit-Game-Assets/KayKit-Halloween-Bits-1.0 | CC0 1.0 |
-| Extra character animation library (Rig_Medium) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 |
-| Animated creatures (wolf, bull, fox, stag, alpaca, spider, frog, goblin, orc, yeti, giant, demon, ghost, goleling, glub, tribal, velociraptor, dragon) | Quaternius | https://poly.pizza/u/Quaternius · https://quaternius.com | CC0 1.0 |
+| Extra character animation library (Rig_Medium), including the bow clip set (`chars/players/bow_anims.glb`) | Kay Lousberg (KayKit) | https://kaylousberg.itch.io/kaykit-character-animations | CC0 1.0 |
+| Animated creatures (`creatures/{alpaca,bull,crabenemy,demon,demonalt,dragonevolved,fox,frog,ghost,giant,glubevolved,goblin,golelingevolved,orc,orcenemy,spider,stag,tribal,velociraptor,yeti,yetialt}.glb`) | Quaternius | https://poly.pizza/u/Quaternius · https://quaternius.com | CC0 1.0 |
+| Procedurally authored creature models (`creatures/chicken_cow.glb`, `creatures/water_elemental.glb`) | World of ClaudeCraft | Authored in-repo by `scripts/gen_chicken_cow.mjs` and `scripts/gen_water_elemental.mjs`, which write these exact paths | Project asset |
+| Ambient wildlife models (`creatures/{rabbit_critter,songbird_critter,squirrel_critter,leaping_fish}.glb`) | World of ClaudeCraft | Project-generated via Tripo AI 3D; each carries its own `tripo_mesh_` identifier | Project asset |
+| Reedbound Acolyte body (`creatures/stone_cantor.glb`) | World of ClaudeCraft | Tripo AI 3D mesh (`tripo_mat_5397a323`); its `Hit` clip authored in-repo by `scripts/_add_cantor_hit_anim.mjs` | Project asset (mesh) |
 | Stylized Nature MegaKit (trees, rocks, bushes, mushrooms, grass) | Quaternius | https://quaternius.itch.io/stylized-nature-megakit | CC0 1.0 |
 | Medieval Village Pack (houses, inn, blacksmith, well, market, cart) | Quaternius | https://quaternius.com/packs/medievalvillage.html | CC0 1.0 |
 | Fantasy Props MegaKit (barrels, crates, lanterns, furniture, smithy) | Quaternius | https://quaternius.itch.io/fantasy-props-megakit | CC0 1.0 |
@@ -38,7 +52,7 @@ provided as a courtesy.
 | Water normal maps (waternormals.jpg, Water_1/2_M_Normal.jpg) | three.js authors | https://github.com/mrdoob/three.js (r165, examples/textures) | MIT |
 | Biome backdrop panoramas (vale_backdrop.webp, marsh_backdrop.webp, peaks_backdrop.webp and 4K variants) | World of ClaudeCraft | Project-generated procedural painterly sky panorama art | Project asset |
 | Elite dragon rank emblem (`public/ui/ranks/elite-dragon-frame.webp`) | World of ClaudeCraft | Project-generated with OpenAI image generation and optimized locally | Project asset |
-| Meshy creature models (edda_reedhand, reedbound_acolyte, tolling_bell, spider_egg_sac from the Drowned Litany, yumi_cat from Protect Yumi, in `public/models/creatures/`) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; the humanoids and yumi_cat rigged and animated), owned under the Meshy paid-plan license | Project asset |
+| Meshy creature models (`creatures/{tolling_bell,spider_egg_sac}.glb` from the Drowned Litany, `creatures/yumi_cat.glb` from Protect Yumi) | World of ClaudeCraft | Project-generated via Meshy AI (text-to-3D; yumi_cat rigged and animated), owned under the Meshy paid-plan license | Project asset |
 | Legacy Credits prototype weapon models and source images (emberfang, Red Skull, and Purple sets, in `public/models/weapons/` and `public/ui/weapons/`) | World of ClaudeCraft | Project-generated and normalized through the PR 1405 asset pipeline | Project asset |
 | Bag icons (`public/ui/items/{backpack,linen_pouch,travelers_knapsack,wolfhide_satchel,gravewoven_bag,mistcallers_duffel}.webp`, encoded to 128px WebP via `scripts/convert_item_icons_webp.mjs`) | World of ClaudeCraft | Project art created for this game; provenance per icon in `public/ui/items/mapping.json` | Project asset |
 | Class ability icons (`public/ui/skills/<class>/*.webp`, re-encoded from the source-pack PNGs to WebP via `scripts/convert_skill_icons_webp.mjs`; all 9 classes: paladin, hunter, priest, warlock, rogue, warrior, mage, druid, shaman; source packs paladin/archer/priest/warlock/thief/warrior/berserker/demon/druid/pyromancer/cryomancer/aeromancer/lightning-mage/earth-magician/100-rpg-skill-icons/100-skill-icons-pack-for-rpg + per-ability fill sets) | CraftPix | https://craftpix.net | CraftPix premium (royalty-free commercial), purchased by Levy Street account (callum@levystreet.com) |
@@ -58,6 +72,27 @@ provided as a courtesy.
 | Assets | Author | Source | License |
 |---|---|---|---|
 | Loading / "entering the world" key art (`public/loading-screen.jpg`) | Endless Glory | Generated with Google Nano Banana, upscaled to 1536x1024 | Project asset |
+
+## Unresolved provenance
+
+These ship today but their attribution could not be established from anything in
+this repository. They are listed here rather than given a plausible-looking
+license row, because a confident wrong attribution is worse than a recorded gap.
+`tests/credits_coverage.test.ts` requires every shipped model to appear either in
+the tables above or in this section, so nothing goes missing silently again.
+
+**Two of these are open compliance questions, not paperwork.** They are marked
+BLOCKER and should be settled before the next commercial release.
+
+| Asset | What the evidence shows | What would settle it |
+|---|---|---|
+| **BLOCKER.** The 7 variety Emberwood NPCs: `emberwood/npcs/emberwood_{armorer,dealer,fisherman,foreman,groundskeeper,herbalist,provisioner}.glb` | `scripts/retheme_openmmo_npc_variety.py` states the sources were "staged raw pulls from github.com/Julian-adv/OpenMMO". This repo's own `.claude/skills/woc-world-creatures/SKILL.md` records that OpenMMO is **PolyForm Noncommercial 1.0.0**, confirmed by fetching its LICENSE, and warns that anything from it "needs the owner's explicit permission before it ships". This game is commercial. The staged sources were gitignored and never committed, so the chain of title cannot be reconstructed here; `emberwood_dealer.glb` additionally carries a `tripo_mat_` identifier, which does not fit an OpenMMO origin. Three of the seven are dead in the manifest but still ship. | Either explicit permission from the OpenMMO owner, or removing these seven files and their manifest entries. A credits row does not resolve a license incompatibility. |
+| **BLOCKER.** `chars/players/Mech/characters/CombatMech.glb` and its committed source `CombatMech.fbx` | The committed FBX embeds the artist's own export path identifying it as KayKit **Patreon** "Mystery Characters" Series 5, a different product from both the CC0 GitHub packs and the paid Adventurers 2.0 pack credited above. The **source FBX is itself published**: `src/render/assets/manifest.generated.ts` maps it into `/media/`, and `public/` deploys verbatim, so the pack file is redistributed to anyone who requests the URL. | The KayKit Patreon tier terms, specifically whether they permit redistributing the source asset. Removing the `.fbx` from the shipped media set is the smaller fix regardless. |
+| `creatures/wolf_basic.glb`, `creatures/greyjaw.glb`, `emberwood/creatures/wolf.glb` | All three share one donor quadruped rig: identical 48-joint list and order, identical 14-clip set (`Bark`, `Howl`, `Idle Alert`, `Sneak`, `Sit`, `Fall`) found in no other model here and matching no Quaternius pack. Source comments call it a "Dog_Animation donor skeleton", but that string appears nowhere else in the tree: no file, no spec, no bake script. The Quaternius row above no longer claims them. | The author of `da24f4d83` confirming what the Dog_Animation donor was and under what license. |
+| `creatures/wild_boar.glb` | Added as a Sketchfab export: the original blob in `72f4bc9a` contains the wrapper chain `Sketchfab_model` and `fb000749137341de99bac236bf0169ef.fbx` around `SWINECONE`. The shipped file still carries material `anim_Swinecone_01_PM_mat_Swinecone`; the wrapper was stripped by a later optimize pass, so provenance now exists only in history. No uploader or license was recorded. | Resolving Sketchfab model `fb000749137341de99bac236bf0169ef` to its uploader and license. |
+| `chars/enemies/skeleton_dagger.glb` | Appears in neither `scripts/assets/specs/characters.json` nor `skeletons_v2.json`, so which KayKit skeleton pack it came from is not recorded. | Confirming which pack and version it was built from. |
+| `kawaii/*.glb` (all 17) | The evidence that these are Meshy output is strong and they are credited as such above, but the commit that added them (`0f194199`) says in its own words that "Meshy asset licensing must be verified for this commercial game before shipping". The existing Meshy row asserts a paid-plan license for other creatures; whether the same plan covers these is an account-records question. | Confirming these 17 fall under the same Meshy paid plan already cited, and recording the account the way the CraftPix row does. |
+| KayKit Adventurers 2.0, the KayKit Paladin pack, and KayKit Skeletons 1.1 | Commit `2133845ed` states these are "the paid KayKit Adventurers 2.0 + Character Animations 1.1 packs". Every player model and four skeleton enemies build from them. No license text or purchase account is recorded, unlike the CraftPix packs. | The purchasing account and pack terms, recorded here the way the CraftPix row does it. |
 
 ## Brand marks
 
@@ -115,7 +150,7 @@ in official releases and the Credits store.
 | Generated prop model (delve_rite_shrine_skull) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (delve_pressure_plate) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (marsh_root_wall) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
-| Generated creature model + animations (training_dummy) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
+| Generated creature model + animations (`creatures/training_dummy.glb`) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D, auto-rig + preset retargets) | Project asset |
 | Generated prop model (engineering_workbench) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (alchemy_cauldron) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
 | Generated prop model (cooking_spit) | World of ClaudeCraft | Project-generated via scripts/asset_pipeline (Tripo AI 3D) | Project asset |
