@@ -17,10 +17,10 @@
 //   a. SPECULAR NORMALIZATION. Roughness is clamped into a narrow house band and
 //      metalness capped near zero for bodies. This is what kills the one glossy
 //      painterly outlier that otherwise reads as a different game.
-//   b. PALETTE HARMONIZATION. Saturation is capped and lightness pulled into a
-//      band, in perceptual (sRGB-encoded) HSL. HUE IS NEVER TOUCHED: quantizing
-//      hue to a fixed palette would erase the per-entity tint the game uses to
-//      tell mob templates apart.
+//   b. PALETTE HARMONIZATION. Saturation is pulled under a ceiling through a soft
+//      knee and lightness clamped into a band, in perceptual (sRGB-encoded) HSL.
+//      HUE IS NEVER TOUCHED: quantizing hue to a fixed palette would erase the
+//      per-entity tint the game uses to tell mob templates apart.
 //   c. FLAT SHADING. Whether the surface should render faceted.
 //
 // ORDERING (deliberate, and the reason hue is preserved rather than quantized):
@@ -28,12 +28,35 @@
 // FIRST, and this policy runs on the result. Normalizing before the tint would
 // let a loud template colour walk the palette straight back out of band, so the
 // pass has to see the tinted colour. Running after is only safe because every
-// palette operation here is a CLAMP, never a set: hue passes through untouched,
-// and two tints that differ inside the band still differ afterwards, so no two
+// palette operation here is order-preserving, never a set: hue passes through
+// untouched, and two tints that differ at all still differ afterwards, so no two
 // differently tinted templates collapse into the same appearance. The two small
 // role-specific readability offsets that follow in tintedMaterial (the weapon
 // highlight and the low-tier Lambert lift) are deliberate bounded departures
 // that need the final colour to derive their emissive from, so they stay last.
+//
+// WHY THE SATURATION CEILING IS A KNEE AND NOT A CLAMP. A hard clamp is
+// order-preserving only as a non-strict inequality: every tint above the ceiling
+// lands on exactly the ceiling, so any two loud templates come out with
+// IDENTICAL chroma and only hue and lightness are left to separate them. This
+// game distinguishes many templates that share one recoloured mesh purely by
+// per-entity tint (the demonalt mesh carries five, the giant mesh six), so that
+// is the one signal the policy must not spend. Measured on the real roster (the
+// content tints lerped into the real glb base materials at the authored tint
+// strength, CIE76 dE in Lab), the clamp cost the warfiend/pyre-colossus pair
+// 26.02 -> 20.26 and the dragonkin pair 18.96 -> 10.12. The knee below leaves
+// everything under HOUSE_SATURATION_KNEE untouched and compresses the rest
+// asymptotically toward HOUSE_SATURATION_MAX, so spacing survives instead of
+// collapsing to a point, and a screaming s=1.0 primary is still hauled to ~0.67.
+//
+// The one property this costs is exact idempotency of the palette half: a knee
+// that is strictly increasing cannot also fix its own image pointwise (that is
+// only possible for the identity), so re-applying moves saturation a bounded
+// step further down. Nothing re-applies it: tintedMaterial() always clones from
+// a pristine source material and caches the result, and the guide viewer builds
+// from a fresh clone too. The specular, lightness and flat-shading halves stay
+// exactly idempotent, and the knee's drift is bounded by the knee width and can
+// never leave the band, which is what tests/house_style_core.test.ts pins.
 //
 // Gameplay-neutral by construction: this is a global stylization applied
 // identically on every graphics tier and every entity. It is not wired to the
@@ -73,16 +96,28 @@ export interface HouseStyleResult {
 // --- The house bands. Widening any of these silently un-unifies the roster, so
 // tests/house_style_core.test.ts pins every one to its literal. ---
 
-/** No character surface is allowed to be glossier than this. */
-export const HOUSE_ROUGHNESS_MIN = 0.55;
+/** No character surface is allowed to be glossier than this. Sits just under the
+ *  0.415 the whole Meshy/Tripo creature lineage authors (stone, crystal, scale,
+ *  fish hide and demon flesh alike), so the floor binds on the genuinely glossy
+ *  outliers instead of flattening every hard surface in the roster: at 0.55 the
+ *  GGX lobe of a 0.415 material widened by 76% (alpha 0.172 -> 0.3025) and the
+ *  constructs lost their highlight, at 0.45 it widens by 18% while the painterly
+ *  outlier (an authored 0.08) is still flattened ~32x in lobe area. */
+export const HOUSE_ROUGHNESS_MIN = 0.45;
 /** Nor chalkier: the ceiling keeps the key light readable on dark creatures. */
 export const HOUSE_ROUGHNESS_MAX = 0.9;
 /** Bodies are dielectric: flesh, cloth, hide, and bark are never metal. */
 export const HOUSE_BODY_METALNESS_MAX = 0.06;
 /** Weapons keep a little metal so blades still catch the one key light. */
 export const HOUSE_WEAPON_METALNESS_MAX = 0.35;
-/** The desaturated house palette ceiling (HSL saturation). */
-export const HOUSE_SATURATION_MAX = 0.55;
+/** Saturation at or below this passes through untouched: the house palette has
+ *  no quarrel with a muted tint, and compressing those too would spend the very
+ *  separation the knee exists to protect. */
+export const HOUSE_SATURATION_KNEE = 0.5;
+/** The desaturated house palette ceiling (HSL saturation). Asymptotic, not a
+ *  clamp: `houseSaturation` approaches it but never reaches it, so two loud
+ *  tints keep their ordering and their spacing instead of both landing here. */
+export const HOUSE_SATURATION_MAX = 0.68;
 /** Lightness band for an untextured surface, where the colour IS the surface. */
 export const HOUSE_LIGHTNESS_MIN = 0.22;
 export const HOUSE_LIGHTNESS_MAX = 0.78;
@@ -172,10 +207,23 @@ export function houseSpecular(
   };
 }
 
-/** (b) Palette harmonization over LINEAR rgb. Saturation is capped and
- *  lightness clamped into the house band; hue passes through untouched so the
- *  per-entity template tint still separates one mob from the next. Idempotent:
- *  every operation is a clamp, and the space round-trips. */
+/** The house saturation ceiling as a soft knee. Identity at or below
+ *  HOUSE_SATURATION_KNEE, then an exponential approach to HOUSE_SATURATION_MAX
+ *  that is continuous and slope-1 at the knee and never reaches the ceiling.
+ *  STRICTLY increasing over the whole 0..1 domain, which is the point: unlike a
+ *  clamp it maps two distinct loud tints to two distinct chromas, so templates
+ *  that share a mesh and differ only by tint stay apart. */
+export function houseSaturation(s: number): number {
+  if (s <= HOUSE_SATURATION_KNEE) return s;
+  const span = HOUSE_SATURATION_MAX - HOUSE_SATURATION_KNEE;
+  return HOUSE_SATURATION_KNEE + span * (1 - Math.exp(-(s - HOUSE_SATURATION_KNEE) / span));
+}
+
+/** (b) Palette harmonization over LINEAR rgb. Saturation is pulled under the
+ *  house ceiling through the soft knee and lightness clamped into the house
+ *  band; hue passes through untouched so the per-entity template tint still
+ *  separates one mob from the next. Order-preserving on every axis; the
+ *  lightness half is a clamp and idempotent, the knee is not (see the header). */
 export function houseColor(
   r: number,
   g: number,
@@ -185,11 +233,7 @@ export function houseColor(
   const hsl = rgbToHsl(encodeSrgb(clamp01(r)), encodeSrgb(clamp01(g)), encodeSrgb(clamp01(b)));
   const lightMin = hasMap ? HOUSE_MAPPED_LIGHTNESS_MIN : HOUSE_LIGHTNESS_MIN;
   const lightMax = hasMap ? 1 : HOUSE_LIGHTNESS_MAX;
-  const out = hslToRgb(
-    hsl.h,
-    Math.min(hsl.s, HOUSE_SATURATION_MAX),
-    clamp(hsl.l, lightMin, lightMax),
-  );
+  const out = hslToRgb(hsl.h, houseSaturation(hsl.s), clamp(hsl.l, lightMin, lightMax));
   return { r: decodeSrgb(out.r), g: decodeSrgb(out.g), b: decodeSrgb(out.b) };
 }
 
@@ -202,8 +246,9 @@ export function houseFlatShading(role: HouseMaterialRole): boolean {
   return role === 'body';
 }
 
-/** The whole policy, as one derivation. Pure and total: same input, same
- *  output, and applying it to its own result changes nothing. */
+/** The whole policy, as one derivation. Pure and total: same input, same output.
+ *  Re-applying is a no-op on every axis except the saturation knee, whose second
+ *  pass moves saturation by at most the knee width and never out of band. */
 export function houseStyle(src: HouseStyleSource): HouseStyleResult {
   const color = houseColor(src.r, src.g, src.b, src.hasMap);
   const spec = houseSpecular(src.roughness, src.metalness, src.role);
