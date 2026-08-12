@@ -51,12 +51,14 @@ const CEILING_LABEL_KEYS: Record<EmpowermentCeiling, TranslationKey> = {
 };
 
 // Gathering display-name keys (the char-window gathering section family).
-// Phase 11's fishing row must add its id here alongside its catalog key; an
-// id with no key renders no row (the view core passes every row through).
+// Every GATHERING_PROFESSION_IDS id adds its id here alongside its catalog
+// key (fishing landed with Phase 11); an id with no key renders no row (the
+// view core passes every row through).
 const GATHERING_NAME_KEYS: Record<string, TranslationKey> = {
   mining: 'hudChrome.gathering.mining',
   logging: 'hudChrome.gathering.logging',
   herbalism: 'hudChrome.gathering.herbalism',
+  fishing: 'hudChrome.gathering.fishing',
 };
 
 /**
@@ -332,7 +334,7 @@ export class ProfessionsWindow {
   }
 
   private nextUnlockText(unlock: CraftNextUnlock): string {
-    if (unlock.kind === 'max') return t('hudChrome.professions.nextUnlockMax');
+    if (unlock.kind === 'mastered') return t('hudChrome.professions.nextUnlockMastered');
     if (unlock.kind === 'specialized')
       return t('hudChrome.professions.nextUnlockSpecialized', {
         points: this.fmt(unlock.pointsRemaining),

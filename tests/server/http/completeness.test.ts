@@ -112,7 +112,6 @@ const REGISTRY_ONLY_PATHS = new Set<string>([
   '/api/deeds/broadcasts',
   '/api/steam/link',
   '/api/steam/status',
-  '/api/welcome/flags',
   '/api/auth/firebase',
   '/api/characters/:id/deeds',
 ]);
@@ -261,8 +260,6 @@ describe('registry completeness: migrated baseline (public reads + auth + charac
     { method: 'GET', path: '/api/woc/balance' },
     { method: 'POST', path: '/api/card' },
     { method: 'GET', path: '/api/referrals' },
-    // The Welcome Screen server flags surface (server/welcome.ts).
-    { method: 'GET', path: '/api/welcome/flags' },
     // The Firebase Auth sign-in surface (server/firebase_auth.ts).
     { method: 'POST', path: '/api/auth/firebase' },
     // The reports + telemetry surface (server/reports.ts). All POST; the

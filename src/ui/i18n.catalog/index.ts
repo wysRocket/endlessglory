@@ -266,6 +266,7 @@ export const en = {
   stats: {
     title: 'World Status',
     accountsCreated: 'Players',
+    charactersCreated: 'Characters Created',
     playersOnline: 'Players Online',
     realmName: 'World Name',
   },
@@ -298,6 +299,8 @@ export const en = {
     empty: 'No updates yet — check back soon.',
     prerelease: 'Pre-release',
     viewOnGithub: 'View on GitHub',
+    new: 'New',
+    viewAll: 'View all updates on GitHub',
   },
   download: {
     title: 'Download Desktop Launcher',

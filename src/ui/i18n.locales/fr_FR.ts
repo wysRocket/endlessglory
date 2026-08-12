@@ -727,11 +727,9 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'La boutique de Credits est indisponible pour le moment. Votre solde et vos achats ne sont pas affectés. Veuillez revenir dans quelques instants.',
   'hudChrome.credits.wocBalance': 'WOC : {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Dépecer : prélevez sur ce cadavre des matériaux d’artisanat (peau, croc, soie et composants similaires), séparément de son butin. Tout le monde peut le dépecer, mais un cadavre donné ne peut l’être que par un seul joueur.',
   'hudChrome.deeds.openBookHint': 'Ouvrir le Livre des hauts faits',
-  'hudChrome.loot.takeAllTooltip':
-    'Tout prendre : récupérez chaque pièce et chaque objet de cette fenêtre de butin.',
   'hudChrome.statInfo.desc.warfare':
     'Augmente de {increase} % les dégâts infligés aux joueurs et réduit de {reduction} % les dégâts que les joueurs vous infligent.',
   'hudChrome.statInfo.names.warfare': 'Art de la guerre',
@@ -5341,6 +5339,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'entities.items.conjured_bread3.name': 'Gâteau au miel invoqué',
   'entities.items.conjured_bread4.name': 'Pain de festin invoqué',
   'entities.items.glimmerfin_koi.name': 'Koï aux nageoires scintillantes',
+  'entities.items.ironreel_fishing_rod.name': 'Canne à moulinet de fer',
+  'entities.items.silverstream_fishing_rod.name': "Canne du ruisseau d'argent",
   'entities.items.raw_bog_eel.name': 'Anguille des marais crue',
   'entities.items.raw_frostgill_trout.name': 'Truite aux ouïes givrées crue',
   'entities.items.raw_marsh_pike.name': 'Brochet des marais cru',
@@ -8342,21 +8342,8 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleRaid': 'Cadres de raid',
   'hudChrome.partyFrames.unlock': 'Déplacer les cadres de groupe et de raid',
   'hudChrome.partyFrames.width': 'Largeur du cadre',
-  'apiError.welcome.invalid_input': 'Saisie invalide.',
-  'welcome.back': 'Bon retour parmi nous, {name}',
-  'welcome.level': 'Niveau {level}',
-  'welcome.lastPlayed': 'Dernière partie : {when}',
-  'welcome.continue': 'Entrer dans le monde',
-  'welcome.continueHint': 'Entrée pour continuer, Échap pour passer',
-  'welcome.continueHintTouch': 'Touchez pour continuer',
-  'welcome.discord.title': 'La communauté vit sur Discord',
-  'welcome.discord.sub':
-    'Aperçus des patchs, événements, discussions avec les développeurs et 2 emplacements de banque bonus en liant votre compte Discord.',
-  'welcome.discord.join': 'Rejoindre notre Discord',
-  'welcome.chest.ready': 'Coffre des récompenses quotidiennes prêt',
-  'welcome.armory.cta': 'Entrer dans le monde et parcourir l’Armurerie',
-  'welcome.news.new': 'Nouveau',
-  'welcome.news.viewAll': 'Voir toutes les mises à jour sur GitHub',
+  'news.new': 'Nouveau',
+  'news.viewAll': 'Voir toutes les mises à jour sur GitHub',
   'entities.letters.heroic_marks_reward.sender': 'Intendant héroïque',
   'entities.letters.heroic_marks_reward.subject': 'Vos Marques héroïques',
   'entities.letters.heroic_marks_reward.body':
@@ -8617,7 +8604,6 @@ export const fr_FR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Passe-temps : {craft}',
   'hudChrome.professions.identityHeader': 'Identité',
   'hudChrome.professions.majorsLabel': 'Majeurs : {a} et {b}',
-  'hudChrome.professions.nextUnlockMax': 'Au maximum de compétence',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} points avant la spécialisation : les coûts des matériaux diminuent',
   'hudChrome.professions.nextUnlockTier':

@@ -105,8 +105,20 @@ import {
   type RecipeDef,
   type SocialInfo,
   type TradeInfo,
+  type VcSharedCupInfo,
+  type VcViewerReadout,
 } from '../world_api';
-import type { MasterworkView } from '../world_api/professions';
+import {
+  type ActionBarLayout,
+  type ActionBarLayoutRestore,
+  sanitizeActionBarLayout,
+} from '../world_api/action_bar';
+import type {
+  ApplyEnchantResultView,
+  DisenchantResultView,
+  MasterworkView,
+  SalvageResultView,
+} from '../world_api/professions';
 import { computeBackoffDelay } from './backoff';
 import { optimisticQuestState } from './quest_state_optimistic';
 import { isTransientReconnectRejection, isTransientTimeoutRejection } from './reconnect_policy';
@@ -801,6 +813,7 @@ export class Api {
 
   async projectStats(): Promise<{
     accounts_created: number;
+    characters_created: number;
     players_online: number;
     realm: string;
   }> {
@@ -874,9 +887,16 @@ export class Api {
     native = false,
     challenge = '',
     nativeAttestation: unknown = undefined,
+    desktop = false,
   ): Promise<{ url: string }> {
     const nativeQuery = native ? `&native=1&challenge=${encodeURIComponent(challenge)}` : '';
-    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}`, { nativeAttestation });
+    // `desktop` and `native` are mutually exclusive: native is the mobile-app PKCE
+    // handoff, desktop marks a login start from the Electron/Steam shell's system
+    // browser so the callback bounces back to /desktop-login instead of '/'.
+    const desktopQuery = !native && desktop ? '&desktop=1' : '';
+    return this.post(`/api/auth/discord/start?mode=${mode}${nativeQuery}${desktopQuery}`, {
+      nativeAttestation,
+    });
   }
 
   async exchangeNativeDiscordCode(
@@ -931,18 +951,6 @@ export class Api {
   // Current account's Discord link status + reward points + live guild presence.
   async discordStatus(): Promise<Record<string, unknown>> {
     return this.get('/api/discord');
-  }
-
-  // Server-side Welcome Screen flags (today: the Season 1 Armory promo gate).
-  async welcomeFlags(): Promise<{ armoryPromoEnabled: boolean }> {
-    return this.get('/api/welcome/flags');
-  }
-
-  // Daily rewards status (bearer-only, no world/character needed): the Welcome
-  // Screen's chest-tile readiness read reuses the same endpoint the in-world
-  // daily rewards window polls via ClientWorld.dailyRewards().
-  async dailyRewards(): Promise<DailyRewardStatus> {
-    return this.get('/api/daily-rewards');
   }
 
   // Unlink Discord. A Discord-provisioned account (no real password yet) must send a
@@ -1077,6 +1085,10 @@ const TELEPORT_SNAP_DIST_SQ = 40 * 40;
 // genuine leaver (logout, corpse cleanup) lingers only momentarily.
 const DESPAWN_GRACE_MS = 600;
 
+// Debounce for the action-bar layout upload: coalesce a burst of drag/drop edits
+// into one wire save rather than a send per slot change (server persists it).
+const ACTION_BAR_SAVE_DEBOUNCE_MS = 1500;
+
 // Auto-reconnect backoff for an unexpectedly dropped game socket. The server
 // holds the character in-world (linkdead) for five minutes; the retry window
 // is deliberately longer, since past the grace a successful auth simply
@@ -1185,6 +1197,9 @@ function blankEntity(id: number): Entity {
     castTotal: 0,
     castTargetId: null,
     castAim: null,
+    gatherCastNodeId: '',
+    fishBiteAtTick: 0,
+    fishReelDeadlineTick: 0,
     channeling: false,
     channelTickTimer: 0,
     channelTickEvery: 0,
@@ -1206,6 +1221,7 @@ function blankEntity(id: number): Entity {
     chargePath: [],
     followTargetId: null,
     sitting: false,
+    afk: false,
     weaponStowed: false,
     eating: null,
     drinking: null,
@@ -1344,9 +1360,14 @@ export class ClientWorld implements IWorld {
   // --- IWorldCardMinigame: Card Duel queue/match state, mirrored from the
   // snapshot self (`s.cardDuel`, delta-omitted). ---
   cardMinigameInfo: CardMinigameInfo = { queued: false, available: true, match: null };
-  // --- IWorldValeCup: Vale Cup queue/match state, mirrored from the snapshot
-  // self (`s.vcup`, delta-omitted: a missing key keeps the prior mirror, an
-  // explicit null clears it, same as `s.arena`). ---
+  // --- IWorldValeCup: Vale Cup queue/match state, recomposed from two
+  // delta-omitted self keys: `s.vcup` (the per-viewer remainder plus a wire-only
+  // liveHidden flag) and `s.vcupb` (the realm-wide fragment, serialized once
+  // server-side and shared across viewers). We keep the last of each mirror and
+  // rebuild cupInfo whenever either changes; a missing key keeps its prior mirror
+  // (never default to empty, that would wipe the other fragment). ---
+  private lastVcupRemainder: VcViewerReadout | null = null;
+  private lastVcupShared: VcSharedCupInfo | null = null;
   cupInfo: CupInfo | null = null;
   // My live sport role, mirrored from the wireRev-gated heavy self field
   // `s.sport` ({ role } | null, delta-omitted). NON-IWorld mirror: while set,
@@ -1449,6 +1470,15 @@ export class ClientWorld implements IWorld {
   // server's `masterwork` event (applyMasterworkEvent below), exactly like
   // lastCraftResult above. Null until this session's first masterwork proc.
   lastMasterwork: MasterworkView | null = null;
+  // Enchanting-action outcome surfaces (Professions 2.0 Phase 13), each mirrored
+  // from BOTH the server's pid-scoped disenchantResult/enchantResult/salvageResult
+  // event (applyDisenchantResultEvent/applyEnchantResultEvent/applySalvageResultEvent
+  // below, the immediacy arm) AND the denc/ench/salv self-delta (applySnapshot, the
+  // convergence arm) exactly the way lastCraftResult mirrors craftResult. Null until
+  // this session's first such attempt.
+  lastDisenchantResult: DisenchantResultView | null = null;
+  lastEnchantResult: ApplyEnchantResultView | null = null;
+  lastSalvageResult: SalvageResultView | null = null;
   // The viewer's own active mobile crafting station (Professions 2.0 Phase 8),
   // mirrored from the server's `mst` self-delta (applySnapshot below). The
   // server computes the active/expired state against its own tickCount, so
@@ -1546,6 +1576,15 @@ export class ClientWorld implements IWorld {
   // HUD redraws on — the frame loop polls this so open panels re-render
   private invChanged = false;
   private cosmeticsChanged = false;
+  // IWorldActionBar: the login-time reconciliation, resolved once from the first
+  // self-payload (undefined until then, and again once consumed); the debounced
+  // upload state coalesces rapid layout edits into one wire save and skips a
+  // send whose serialized layout matches the last one sent.
+  private actionBarRestore: ActionBarLayoutRestore | undefined = undefined;
+  private actionBarRestoreResolved = false;
+  private actionBarSaveTimer: ReturnType<typeof setTimeout> | null = null;
+  private actionBarSaveLastJson: string | null = null;
+  private actionBarSavePending: ActionBarLayout | null = null;
   // Soft (cosmetic) profanity terms the server sends in `hello` and pushes via
   // `censor` frames when an admin edits the list. The HUD drains these to mask
   // chat locally when the player's filter is on. Hard words never arrive here.
@@ -1595,6 +1634,16 @@ export class ClientWorld implements IWorld {
   // resume, force a real state check and retry immediately instead of
   // waiting for a close event or the rest of the backoff delay.
   private readonly handleVisibilityChange = (): void => {
+    if (document.visibilityState === 'hidden') {
+      // Backgrounding (tab switch, tab close, phone lock) is the last reliable
+      // beat to get an in-flight debounced layout edit to the server while the
+      // socket is still open, so a "rearrange then close the tab" never strands
+      // the final edit for a second device. Bounded: a no-op unless a save is
+      // pending. A raw tab close routes through pagehide, not sendLogout, so this
+      // is what covers it.
+      this.flushActionBarLayoutSave();
+      return;
+    }
     if (document.visibilityState !== 'visible') return;
     if (this.sessionEnded) return;
     if (this.ws.readyState === WebSocket.OPEN) return;
@@ -1688,6 +1737,11 @@ export class ClientWorld implements IWorld {
   }
 
   private endSession(): void {
+    // Flush a pending layout save BEFORE teardown, while the socket is still open
+    // and `connected` is still true: close() calls this before ws.close() and
+    // sendLogout() calls it before the logout frame, so the final edit is not
+    // lost to a deliberate logout within the debounce window.
+    this.flushActionBarLayoutSave();
     this.sessionEnded = true;
     this.failPendingCommandOutcomes();
     clearInterval(this.sendTimer);
@@ -1982,6 +2036,9 @@ export class ClientWorld implements IWorld {
         this.applyLockpickEvent(ev as SimEvent);
         this.applyCraftResultEvent(ev as SimEvent);
         this.applyMasterworkEvent(ev as SimEvent);
+        this.applyDisenchantResultEvent(ev as SimEvent);
+        this.applyEnchantResultEvent(ev as SimEvent);
+        this.applySalvageResultEvent(ev as SimEvent);
         this.applyChatFlairEvent(ev as SimEvent);
         this.eventQueue.push(ev as SimEvent);
       }
@@ -2390,6 +2447,7 @@ export class ClientWorld implements IWorld {
       e.castTotal = w.castTot ?? 0;
       e.channeling = !!w.chan;
       e.sitting = !!w.sit;
+      e.afk = !!w.ak; // /afk display bit: drives the nameplate tag + social presence dot
       e.weaponStowed = !!w.ws;
       e.aggroTargetId = w.aggro ?? null;
       // Another entity's selected target (players/bots; mobs use aggro above). Powers
@@ -2701,7 +2759,9 @@ export class ClientWorld implements IWorld {
       if (s.cardDuel !== undefined) this.cardMinigameInfo = s.cardDuel;
       if (s.honor !== undefined) this.honor = s.honor ?? 0;
       if (s.lhonor !== undefined) this.lifetimeHonor = s.lhonor ?? 0;
-      if (s.vcup !== undefined) this.cupInfo = s.vcup;
+      if (s.vcup !== undefined) this.lastVcupRemainder = s.vcup as VcViewerReadout | null;
+      if (s.vcupb !== undefined) this.lastVcupShared = s.vcupb as VcSharedCupInfo | null;
+      if (s.vcup !== undefined || s.vcupb !== undefined) this.recomputeCupInfo();
       if (s.market !== undefined) this.marketInfo = s.market;
       if (s.mail !== undefined) this.mailInfo = s.mail;
       if (s.mailU !== undefined) this.mailUnread = s.mailU ?? 0;
@@ -2738,6 +2798,14 @@ export class ClientWorld implements IWorld {
       // mst -> activeMobileStationCraft: a nullable scalar, so the delta's
       // explicit null (station expired or never placed) must overwrite.
       if (s.mst !== undefined) this.activeMobileStationCraft = (s.mst as string | null) ?? null;
+      // Enchanting-action outcome mirrors (Professions 2.0 Phase 13): the
+      // convergence arm for lastDisenchantResult/lastEnchantResult/lastSalvageResult
+      // (the event mirror above is the immediacy arm; both feed the same field).
+      // Server-diffed per tick, so two identical consecutive deny results produce
+      // no delta change, which is exactly why the event arm also exists.
+      if (s.denc !== undefined) this.lastDisenchantResult = s.denc ?? null;
+      if (s.ench !== undefined) this.lastEnchantResult = s.ench ?? null;
+      if (s.salv !== undefined) this.lastSalvageResult = s.salv ?? null;
       if (s.gprof !== undefined) this.gatheringProficiency = s.gprof ?? {};
       if (s.prof !== undefined) this.professionsState = s.prof ?? { skills: [] };
       if (s.cprof !== undefined && s.cprof) {
@@ -2772,6 +2840,22 @@ export class ClientWorld implements IWorld {
         while (d > Math.PI) d -= 2 * Math.PI;
         while (d < -Math.PI) d += 2 * Math.PI;
         this.pendingFacingDelta += d;
+      }
+      // IWorldActionBar: resolve the login-time layout reconciliation exactly
+      // once, on the first self-payload this ClientWorld processes. A fresh join
+      // always carries the heavy self block, so `hbl` is present: the stored
+      // server layout (server WINS) or an explicit null (the server has no copy,
+      // so seed from local). `hbl` absent on the first payload (a resumed
+      // session's re-sync, where it was already sent once) leaves the local
+      // mirror authoritative ('noop').
+      if (!this.actionBarRestoreResolved) {
+        this.actionBarRestoreResolved = true;
+        if (s.hbl !== undefined) {
+          const clean = s.hbl === null ? null : sanitizeActionBarLayout(s.hbl);
+          this.actionBarRestore = clean ? { source: 'server', layout: clean } : { source: 'seed' };
+        } else {
+          this.actionBarRestore = { source: 'noop' };
+        }
       }
     }
 
@@ -2853,6 +2937,31 @@ export class ClientWorld implements IWorld {
     const v = this.cosmeticsChanged;
     this.cosmeticsChanged = false;
     return v;
+  }
+
+  // Rebuild the public cupInfo from the two mirrored wire fragments. A null
+  // remainder (the viewer has no readout, or an explicit vcup:null) clears it; a
+  // remainder with no shared fragment yet (should not happen, they ship together
+  // on every gate-open pass and every resync) keeps the prior value rather than
+  // emitting a half-built readout. liveHidden reapplies the per-viewer practice
+  // suppression the server derived and is never surfaced on CupInfo.
+  private recomputeCupInfo(): void {
+    const rem = this.lastVcupRemainder;
+    const shared = this.lastVcupShared;
+    if (rem === null) {
+      this.cupInfo = null;
+      return;
+    }
+    if (shared === null) return;
+    const { liveHidden, ...viewer } = rem;
+    this.cupInfo = {
+      ...viewer,
+      queueSizes: shared.queueSizes,
+      live: liveHidden ? null : shared.live,
+      board: shared.board,
+      guildBoard: shared.guildBoard,
+      practicing: shared.practicing,
+    };
   }
 
   // Refuse a hostile-target cast at an already-dead target: near-monotonic +
@@ -3047,6 +3156,19 @@ export class ClientWorld implements IWorld {
   trainRecipe(recipeId: string): void {
     this.cmd({ cmd: 'train_recipe', recipe: recipeId });
   }
+  // Enchanting profession commands (Professions 2.0 Phase 13): command only,
+  // never predicted. The server re-validates ownership/eligibility/throttle in
+  // the sim resolvers and answers with the personal disenchantResult/
+  // enchantResult/salvageResult event plus the denc/ench/salv self-delta.
+  disenchantItem(itemId: string): void {
+    this.cmd({ cmd: 'disenchant_item', item: itemId });
+  }
+  applyEnchant(itemId: string, enchantId: string): void {
+    this.cmd({ cmd: 'apply_enchant', item: itemId, enchant: enchantId });
+  }
+  salvageItem(itemId: string): void {
+    this.cmd({ cmd: 'salvage_item', item: itemId });
+  }
   sellItem(itemId: string, count?: number): void {
     this.cmd({ cmd: 'sell', item: itemId, count });
   }
@@ -3130,6 +3252,46 @@ export class ClientWorld implements IWorld {
       this.cosmeticsChanged = true;
     }
     this.cmd({ cmd: 'change_weapon_skin', skin: skinId, wtype: type ?? null });
+  }
+  saveActionBarLayout(layout: ActionBarLayout): void {
+    // Debounced, deduped upload of the whole layout. The controller has already
+    // written the localStorage mirror; this pushes the server copy so it
+    // restores on other devices. Rapid drags coalesce to the last layout, and an
+    // upload whose serialized form matches the last send is skipped, so a
+    // re-save during login (or an unchanged bar) never amplifies wire/db writes.
+    const clean = sanitizeActionBarLayout(layout);
+    if (!clean) return;
+    const json = JSON.stringify(clean);
+    if (json === this.actionBarSaveLastJson) return;
+    this.actionBarSaveLastJson = json;
+    this.actionBarSavePending = clean;
+    if (this.actionBarSaveTimer !== null) clearTimeout(this.actionBarSaveTimer);
+    this.actionBarSaveTimer = setTimeout(
+      () => this.flushActionBarLayoutSave(),
+      ACTION_BAR_SAVE_DEBOUNCE_MS,
+    );
+  }
+
+  // Send any debounced-but-not-yet-sent layout NOW. Called on the debounce timer
+  // and, critically, when the session ends or the page backgrounds (endSession +
+  // the visibilitychange 'hidden' branch), so the final sub-debounce edit reaches
+  // the server before the socket goes away instead of being stranded (the local
+  // mirror would still be right on the same device, but a second device would
+  // miss it). No-op unless a save is pending.
+  private flushActionBarLayoutSave(): void {
+    if (this.actionBarSaveTimer !== null) {
+      clearTimeout(this.actionBarSaveTimer);
+      this.actionBarSaveTimer = null;
+    }
+    const pending = this.actionBarSavePending;
+    if (pending === null) return;
+    this.actionBarSavePending = null;
+    this.cmd({ cmd: 'save_hotbar_layout', layout: pending });
+  }
+  takeActionBarLayoutRestore(): ActionBarLayoutRestore | undefined {
+    const restore = this.actionBarRestore;
+    this.actionBarRestore = undefined; // one-shot: consumed by the HUD at world entry
+    return restore;
   }
   chat(text: string): void {
     this.cmd({ cmd: 'chat', text });
@@ -3671,6 +3833,42 @@ export class ClientWorld implements IWorld {
   private applyMasterworkEvent(ev: SimEvent): void {
     if (ev.type !== 'masterwork') return;
     this.lastMasterwork = { recipeId: ev.recipeId, itemId: ev.itemId, crafter: ev.crafter };
+  }
+  // Mirror the authoritative enchanting-action outcomes into their lastX field
+  // (Professions 2.0 Phase 13), each modeled exactly on applyCraftResultEvent
+  // above (the immediacy arm; the denc/ench/salv self-delta is the convergence
+  // arm in applySnapshot). The events still flow to the HUD (drainEvents) for a
+  // toast/log line.
+  private applyDisenchantResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'disenchantResult') return;
+    this.lastDisenchantResult = {
+      ok: ev.ok,
+      itemId: ev.itemId,
+      materialItemId: ev.materialItemId,
+      count: ev.count,
+      secondaryItemId: ev.secondaryItemId,
+      secondaryCount: ev.secondaryCount,
+      reason: ev.reason,
+    };
+  }
+  private applyEnchantResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'enchantResult') return;
+    this.lastEnchantResult = {
+      ok: ev.ok,
+      itemId: ev.itemId,
+      enchantId: ev.enchantId,
+      reason: ev.reason,
+    };
+  }
+  private applySalvageResultEvent(ev: SimEvent): void {
+    if (ev.type !== 'salvageResult') return;
+    this.lastSalvageResult = {
+      ok: ev.ok,
+      itemId: ev.itemId,
+      materialItemId: ev.materialItemId,
+      count: ev.count,
+      reason: ev.reason,
+    };
   }
   delveRiteChoose(intensity: RiteIntensity): void {
     this.cmd({ cmd: 'delve_rite_choose', intensity });

@@ -162,6 +162,7 @@ describe('Api.projectStats', () => {
   it('fetches and returns project stats', async () => {
     const mockStats = {
       accounts_created: 100,
+      characters_created: 250,
       players_online: 10,
       realm: 'Test Realm',
     };

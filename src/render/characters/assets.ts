@@ -10,6 +10,7 @@ import * as THREE from 'three';
 import type { GLTF } from 'three/addons/loaders/GLTFLoader.js';
 import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
 import { clone as cloneSkinned } from 'three/addons/utils/SkeletonUtils.js';
+import { offhandMirrorsWeaponSkin } from '../../sim/content/weapon_skin_rules';
 import { WEAPON_SKINS } from '../../sim/content/weapon_skins';
 import { ACTIVE_VISUAL_THEME } from '../../visual_theme';
 import { VISUAL_THEME_CATALOG } from '../../visual_theme_catalog.generated';
@@ -17,14 +18,16 @@ import { themedAssetPath } from '../../visual_theme_core';
 import { loadGltf, loadTexture } from '../assets/loader';
 import { registerPreload } from '../assets/preload';
 import { addRimGlow, GFX } from '../gfx';
+import { DEFAULT_TEMPLATE_TINT_STRENGTH } from '../house_style_core';
+import { applyHouseStyleMaterial, applyTemplateTint } from '../house_style_material';
 import { backGripFor } from './back_grips';
 import { dequantizeAttribute } from './dequantize_attribute';
 import { type HandGrip, KAYKIT_SHIELD_ACCESSORIES, KAYKIT_SHIELD_GRIPS } from './held_item_grips';
 import {
   type AttachDef,
   characterPreloadUrls,
-  itemOffhandModelUrl,
   itemWeaponModelUrl,
+  offhandModelUrl,
   SKIN_EMISSIVE,
   SKINS,
   VISUALS,
@@ -37,8 +40,6 @@ import { mergeSkinnedParts } from './rig_merge';
 import { weaponSkinAttachBone, weaponSkinHandling } from './skin_attack';
 import { variantGripTransform, WEAPON_GRIP_OVERRIDES } from './weapon_grip';
 import { markOwnedWeaponSkinMaterials } from './weapon_skin_materials';
-
-const DEFAULT_TINT_STRENGTH = 0.4;
 
 // KayKit adventurer standalone weapon glbs ship a left-hand mesh offset on a
 // lone child node. handslot.r/l children in the character glbs carry the
@@ -443,11 +444,17 @@ function swapAttachDef(
   return url ? { url, bone: base.bone } : base;
 }
 
+// The AttachDef for the actual equipped offhand. Its model is the offhand item's
+// own, EXCEPT when the active mainhand skin mirrors onto it (a matching-type
+// offhand weapon), in which case the offhand renders the skin too.
+// Shields, held offhands (orbs/tomes), and different-type weapons never mirror
+// (offhandModelUrl gates it on the pure rule) and keep their item model.
 function offhandAttachDef(
   base: AttachDef,
   offhandItemId: string | null | undefined,
+  weaponSkinId: string | null | undefined = null,
 ): AttachDef | null {
-  const url = itemOffhandModelUrl(offhandItemId);
+  const url = offhandModelUrl(offhandItemId, weaponSkinId);
   return url ? { url, bone: base.bone } : null;
 }
 
@@ -723,12 +730,14 @@ function attachTargetBone(
 
 // Attach every authored prop: swappable slots take the equipped item's model (or an
 // applied weapon skin, which wins); the actual offhand slot takes the equipped
-// offhand's model (or nothing while none is equipped); every other attachment is
-// fixed (the warlock's spellbook offhand), except the hunter's fixed RANGED attach,
-// which a bow/crossbow skin replaces in place. The rogue lists both hand slots so a
-// dagger shows in both. A manifest/bone mismatch ships without that prop. Returns
-// the WEAPON payload roots (the swap + ranged-swap ones), the set rarity VFX and
-// orientation pins ride; the offhand payload has its own cycle (setHeldOffhand).
+// offhand's model (or the same skin mirrored onto a matching-type weapon,
+// or nothing while none is equipped); every other attachment is fixed (the warlock's
+// spellbook offhand), except the hunter's fixed RANGED attach, which a bow/crossbow
+// skin replaces in place. The rogue lists both hand slots so a dagger shows in both.
+// A manifest/bone mismatch ships without that prop. Returns the WEAPON payload roots
+// (the swap + ranged-swap ones), plus a skin-mirrored offhand payload, the set
+// rarity VFX and orientation pins ride; a NON-mirrored offhand has its own cycle
+// (setHeldOffhand) and stays out of the returned set.
 function attachAllProps(
   root: THREE.Object3D,
   def: VisualDef,
@@ -738,6 +747,11 @@ function attachAllProps(
   offhandItemId: string | null = null,
 ): THREE.Object3D[] {
   const attachments = visibleAttachmentsForGraphics(def);
+  // A skin mirrored onto the offhand rides the same rarity-VFX + material path as
+  // the mainhand skin, so its payload joins the returned set (the caller runs the
+  // VFX/isolation pass over these). A plain offhand (shield/held-offhand/different
+  // -type weapon) stays out, untouched.
+  const offhandSkinned = offhandMirrorsWeaponSkin(weaponSkinId, offhandItemId);
   const payloads: THREE.Object3D[] = [];
   for (let i = 0; i < attachments.length; i++) {
     const base = attachments[i];
@@ -747,14 +761,14 @@ function attachAllProps(
     const att = isSwap
       ? swapAttachDef(base, weaponItemId, weaponSkinId)
       : isOffhandSwap
-        ? offhandAttachDef(base, offhandItemId)
+        ? offhandAttachDef(base, offhandItemId, weaponSkinId)
         : (rangedSkinAttachDef(base, weaponSkinId) ?? base);
     if (!att) continue;
     const bone = attachTargetBone(root, att, stowed);
     if (!bone) continue;
     const swapKind = isOffhandSwap ? 'offhand' : isWeapon ? 'mainhand' : null;
     const payload = attachProp(root, bone, att, swapKind, stowed);
-    if (isWeapon) payloads.push(payload);
+    if (isWeapon || (isOffhandSwap && offhandSkinned)) payloads.push(payload);
   }
   return payloads;
 }
@@ -799,12 +813,16 @@ export function setHeldWeapon(
   return payloads;
 }
 
-/** Replace only the actual offhand attachment, honoring an active sheathe.
- *  Mainhand item/cosmetic models and their rarity VFX remain untouched. */
+/** Replace only the actual offhand attachment, honoring an active sheathe. The
+ *  offhand renders its own item model UNLESS the active mainhand skin mirrors onto
+ *  it (a matching-type weapon), in which case it shows the skin (and the
+ *  caller must run the rarity-VFX/material pass over the returned payload). Mainhand
+ *  item/cosmetic models and their rarity VFX remain untouched. */
 export function setHeldOffhand(
   root: THREE.Object3D,
   def: VisualDef,
   offhandItemId: string | null,
+  weaponSkinId: string | null = null,
   stowed = false,
 ): THREE.Object3D[] {
   if (def.offhandSlot === undefined) return [];
@@ -816,7 +834,7 @@ export function setHeldOffhand(
 
   const base = def.attach?.[def.offhandSlot];
   if (!base) return [];
-  const att = offhandAttachDef(base, offhandItemId);
+  const att = offhandAttachDef(base, offhandItemId, weaponSkinId);
   if (!att) return [];
   const bone = attachTargetBone(root, att, stowed);
   return bone ? [attachProp(root, bone, att, 'offhand', stowed)] : [];
@@ -871,7 +889,6 @@ export function setWeaponsStowed(
 
 const matCache = new Map<string, THREE.Material>();
 const sourceMaterials = new WeakMap<THREE.Mesh, THREE.Material | THREE.Material[]>();
-const tintScratch = new THREE.Color();
 const lowReadabilityWhite = new THREE.Color(0xffffff);
 const weaponHighlight = new THREE.Color(0xfff0c2);
 type MaterialRole = 'body' | 'weapon';
@@ -932,11 +949,7 @@ export function tintedMaterial(
       });
     }
   }
-  if (tint !== null) {
-    // subtle pull toward the template color - hard multiplies turn the
-    // hand-painted textures muddy
-    mat.color.lerp(tintScratch.set(tint), strength);
-  }
+  applyTemplateTint(mat, tint, strength);
   if (skinTex) mat.map = skinTex; // alternate body atlas, same UVs as the default
   // Emissive glow map (mech epics): standard tier only - Lambert/Basic don't
   // glow, and adding a map where none existed needs a shader recompile.
@@ -947,6 +960,15 @@ export function tintedMaterial(
     sm.emissiveIntensity = 1.0;
     sm.needsUpdate = true;
   }
+  // House style: the roster-wide surface/palette normalization, shared verbatim
+  // with the guide viewer (house_style_material.ts). It runs AFTER the per-entity
+  // tint (so a loud template colour cannot walk the palette straight back out of
+  // band) and BEFORE the two role-specific readability offsets below, which are
+  // bounded departures that derive their emissive from the final colour. See the
+  // ordering note in house_style_core.ts. It adds NO new input to the cache key
+  // above: the plan is a pure function of the source material, the tint, the
+  // tier, and the role, every one of which the key already carries.
+  applyHouseStyleMaterial(mat, role);
   if (role === 'weapon') applyWeaponMaterialPolish(mat);
   if (!GFX.standardMaterials) applyLowReadabilityLift(mat, role);
   matCache.set(key, mat);
@@ -968,7 +990,7 @@ export function applyMaterials(
   emisTex: THREE.Texture | null = null,
 ): void {
   const tint = tintFor(def, entityColor);
-  const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
+  const strength = def.tintStrength ?? DEFAULT_TEMPLATE_TINT_STRENGTH;
   root.traverse((o) => {
     const mesh = o as THREE.Mesh;
     if (!mesh.isMesh) return;
@@ -1001,7 +1023,7 @@ export function tintedFarMaterials(
   srcMats: THREE.Material[],
 ): THREE.Material[] {
   const tint = tintFor(def, entityColor);
-  const strength = def.tintStrength ?? DEFAULT_TINT_STRENGTH;
+  const strength = def.tintStrength ?? DEFAULT_TEMPLATE_TINT_STRENGTH;
   return srcMats.map((m) => tintedMaterial(m, tint, strength));
 }
 

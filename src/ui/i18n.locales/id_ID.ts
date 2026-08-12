@@ -2838,6 +2838,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'entities.items.ghostly_essence.name': 'Esensi Hantu',
   'entities.items.glacier_melt.name': 'Lelehan Gletser',
   'entities.items.glimmerfin_koi.name': 'Koi Sirip Kilau',
+  'entities.items.ironreel_fishing_rod.name': 'Joran gulungan besi',
+  'entities.items.silverstream_fishing_rod.name': 'Joran arus perak',
   'entities.items.glowing_wax.name': 'Lilin Bercahaya',
   'entities.items.gnarled_staff.name': 'Tongkat Bogoak',
   'entities.items.gorraks_cleaver.name': 'Golok Gorrak',
@@ -7740,11 +7742,9 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.credits.unavailable':
     'Toko Credits tidak tersedia saat ini. Saldo dan pembelian Anda tidak terpengaruh; harap segera periksa kembali.',
   'hudChrome.credits.wocBalance': 'WOC: {amount}',
-  'hudChrome.corpseHarvest.harvestButtonTooltip':
+  'hudChrome.corpseHarvest.harvestTooltip':
     'Panen: kumpulkan bahan kerajinan dari mayat ini (kulit, taring, sutra, dan komponen serupa), pisahkan dari jarahan apa pun. Siapapun bisa memanen; hanya satu pemain yang dapat memanen mayat tertentu.',
   'hudChrome.deeds.openBookHint': 'Buka Kitab Jasa',
-  'hudChrome.loot.takeAllTooltip':
-    'Ambil Semua: kumpulkan setiap koin dan item di jendela jarahan ini.',
   'hudChrome.statInfo.desc.warfare':
     'Meningkatkan kerusakan yang diberikan kepada pemain sebesar {increase}% dan mengurangi kerusakan yang diterima dari pemain sebesar {reduction}%.',
   'hudChrome.statInfo.names.warfare': 'Perang',
@@ -8230,21 +8230,8 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.partyFrames.styleRaid': 'Bingkai Raid',
   'hudChrome.partyFrames.unlock': 'Pindahkan bingkai grup dan raid',
   'hudChrome.partyFrames.width': 'Lebar Bingkai',
-  'apiError.welcome.invalid_input': 'Data yang dimasukkan tidak valid.',
-  'welcome.back': 'Selamat datang kembali, {name}',
-  'welcome.level': 'Level {level}',
-  'welcome.lastPlayed': 'Terakhir dimainkan: {when}',
-  'welcome.continue': 'Masuki Dunia',
-  'welcome.continueHint': 'Tekan Enter untuk melanjutkan, Esc untuk melewati',
-  'welcome.continueHintTouch': 'Ketuk untuk melanjutkan',
-  'welcome.discord.title': 'Komunitas berkumpul di Discord',
-  'welcome.discord.sub':
-    'Pratinjau pembaruan, acara, obrolan pengembang, serta 2 slot bank bonus saat Discord ditautkan.',
-  'welcome.discord.join': 'Gabung ke Discord kami',
-  'welcome.chest.ready': 'Peti harian siap dibuka',
-  'welcome.armory.cta': 'Masuki dunia dan jelajahi Gudang Senjata',
-  'welcome.news.new': 'Baru',
-  'welcome.news.viewAll': 'Lihat semua pembaruan di GitHub',
+  'news.new': 'Baru',
+  'news.viewAll': 'Lihat semua pembaruan di GitHub',
   'entities.letters.heroic_marks_reward.sender': 'Perbekal heroik',
   'entities.letters.heroic_marks_reward.subject': 'Tanda Heroik milikmu',
   'entities.letters.heroic_marks_reward.body':
@@ -8501,7 +8488,6 @@ export const id_ID: Partial<Record<TranslationKey, string>> = {
   'hudChrome.professions.hobbyLabel': 'Hobi: {craft}',
   'hudChrome.professions.identityHeader': 'Identitas',
   'hudChrome.professions.majorsLabel': 'Jurusan: {a} dan {b}',
-  'hudChrome.professions.nextUnlockMax': 'Pada keterampilan maksimal',
   'hudChrome.professions.nextUnlockSpecialized':
     '{points} menunjuk ke Khusus: biaya material turun',
   'hudChrome.professions.nextUnlockTier':
