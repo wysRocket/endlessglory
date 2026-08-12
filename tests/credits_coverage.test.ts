@@ -62,8 +62,11 @@ const PER_FILE_DIRS = ['creatures', 'chars'];
  *  real names, not the shorthand. */
 function creditedFilenames(md: string): Set<string> {
   const out = new Set<string>();
-  for (const m of md.matchAll(/\{([^{}]+)\}\.glb/g)) {
-    for (const stem of m[1].split(',')) out.add(`${stem.trim()}.glb`);
+  // A brace group can carry a shared prefix, as in `emberwood_{knight,mage}.glb`.
+  // That prefix is part of every filename it expands to, so dropping it both
+  // fails to credit the real files and invents ghosts that were never cited.
+  for (const m of md.matchAll(/([A-Za-z0-9_]*)\{([^{}]+)\}\.glb/g)) {
+    for (const stem of m[2].split(',')) out.add(`${m[1]}${stem.trim()}.glb`);
   }
   for (const m of md.matchAll(/([A-Za-z0-9_]+)\.glb/g)) out.add(m[1]);
   return new Set([...out].map((f) => (f.endsWith('.glb') ? f : `${f}.glb`)));
@@ -153,6 +156,15 @@ describe('CREDITS.md coverage', () => {
         `${file} is listed under Unresolved provenance but no longer ships`,
       ).toBe(true);
     }
+  });
+
+  it('expands brace groups including any shared prefix', () => {
+    const expanded = creditedFilenames('`emberwood_{knight,mage}.glb` and `chars/{rogue}.glb`');
+    expect([...expanded].sort()).toEqual([
+      'emberwood_knight.glb',
+      'emberwood_mage.glb',
+      'rogue.glb',
+    ]);
   });
 
   it('skips symlinked aliases rather than demanding a separate credit', () => {
