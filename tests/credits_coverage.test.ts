@@ -20,7 +20,17 @@
 // shipping wolf_basic.glb and dragonevolved.glb. Informal names are what let
 // crabenemy.glb sit uncredited unnoticed, so per-file rows cite the real file.
 
-import { readdirSync, readFileSync, statSync } from 'node:fs';
+import {
+  lstatSync,
+  mkdtempSync,
+  readdirSync,
+  readFileSync,
+  rmSync,
+  statSync,
+  symlinkSync,
+  writeFileSync,
+} from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { describe, expect, it } from 'vitest';
 
@@ -61,10 +71,16 @@ function creditedFilenames(md: string): Set<string> {
 
 const credited = creditedFilenames(CREDITS);
 
+/** Symlinks are skipped: an alias like `knight_npc.glb -> knight.glb` is not
+ *  separate art and needs no separate credit, and demanding one would make this
+ *  guard fail on aliases the renderer deliberately uses to share a model.
+ *  `lstatSync` is required here, since `statSync` follows the link and reports
+ *  the target, which is what would let them through as real files. */
 function walkGlb(dir: string): string[] {
   const out: string[] = [];
   for (const entry of readdirSync(dir)) {
     const full = path.join(dir, entry);
+    if (lstatSync(full).isSymbolicLink()) continue;
     if (statSync(full).isDirectory()) out.push(...walkGlb(full));
     else if (entry.endsWith('.glb')) out.push(full);
   }
@@ -136,6 +152,22 @@ describe('CREDITS.md coverage', () => {
         allGlb.some((f) => path.basename(f) === file),
         `${file} is listed under Unresolved provenance but no longer ships`,
       ).toBe(true);
+    }
+  });
+
+  it('skips symlinked aliases rather than demanding a separate credit', () => {
+    // No symlinks ship on this branch, but sibling branches alias models
+    // (knight_npc.glb -> knight.glb) so the renderer can share one file. Build a
+    // throwaway tree to prove the walker skips them, rather than leaving the
+    // behaviour untested until an alias lands and the guard fails spuriously.
+    const tmp = mkdtempSync(path.join(tmpdir(), 'credits-symlink-'));
+    try {
+      writeFileSync(path.join(tmp, 'real.glb'), '');
+      symlinkSync('real.glb', path.join(tmp, 'alias.glb'));
+      const found = walkGlb(tmp).map((f) => path.basename(f));
+      expect(found).toEqual(['real.glb']);
+    } finally {
+      rmSync(tmp, { recursive: true, force: true });
     }
   });
 
