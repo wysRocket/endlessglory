@@ -1,8 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { STATION_TYPE_BY_CRAFT } from '../src/sim/content/professions';
 import {
   CRAFT_THROTTLE_MAX_PER_WINDOW,
   CRAFT_THROTTLE_WINDOW_SECONDS,
+  STATION_TYPE_BY_CRAFT,
 } from '../src/sim/content/professions';
 import {
   CASTER_HUB_RECIPES,

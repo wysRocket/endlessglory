@@ -8531,5 +8531,4 @@ export const ja_JP: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': 'エンチャントするアイテムを選択',
   'hudChrome.enchanting.noEnchants': 'この素材を使うエンチャントはありません。',
   'hudChrome.enchanting.noTargets': 'エンチャントできるアイテムがありません。',
-
 };

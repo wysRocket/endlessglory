@@ -8519,5 +8519,4 @@ export const ko_KR: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': '마법부여할 아이템을 선택하세요',
   'hudChrome.enchanting.noEnchants': '이 재료를 사용하는 마법부여가 없습니다.',
   'hudChrome.enchanting.noTargets': '마법부여할 수 있는 아이템이 없습니다.',
-
 };

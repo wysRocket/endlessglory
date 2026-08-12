@@ -8689,5 +8689,4 @@ export const ru_RU: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': 'Выберите предмет для зачарования',
   'hudChrome.enchanting.noEnchants': 'Нет чар, использующих этот реагент.',
   'hudChrome.enchanting.noTargets': 'Нет подходящего предмета для зачарования.',
-
 };

@@ -8125,5 +8125,4 @@ export const zh_TW: Partial<Record<TranslationKey, string>> = {
   'hudChrome.enchanting.targetTitle': '選擇要附魔的物品',
   'hudChrome.enchanting.noEnchants': '沒有附魔會用到此材料。',
   'hudChrome.enchanting.noTargets': '沒有可附魔的合適物品。',
-
 };
