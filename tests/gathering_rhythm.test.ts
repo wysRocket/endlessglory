@@ -946,11 +946,22 @@ describe('rod synergy is literal-pinned on one shared draw (QA pins)', () => {
   // literals pin FISH_BITE_DELAY_MIN_SEC and the 1.5 s/tier max-side
   // reduction in BOTH directions (the sampled-bounds arms above catch only
   // a shrink of the reduction, not a growth).
-  it('first-cast delay ticks at seed 4242: bare 127, tier-2 rod 107, tier-3 rod 87', () => {
+  //
+  // Re-derived at the release/v0.29.0 merge into main: both sides changed
+  // `src/sim/`, so a fresh Sim at seed 4242 consumes 1540 construction draws
+  // instead of 1530 and the first cast now reads u = 0.6453546 (was
+  // 0.6671954). The three arms still come off that ONE shared draw and the
+  // formula is untouched: ticks = ceil((3 + u * (effMax - 3)) / DT) with
+  // effMax 8 / 6.5 / 5, giving ceil(124.54) = 125, ceil(105.17) = 106 and
+  // ceil(85.81) = 86. The rod ordering (better rod, fewer ticks) and the
+  // ~30 * u tick gap between adjacent arms are preserved; the gaps read 19
+  // and 20 rather than 20 and 20 purely from where the smaller u lands
+  // against the ceil.
+  it('first-cast delay ticks at seed 4242: bare 125, tier-2 rod 106, tier-3 rod 86', () => {
     for (const [rod, ticks] of [
-      [null, 127],
-      ['ironreel_fishing_rod', 107],
-      ['silverstream_fishing_rod', 87],
+      [null, 125],
+      ['ironreel_fishing_rod', 106],
+      ['silverstream_fishing_rod', 86],
     ] as [string | null, number][]) {
       const sim = makeSim(4242);
       const meta = mustMeta(sim, sim.playerId);
