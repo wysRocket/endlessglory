@@ -408,6 +408,18 @@ export default defineConfig({
       DATABASE_URL:
         process.env.DATABASE_URL ?? 'postgres://vitest:vitest@127.0.0.1:5433/wocc_vitest_dummy',
     },
+    // Vitest defaults to 5s per test, which this suite never actually chose. A
+    // handful of files do real subprocess work whose cost is process spawns and
+    // codec time rather than anything their assertions control: the SFX conform
+    // and studio suites shell out to ffmpeg and ffprobe, the gate preflight
+    // spawns scripts/gate.mjs, and the masterwork proc tests rebuild a full Sim
+    // in a bounded retry. Each passes comfortably in isolation and then fails by
+    // a hair under the sharded full run, observed at 5007ms, 5011ms and 6004ms
+    // in one sitting, having asserted nothing new. Four files hit this before it
+    // was worth fixing in one place rather than patching them individually as
+    // each happened to bite. Kept well under a minute so a genuinely hung test
+    // still fails the run instead of stalling it.
+    testTimeout: 20_000,
     globalSetup: ['./tests/global_setup.ts'],
     // Runs per test file (unlike globalSetup, which runs once outside any
     // jsdom environment); see the file for why this is needed on Node 22+.

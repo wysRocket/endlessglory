@@ -32,6 +32,15 @@ const publicDir = path.join(root, 'public');
 const outDir = path.join(publicDir, 'ui', 'dungeons');
 const mobOutDir = path.join(publicDir, 'ui', 'mobs');
 const OUT_PX = Number(process.env.PORTRAIT_PX || 128); // shipped size; the window shows 64px
+// The vignette ring's diameter as a fraction of the frame. MUST track the circle
+// in lib/mob_portrait_background.mjs, which draws `r = size * 0.43`; deriving it
+// from the inset instead (as a first pass did) silently sized every subject 8
+// percent small, which cost thumbnail legibility at the 64px the window renders.
+const RING_DIAMETER_FRAC = 0.43 * 2;
+// How much of that diameter a subject's bounding-box DIAGONAL fills. At 1.0 the
+// box is exactly inscribed; since a creature never fills its own bounding-box
+// corners, the visible silhouette still sits comfortably inside the ring.
+const RING_FILL = 1.0;
 mkdirSync(outDir, { recursive: true });
 mkdirSync(mobOutDir, { recursive: true });
 
@@ -214,18 +223,28 @@ for (const job of jobs.values()) {
     const trimmed = await sharp(png).trim().png().toBuffer();
     const { width = 0, height = 0 } = await sharp(trimmed).metadata();
     const bustHeight = height > width * 0.8 ? Math.max(1, Math.round(height * 0.65)) : height;
-    const inset = Math.max(1, Math.round(OUT_PX * 0.07));
+    // Scale on the DIAGONAL, not the longest side. The backdrop
+    // (mob_portrait_background.mjs) is a circular vignette inscribed in the
+    // square frame, so fitting a subject to the square's width puts the corners
+    // of anything near-square OUTSIDE the ring: crabs, ogres and hooded busts
+    // covered the vignette entirely while wide quadrupeds, which only ever fill
+    // their width, floated small inside it. Matching each subject's bounding-box
+    // diagonal to the ring diameter makes a squat wolf and a tall bust carry the
+    // same visual weight and keeps every one of them inside the ring.
+    const cropW = width;
+    const cropH = bustHeight;
+    const diagonal = Math.hypot(cropW, cropH) || 1;
+    const ring = OUT_PX * RING_DIAMETER_FRAC * RING_FILL;
+    const targetW = Math.max(1, Math.round((ring * cropW) / diagonal));
+    const targetH = Math.max(1, Math.round((ring * cropH) / diagonal));
     const portraitLayer = await sharp(trimmed)
-      .extract({ left: 0, top: 0, width, height: bustHeight })
-      .resize(OUT_PX - inset * 2, OUT_PX - inset * 2, {
-        fit: 'contain',
-        background: { r: 0, g: 0, b: 0, alpha: 0 },
-      })
+      .extract({ left: 0, top: 0, width: cropW, height: cropH })
+      .resize(targetW, targetH, { fit: 'fill' })
       .extend({
-        top: inset,
-        bottom: inset,
-        left: inset,
-        right: inset,
+        top: Math.max(0, Math.round((OUT_PX - targetH) / 2)),
+        bottom: Math.max(0, OUT_PX - targetH - Math.round((OUT_PX - targetH) / 2)),
+        left: Math.max(0, Math.round((OUT_PX - targetW) / 2)),
+        right: Math.max(0, OUT_PX - targetW - Math.round((OUT_PX - targetW) / 2)),
         background: { r: 0, g: 0, b: 0, alpha: 0 },
       })
       .png()
