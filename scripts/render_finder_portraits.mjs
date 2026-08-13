@@ -32,10 +32,15 @@ const publicDir = path.join(root, 'public');
 const outDir = path.join(publicDir, 'ui', 'dungeons');
 const mobOutDir = path.join(publicDir, 'ui', 'mobs');
 const OUT_PX = Number(process.env.PORTRAIT_PX || 128); // shipped size; the window shows 64px
-// Fraction of the inner box a subject's bounding-box DIAGONAL should occupy.
-// 1.0 would inscribe the subject exactly in the vignette ring; a little under
-// leaves the ring visible as a frame rather than a rim the art sits flush against.
-const RING_FILL = 0.92;
+// The vignette ring's diameter as a fraction of the frame. MUST track the circle
+// in lib/mob_portrait_background.mjs, which draws `r = size * 0.43`; deriving it
+// from the inset instead (as a first pass did) silently sized every subject 8
+// percent small, which cost thumbnail legibility at the 64px the window renders.
+const RING_DIAMETER_FRAC = 0.43 * 2;
+// How much of that diameter a subject's bounding-box DIAGONAL fills. At 1.0 the
+// box is exactly inscribed; since a creature never fills its own bounding-box
+// corners, the visible silhouette still sits comfortably inside the ring.
+const RING_FILL = 1.0;
 mkdirSync(outDir, { recursive: true });
 mkdirSync(mobOutDir, { recursive: true });
 
@@ -229,7 +234,7 @@ for (const job of jobs.values()) {
     const cropW = width;
     const cropH = bustHeight;
     const diagonal = Math.hypot(cropW, cropH) || 1;
-    const ring = (OUT_PX - Math.max(1, Math.round(OUT_PX * 0.07)) * 2) * RING_FILL;
+    const ring = OUT_PX * RING_DIAMETER_FRAC * RING_FILL;
     const targetW = Math.max(1, Math.round((ring * cropW) / diagonal));
     const targetH = Math.max(1, Math.round((ring * cropH) / diagonal));
     const portraitLayer = await sharp(trimmed)
