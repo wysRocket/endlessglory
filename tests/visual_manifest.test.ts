@@ -218,6 +218,74 @@ describe('character visual manifest', () => {
     }
   });
 
+  it('gives the roster-variety templates their own bodies instead of an over-used one', () => {
+    // Seven templates that each shared a body with many other mobs now wear a GLB
+    // that was already committed and licensed but unused. Pinned by template id
+    // AND by asset url: a revert to the shared body has to fail here.
+    const wired: Array<[templateId: string, key: string, url: string]> = [
+      ['deepfen_murloc', 'mob_snapper', 'models/creatures/crabenemy.glb'],
+      ['bog_bloat', 'mob_bog_bloat', 'models/creatures/glubevolved.glb'],
+      ['grubjaw', 'mob_grubjaw', 'models/creatures/orcenemy.glb'],
+      ['sump_troll_devourer', 'mob_devourer', 'models/creatures/yeti.glb'],
+      ['wyrmcult_zealot', 'mob_zealot', 'models/creatures/tribal.glb'],
+      ['vale_bandit', 'mob_bandit_archer', 'models/chars/players/ranger.glb'],
+      ['knight_commander_olen', 'mob_knight_commander', 'models/chars/players/paladin.glb'],
+    ];
+    // The bodies they came off are still shared by other mobs, so none of the
+    // seven may quietly land back on one of them.
+    const vacated = [
+      'models/creatures/frog.glb',
+      'models/creatures/orc.glb',
+      'models/creatures/yetialt.glb',
+      'models/chars/players/rogue_hooded.glb',
+      'models/chars/enemies/skeleton_warrior.glb',
+    ];
+    for (const [templateId, key, url] of wired) {
+      expect(visualKeyFor({ kind: 'mob', templateId } as never), templateId).toBe(key);
+      expect(VISUALS[key].url, key).toBe(url);
+      expect(vacated, `${templateId} is back on a shared body`).not.toContain(VISUALS[key].url);
+    }
+  });
+
+  it('points every roster-variety visual at clip names its own GLB really has', async () => {
+    // Clip vocabularies differ per source pack and there is no automatic
+    // retarget, so a wrong ClipMap factory ships a mob frozen in its bind pose
+    // with no runtime error. crabenemy/orcenemy/yeti in particular look like the
+    // ENEMY7 rig (same 'HitRecieve' misspelling) but ship no Run clip at all.
+    for (const key of [
+      'mob_snapper',
+      'mob_bog_bloat',
+      'mob_grubjaw',
+      'mob_devourer',
+      'mob_zealot',
+      'mob_bandit_archer',
+      'mob_knight_commander',
+    ] as const) {
+      const visual = VISUALS[key];
+      const animationNames = await glbAnimationNames(`public/${visual.url}`);
+      expect(animationNames.size, key).toBeGreaterThan(0);
+      expect(
+        [...new Set(expectedClipNames(visual.clips))].filter((name) => !animationNames.has(name)),
+        `${key} names clips absent from ${visual.url}`,
+      ).toEqual([]);
+    }
+    // The BITER pack ships no Run take: run MUST alias Walk rather than being
+    // left to a silent fallback, which is the exact trap that factory documents.
+    const yetiClips = await glbAnimationNames('public/models/creatures/yeti.glb');
+    expect(yetiClips.has('Run')).toBe(false);
+    expect(VISUALS.mob_devourer.clips.run).toBe('Walk');
+  });
+
+  it('hovers the two roster-variety bodies whose rigs have no legs', () => {
+    // glubevolved and tribal are authored as flying meshes (wings / no leg
+    // joints) and carry the FLOATING clip set. Without a hover offset they
+    // render sunk into the ground with a walk cycle that never plays.
+    for (const key of ['mob_bog_bloat', 'mob_zealot'] as const) {
+      expect(VISUALS[key].hover ?? 0, key).toBeGreaterThan(0);
+      expect(VISUALS[key].clips.idle, key).toBe('Flying_Idle');
+    }
+  });
+
   it('keeps deepfen_spearjaw on its raptor model despite its reptile family retag', () => {
     // Prose-only claim otherwise (FAMILY_KEYS.reptile comment): the explicit MOB_KEYS
     // override this pins is what actually keeps the model, and nothing else does.

@@ -298,6 +298,21 @@ const ENEMY7: ClipMap = {
   death: 'Death',
 };
 
+// Quaternius enemy-pack rig shared by crabenemy/orcenemy/yeti. Same source family
+// as ENEMY7 (note the identical 'HitRecieve' misspelling) but a DIFFERENT clip
+// vocabulary: the pack ships no Run take and names its swing Bite_Front, so run
+// aliases walk (the RAID_CASTER precedent) and attack is the bite. Verified by
+// reading each GLB's JSON chunk, not by assuming ENEMY7 carried over.
+const BITER: ClipMap = {
+  idle: 'Idle',
+  walk: 'Walk',
+  run: 'Walk',
+  attack: ['Bite_Front'],
+  hit: ['HitRecieve'],
+  death: 'Death',
+  jump: 'Jump',
+};
+
 // floating/flying rigs (goleling/dragon) - hover instead of walking
 const FLOATING: ClipMap = {
   idle: 'Flying_Idle',
@@ -778,6 +793,64 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 'entity',
     tintStrength: 0.45,
   },
+  // Deepfen Snapper: the unused Quaternius crab. The frog body above carried
+  // eight separate templates, and a "Snapper" is the one of them whose name
+  // already promises a claw, so it gets the crab instead of another frog. This
+  // pack's crab is the only body in it with a second bite take, so both are
+  // rotated as the swing.
+  mob_snapper: {
+    url: `${CREATURES}/crabenemy.glb`,
+    height: 1.5, // low and wide - a crab reads shorter than the 1.7 frog
+    clips: { ...BITER, attack: ['Bite_Front', 'Bite_InPlace'] },
+    tint: 'entity',
+    tintStrength: 0.4,
+  },
+  // Bog Bloat: the unused Quaternius "glub", a winged marsh gas-bag. It hovers
+  // (the rig has wings and no legs, and its clip set is the FLOATING vocabulary
+  // exactly), which suits a swollen sack that bursts into caustic spores far
+  // better than the frog body it used to share with seven other templates.
+  mob_bog_bloat: {
+    url: `${CREATURES}/glubevolved.glb`,
+    height: 1.6,
+    hover: 0.3,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.4,
+  },
+  // Grubjaw the Glutton: the unused Quaternius orc variant. A named rare that
+  // used to be indistinguishable from every other troll-family mob on orc.glb;
+  // the tint stays as faint as mob_troll's for the same reason (0.35 floods
+  // every material with the template green).
+  mob_grubjaw: {
+    url: `${CREATURES}/orcenemy.glb`,
+    height: 2.4,
+    clips: BITER,
+    tint: 'entity',
+    tintStrength: 0.12,
+  },
+  // Sump Troll Devourer: the unused Quaternius yeti (distinct from the yetialt
+  // rig the bear/druid forms wear). A hulking silhouette for the delve's elite
+  // bruiser, pulled hard toward its silt-green so the white fur reads as marsh
+  // muck rather than snow.
+  mob_devourer: {
+    url: `${CREATURES}/yeti.glb`,
+    height: 2.4,
+    clips: BITER,
+    tint: 'entity',
+    tintStrength: 0.35,
+  },
+  // Wyrmcult Zealot: the unused Quaternius "tribal" body. Its mesh is authored
+  // as a FLYING creature (no leg joints, and the FLOATING clip vocabulary
+  // exactly), so it hovers - a chanting cultist lifted off the ground reads as
+  // possessed and is unmistakable next to the nine mobs on rogue_hooded.
+  mob_zealot: {
+    url: `${CREATURES}/tribal.glb`,
+    height: 1.9,
+    hover: 0.35,
+    clips: FLOATING,
+    tint: 'entity',
+    tintStrength: 0.3,
+  },
   mob_kobold: {
     url: `${CREATURES}/goblin.glb`,
     height: 2.1,
@@ -998,6 +1071,41 @@ export const VISUALS: Record<string, VisualDef> = {
     tint: 0x6b3a32,
     tintStrength: 0.3,
   },
+  // Scar Bandit: the unused KayKit ranger body, one of nine mobs that all wore
+  // rogue_hooded. It ships its cape and quiver by default (no `show` filter), so
+  // the crossbow reads as an archer's kit rather than a second knife-fighter.
+  // Unlike mob_bandit's fixed leather, the entity tint is safe here: the Scar
+  // Bandit's own colour is a rust red, not one of the faction greens that made
+  // a tinted bandit read as a friendly villager.
+  mob_bandit_archer: {
+    url: `${PLAYERS}/ranger.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['2H_Ranged_Shoot', '1H_Melee_Attack_Chop']),
+    attach: [{ url: `${WEAPONS}/crossbow_1handed.glb`, bone: 'handslot.r' }],
+    // 0.55, not the 0.3 most tinted mobs use: the ranger ships a bright blue
+    // cape and tan leathers that read as a friendly town scout until the rust
+    // red actually bites. Same failure mode mob_bandit's fixed leather avoids.
+    tint: 'entity',
+    tintStrength: 0.55,
+  },
+  // Knight-Commander Olen: the unused KayKit paladin body. He was one of nine
+  // mobs on skeleton_warrior; a fallen commander should still be wearing his
+  // plate, so the armoured body plus his own grave-grey carries the "risen, not
+  // stripped to bone" read. Sword and shield are fixed (mob gear never changes).
+  mob_knight_commander: {
+    url: `${PLAYERS}/paladin.glb`,
+    height: HUMANOID_H,
+    clips: kaykit(['1H_Melee_Attack_Chop', '1H_Melee_Attack_Slice_Diagonal']),
+    attach: [
+      { url: `${WEAPONS}/sword_1handed.glb`, bone: 'handslot.r' },
+      { url: `${WEAPONS}/shield_square.glb`, bone: 'handslot.l' },
+    ],
+    // Strong wash: the KayKit paladin's gilded plate reads as a living, shining
+    // hero at the usual 0.3, and Olen is a risen corpse. 0.6 toward his own
+    // grave grey dulls the gold to tarnished steel without losing the plate.
+    tint: 'entity',
+    tintStrength: 0.6,
+  },
   mob_dark_caster: {
     url: `${PLAYERS}/mage.glb`,
     height: HUMANOID_H,
@@ -1208,7 +1316,14 @@ const MOB_KEYS: Record<string, string> = {
   forest_wolf: 'mob_hallow',
   // beasts that would otherwise fall back to the wolf model (FAMILY_KEYS.beast)
   old_cragmaw: 'mob_bear',
-  bog_bloat: 'mob_murloc',
+  // Roster-variety pass: five templates that shared an over-used body now wear
+  // an already-licensed GLB that was sitting unused in the repo. Visual only -
+  // no stats, loot, or behaviour changed.
+  bog_bloat: 'mob_bog_bloat',
+  deepfen_murloc: 'mob_snapper',
+  grubjaw: 'mob_grubjaw',
+  wyrmcult_zealot: 'mob_zealot',
+  vale_bandit: 'mob_bandit_archer',
   // Old Greyjaw: the named rare wolf gets his own custom model (the pack
   // wolves keep the light mob_wolf)
   old_greyjaw: 'greyjaw',
@@ -1220,7 +1335,7 @@ const MOB_KEYS: Record<string, string> = {
   // instead of the family fallback (beast -> wolf, undead -> skeleton minion).
   mirefen_widowling: 'mob_spider',
   spider_egg_sac: 'mob_spider_egg_sac',
-  sump_troll_devourer: 'mob_troll',
+  sump_troll_devourer: 'mob_devourer',
   grave_silt_bulwark: 'mob_ogre',
   drowned_cantor: 'delve_mob_acolyte',
   deepfen_spearjaw: 'mob_spearjaw',
@@ -1245,7 +1360,7 @@ const MOB_KEYS: Record<string, string> = {
   boneclad_revenant: 'skel_warrior',
   marrowlord_varkas: 'skel_warrior',
   bastion_revenant: 'skel_warrior',
-  knight_commander_olen: 'skel_warrior',
+  knight_commander_olen: 'mob_knight_commander',
   sanctum_boneguard: 'skel_warrior',
   nythraxis_scourge_of_thornpeak: 'skel_golem',
   nythraxis_skeleton_warrior: 'skel_warrior',

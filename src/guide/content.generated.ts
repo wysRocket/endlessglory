@@ -1742,9 +1742,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 11,
         "rare": false,
         "templateId": "bog_bloat",
-        "model": "mob_murloc",
+        "model": "mob_bog_bloat",
         "tint": "#6b8e23",
-        "still": "/guide-stills/mob_murloc__6b8e23.webp"
+        "still": "/guide-stills/mob_bog_bloat__6b8e23.webp"
       },
       {
         "name": "Ridge Stalker",
@@ -1802,9 +1802,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 9,
         "rare": false,
         "templateId": "deepfen_murloc",
-        "model": "mob_murloc",
+        "model": "mob_snapper",
         "tint": "#45b39d",
-        "still": "/guide-stills/mob_murloc__45b39d.webp"
+        "still": "/guide-stills/mob_snapper__45b39d.webp"
       },
       {
         "name": "Glimmermere Wader",
@@ -1852,9 +1852,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 5,
         "rare": false,
         "templateId": "vale_bandit",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_bandit_archer",
+        "tint": "#943126",
+        "still": "/guide-stills/mob_bandit_archer__943126.webp"
       },
       {
         "name": "Gravecaller Cultist",
@@ -1892,9 +1892,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 19,
         "rare": false,
         "templateId": "wyrmcult_zealot",
-        "model": "mob_bandit",
-        "tint": "#6b3a32",
-        "still": "/guide-stills/mob_bandit__6b3a32.webp"
+        "model": "mob_zealot",
+        "tint": "#76448a",
+        "still": "/guide-stills/mob_zealot__76448a.webp"
       },
       {
         "name": "Wyrmcult Necromancer",
@@ -1927,9 +1927,9 @@ export const GUIDE_FAMILIES: GuideFamily[] = [
         "max": 12,
         "rare": true,
         "templateId": "grubjaw",
-        "model": "mob_troll",
+        "model": "mob_grubjaw",
         "tint": "#145a32",
-        "still": "/guide-stills/mob_troll__145a32.webp"
+        "still": "/guide-stills/mob_grubjaw__145a32.webp"
       }
     ]
   },
@@ -3693,21 +3693,17 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.1,
     "tintStrength": 0.2
   },
-  "mob_bandit": {
-    "url": "models/chars/players/rogue_hooded.glb",
+  "mob_bandit_archer": {
+    "url": "models/chars/players/ranger.glb",
     "idle": "Idle",
     "height": 2.6,
     "attach": [
       {
-        "url": "models/weapons/dagger.glb",
+        "url": "models/weapons/crossbow_1handed.glb",
         "bone": "handslot.r"
-      },
-      {
-        "url": "models/weapons/dagger.glb",
-        "bone": "handslot.l"
       }
     ],
-    "tintStrength": 0.3
+    "tintStrength": 0.55
   },
   "skel_minion": {
     "url": "models/chars/enemies/skeleton_minion.glb",
@@ -3721,8 +3717,20 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 1.6,
     "tintStrength": 0.35
   },
+  "mob_snapper": {
+    "url": "models/creatures/crabenemy.glb",
+    "idle": "Idle",
+    "height": 1.5,
+    "tintStrength": 0.4
+  },
   "mob_troll": {
     "url": "models/creatures/orc.glb",
+    "idle": "Idle",
+    "height": 2.4,
+    "tintStrength": 0.12
+  },
+  "mob_grubjaw": {
+    "url": "models/creatures/orcenemy.glb",
     "idle": "Idle",
     "height": 2.4,
     "tintStrength": 0.12
@@ -3742,6 +3750,29 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     ],
     "tintStrength": 0.5
   },
+  "mob_bandit": {
+    "url": "models/chars/players/rogue_hooded.glb",
+    "idle": "Idle",
+    "height": 2.6,
+    "attach": [
+      {
+        "url": "models/weapons/dagger.glb",
+        "bone": "handslot.r"
+      },
+      {
+        "url": "models/weapons/dagger.glb",
+        "bone": "handslot.l"
+      }
+    ],
+    "tintStrength": 0.3
+  },
+  "mob_bog_bloat": {
+    "url": "models/creatures/glubevolved.glb",
+    "idle": "Flying_Idle",
+    "height": 1.6,
+    "hover": 0.3,
+    "tintStrength": 0.4
+  },
   "mob_ogre": {
     "url": "models/creatures/giant.glb",
     "idle": "Idle",
@@ -3754,6 +3785,13 @@ export const GUIDE_MODELS: Record<string, GuideModelSpec> = {
     "height": 2.2,
     "hover": 0.3,
     "tintStrength": 0.4
+  },
+  "mob_zealot": {
+    "url": "models/creatures/tribal.glb",
+    "idle": "Flying_Idle",
+    "height": 1.9,
+    "hover": 0.35,
+    "tintStrength": 0.3
   },
   "skel_warrior": {
     "url": "models/chars/enemies/skeleton_warrior.glb",

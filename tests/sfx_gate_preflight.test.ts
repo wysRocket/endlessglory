@@ -2,7 +2,16 @@ import { spawnSync } from 'node:child_process';
 import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// Every test here spawns `node scripts/gate.mjs` as a real subprocess to drive
+// the preflight, so its cost is a Node startup plus a script load rather than
+// anything this file controls. That fits vitest's 5s default when the file runs
+// alone, but not when the suite shards and workers contend for cores: it then
+// fails on Test timed out in 5000ms, observed at 5007ms, while asserting
+// nothing new. Raising the ceiling keeps the real subprocess probe, which is
+// the whole point of a preflight test, rather than mocking the thing under test.
+vi.setConfig({ testTimeout: 30_000 });
 
 describe('SFX gate toolchain preflight', () => {
   it('fails fast with a clear message when the resolved ffmpeg and ffprobe are broken', () => {
