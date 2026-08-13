@@ -5,7 +5,14 @@ import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import ffmpegPath from 'ffmpeg-static';
 import ffprobeStatic from 'ffprobe-static';
-import { describe, expect, it } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
+
+// This suite shells out to the real ffmpeg and ffprobe binaries to measure and
+// re-encode audio, so its cost is process spawns plus codec work, not anything
+// the assertions control. That fits vitest's 5s default when the file runs alone
+// (60 tests pass in isolation) but not when the suite shards and workers contend:
+// it then fails at just over the line, observed at 6004ms, having asserted
+// nothing new. Mocking ffmpeg would defeat the point of a conformance suite.
 // @ts-expect-error scripts use the repository's untyped Node ESM convention
 import * as conformAudioModule from '../scripts/sfx/conform_audio.mjs';
 import {
@@ -110,6 +117,8 @@ describe('classify: normalization branch routing', () => {
     expect(classify({ ...AT_SPEC, duration: 3.0 }).normBranch).toBe('lufs');
   });
 });
+
+vi.setConfig({ testTimeout: 30_000 });
 
 describe('shared conform command', () => {
   it('measures and conforms short clips by true peak', () => {
