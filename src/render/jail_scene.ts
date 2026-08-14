@@ -10,6 +10,7 @@ import { groundHeight } from '../sim/world';
 import { registerPreload } from './assets/preload';
 import { buildDungeonPropMesh, ensureDungeonAssets, loadKitModules } from './dungeon';
 import { GFX } from './gfx';
+import { applyHouseSurfaceMaterial, type StyleableMaterial } from './house_style_material';
 import { freezeStaticMatrices } from './static_matrix';
 import { radialGlowTexture } from './textures';
 
@@ -410,7 +411,11 @@ function displayMaterial(src: THREE.Material): THREE.Material {
   } else {
     const std = (src as THREE.MeshStandardMaterial).clone();
     std.vertexColors = false;
-    std.metalness = 0;
+    // Third of the three hand-rolled copies of the house policy, now routed
+    // through the shared applier. The 0.85 floor is kept for the same reason
+    // dungeon.ts keeps it: the house band bottoms out at 0.45, so the shared
+    // pass alone would let jail stone come out glossier than it shipped.
+    applyHouseSurfaceMaterial(std as StyleableMaterial);
     std.roughness = Math.max(0.85, std.roughness);
     mat = std;
   }

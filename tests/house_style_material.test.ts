@@ -5,10 +5,15 @@ import { describe, expect, it } from 'vitest';
 import {
   DEFAULT_TEMPLATE_TINT_STRENGTH,
   HOUSE_BODY_METALNESS_MAX,
+  HOUSE_ROUGHNESS_MAX,
   HOUSE_ROUGHNESS_MIN,
   houseStyle,
 } from '../src/render/house_style_core';
-import { applyHouseStyleMaterial, applyTemplateTint } from '../src/render/house_style_material';
+import {
+  applyHouseStyleMaterial,
+  applyHouseSurfaceMaterial,
+  applyTemplateTint,
+} from '../src/render/house_style_material';
 
 const repoRoot = join(__dirname, '..');
 const read = (rel: string): string => readFileSync(join(repoRoot, rel), 'utf8');
@@ -132,5 +137,96 @@ describe('the in-game funnel and the guide viewer cannot drift', () => {
         [],
       );
     }
+  });
+});
+
+// ---------------------------------------------------------------------------
+// The environment half: props, dungeon dressing, and scenery.
+// ---------------------------------------------------------------------------
+
+const ENV_CONSUMERS = ['src/render/props.ts', 'src/render/dungeon.ts', 'src/render/jail_scene.ts'];
+
+describe('house surface style (environment)', () => {
+  it('pulls an off-house prop material into the house bands', () => {
+    // The real case this exists for: a glTF that omits metallicFactor and
+    // roughnessFactor takes the spec defaults of 1.0, so a kit barrel shipped
+    // as a fully metallic, perfectly smooth barrel.
+    const mat = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 1 });
+    mat.color.setRGB(0.5, 0.4, 0.3, THREE.LinearSRGBColorSpace);
+    applyHouseSurfaceMaterial(mat);
+    expect(mat.metalness).toBeLessThanOrEqual(HOUSE_BODY_METALNESS_MAX);
+    expect(mat.roughness).toBeGreaterThanOrEqual(HOUSE_ROUGHNESS_MIN);
+    expect(mat.roughness).toBeLessThanOrEqual(HOUSE_ROUGHNESS_MAX);
+  });
+
+  it('leaves authored shading alone, unlike the character applier', () => {
+    // A prop's bevels are its silhouette language: faceting a barrel band or a
+    // smooth-shaded roof reads as damage, not as style. This is the one half of
+    // the policy the environment deliberately does not take.
+    const smooth = new THREE.MeshStandardMaterial({ flatShading: false });
+    applyHouseSurfaceMaterial(smooth);
+    expect(smooth.flatShading).toBe(false);
+
+    const faceted = new THREE.MeshStandardMaterial({ flatShading: true });
+    applyHouseSurfaceMaterial(faceted);
+    expect(faceted.flatShading).toBe(true);
+  });
+
+  it('is idempotent, so a re-converted cached material cannot drift', () => {
+    const mat = new THREE.MeshStandardMaterial({ roughness: 1, metalness: 1 });
+    mat.color.setRGB(0.5, 0.4, 0.3, THREE.LinearSRGBColorSpace);
+    applyHouseSurfaceMaterial(mat);
+    const once = {
+      r: mat.color.r,
+      g: mat.color.g,
+      b: mat.color.b,
+      ro: mat.roughness,
+      me: mat.metalness,
+    };
+    applyHouseSurfaceMaterial(mat);
+    expect(mat.roughness).toBeCloseTo(once.ro, 10);
+    expect(mat.metalness).toBeCloseTo(once.me, 10);
+  });
+
+  it('survives a Lambert material on the low tier without throwing', () => {
+    // Low tier substitutes Lambert, which has no roughness/metalness at all.
+    const lam = new THREE.MeshLambertMaterial();
+    lam.color.setRGB(0.5, 0.4, 0.3, THREE.LinearSRGBColorSpace);
+    expect(() => applyHouseSurfaceMaterial(lam)).not.toThrow();
+  });
+
+  it('every environment material funnel routes through the shared applier', () => {
+    // Guards the reason this exists: the policy had been reinvented by hand in
+    // three separate modules. A fourth hand-rolled copy should fail here.
+    for (const rel of ENV_CONSUMERS) {
+      expect(read(rel), `${rel} applies the house surface style`).toContain(
+        'applyHouseSurfaceMaterial',
+      );
+    }
+  });
+
+  it('no environment module hand-rolls the specular pair any more', () => {
+    // The exact shape of the three copies that were removed:
+    //   metalness = 0; roughness = Math.max(0.85, ...)
+    // A bare `metalness = 0` with no applier nearby is the regression.
+    for (const rel of ENV_CONSUMERS) {
+      const src = read(rel);
+      expect(src, `${rel} has no bare metalness reset`).not.toMatch(/\.metalness\s*=\s*0\s*;/);
+    }
+  });
+
+  it('deliberate metal overrides outrank the blanket policy', () => {
+    // props.ts MAT_OVERRIDES carries the intentional exceptions: the village
+    // bell is bronze (0.6) and the ore vein is copper (0.45). Both sit far above
+    // the dielectric body ceiling, and flattening them would ruin exactly the
+    // two surfaces someone hand-tuned. Pinned to literals so a future edit that
+    // drops the re-apply is caught here.
+    const src = read('src/render/props.ts');
+    expect(src).toContain("'village:Bell': { metalness: 0.6");
+    expect(src).toContain("'ore:Stone_Dark': { color: 0xb87333, metalness: 0.45");
+    const applyIdx = src.indexOf('applyHouseSurfaceMaterial(mat as StyleableMaterial)');
+    const reapplyIdx = src.indexOf('std.metalness = ov.metalness');
+    expect(applyIdx).toBeGreaterThan(-1);
+    expect(reapplyIdx).toBeGreaterThan(applyIdx);
   });
 });
