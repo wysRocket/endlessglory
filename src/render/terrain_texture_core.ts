@@ -16,7 +16,7 @@
 //     regenerated texture is byte-identical and reviewable as a diff of code.
 //
 // This module is pure: no Three, no DOM, no image encoding. It returns raw
-// texel buffers; scripts/gen_terrain_textures.mts is the thin consumer that
+// texel buffers; scripts/gen_terrain_textures.ts is the thin consumer that
 // writes them to PNG with sharp.
 //
 // Authoring scale: terrain.ts samples these at `tuv = vWPos.xz * 0.22`, so one
@@ -25,7 +25,13 @@
 // fine surface detail: detail at that scale is invisible at gameplay camera
 // distance and only reads as noise.
 
-import { HOUSE_LIGHTNESS_MAX, HOUSE_LIGHTNESS_MIN, houseColor, hslToRgb, rgbToHsl } from './house_style_core';
+import {
+  HOUSE_LIGHTNESS_MAX,
+  HOUSE_LIGHTNESS_MIN,
+  houseColor,
+  hslToRgb,
+  rgbToHsl,
+} from './house_style_core';
 
 /** Ground sits in a narrower lightness band than the house band allows. It is a
  *  backdrop: it must never flash brighter than a character standing on it, nor
@@ -224,7 +230,11 @@ export interface Rgb {
 }
 
 /** HSL of an sRGB byte triple, for palette assertions over produced texels. */
-export function rgbToHslBytes(r: number, g: number, b: number): { h: number; s: number; l: number } {
+export function rgbToHslBytes(
+  r: number,
+  g: number,
+  b: number,
+): { h: number; s: number; l: number } {
   return rgbToHsl(r / 255, g / 255, b / 255);
 }
 
@@ -357,8 +367,12 @@ function layerField(
   v: number,
 ): { tone: number; height: number } {
   // Domain warp, shared by every pattern.
-  const wu = u + (periodicFbm(u, v, spec.basePeriod, 2, spec.seed + 31) - 0.5) * (spec.warp / spec.basePeriod);
-  const wv = v + (periodicFbm(u, v, spec.basePeriod, 2, spec.seed + 67) - 0.5) * (spec.warp / spec.basePeriod);
+  const wu =
+    u +
+    (periodicFbm(u, v, spec.basePeriod, 2, spec.seed + 31) - 0.5) * (spec.warp / spec.basePeriod);
+  const wv =
+    v +
+    (periodicFbm(u, v, spec.basePeriod, 2, spec.seed + 67) - 0.5) * (spec.warp / spec.basePeriod);
   const base = periodicFbm(wu, wv, spec.basePeriod, spec.octaves, spec.seed);
 
   if (spec.pattern === 'plated') {
@@ -377,7 +391,13 @@ function layerField(
   // single-scale field gives every blob the same size, which is the signature of
   // camouflage rather than ground: the macro term shifts whole regions across a
   // band boundary, so large areas of one tone carry smaller detail inside them.
-  const macro = periodicFbm(wu, wv, Math.max(2, Math.round(spec.basePeriod / 4)), 2, spec.seed + 53);
+  const macro = periodicFbm(
+    wu,
+    wv,
+    Math.max(2, Math.round(spec.basePeriod / 4)),
+    2,
+    spec.seed + 53,
+  );
 
   if (spec.pattern === 'rippled') {
     // Ripples run diagonally so they never read as scanlines, and the integer
@@ -458,7 +478,8 @@ export function generateTerrainLayer(spec: TerrainLayerSpec, size: number): Terr
       const stop = stops[Math.min(level, stops.length - 1)];
 
       // Small within-band variation so a band is not a dead flat fill.
-      const g = 1 + (periodicFbm(u, v, spec.basePeriod * 4, 2, spec.seed + 13) - 0.5) * spec.grain * 2;
+      const g =
+        1 + (periodicFbm(u, v, spec.basePeriod * 4, 2, spec.seed + 13) - 0.5) * spec.grain * 2;
 
       const i = (y * size + x) * 3;
       albedo[i] = clamp(Math.round(stop.r * g * 255), 0, 255);
@@ -483,9 +504,9 @@ export function generateTerrainLayer(spec: TerrainLayerSpec, size: number): Terr
       const ny = (d - t) * spec.relief * size * 0.012;
       const len = Math.hypot(nx, ny, 1);
       const i = (y * size + x) * 3;
-      normal[i] = Math.round((nx / len * 0.5 + 0.5) * 255);
-      normal[i + 1] = Math.round((ny / len * 0.5 + 0.5) * 255);
-      normal[i + 2] = Math.round((1 / len * 0.5 + 0.5) * 255);
+      normal[i] = Math.round(((nx / len) * 0.5 + 0.5) * 255);
+      normal[i + 1] = Math.round(((ny / len) * 0.5 + 0.5) * 255);
+      normal[i + 2] = Math.round(((1 / len) * 0.5 + 0.5) * 255);
     }
   }
   return { size, albedo, normal };

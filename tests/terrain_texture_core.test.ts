@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest';
 import {
+  generateTerrainLayer,
   HOUSE_BAND,
+  harmonizedStops,
+  periodicFbm,
+  rgbToHslBytes,
   TERRAIN_LAYERS,
   TERRAIN_LIGHTNESS_MAX,
   TERRAIN_LIGHTNESS_MIN,
   TERRAIN_SATURATION_MAX,
   type TerrainLayerSpec,
-  generateTerrainLayer,
-  harmonizedStops,
-  periodicFbm,
-  rgbToHslBytes,
 } from '../src/render/terrain_texture_core';
 
 // Small enough to keep the suite fast; tiling is exact at any size (the fields
@@ -29,7 +29,10 @@ function columnDelta(buf: Uint8Array, size: number, ax: number, bx: number): num
   for (let y = 0; y < size; y++) {
     const ia = (y * size + ax) * 3;
     const ib = (y * size + bx) * 3;
-    sum += Math.abs(buf[ia] - buf[ib]) + Math.abs(buf[ia + 1] - buf[ib + 1]) + Math.abs(buf[ia + 2] - buf[ib + 2]);
+    sum +=
+      Math.abs(buf[ia] - buf[ib]) +
+      Math.abs(buf[ia + 1] - buf[ib + 1]) +
+      Math.abs(buf[ia + 2] - buf[ib + 2]);
   }
   return sum / (size * 3);
 }
@@ -39,7 +42,10 @@ function rowDelta(buf: Uint8Array, size: number, ay: number, by: number): number
   for (let x = 0; x < size; x++) {
     const ia = (ay * size + x) * 3;
     const ib = (by * size + x) * 3;
-    sum += Math.abs(buf[ia] - buf[ib]) + Math.abs(buf[ia + 1] - buf[ib + 1]) + Math.abs(buf[ia + 2] - buf[ib + 2]);
+    sum +=
+      Math.abs(buf[ia] - buf[ib]) +
+      Math.abs(buf[ia + 1] - buf[ib + 1]) +
+      Math.abs(buf[ia + 2] - buf[ib + 2]);
   }
   return sum / (size * 3);
 }
@@ -98,9 +104,15 @@ describe('terrain texture core: palette agreement', () => {
     for (const spec of TERRAIN_LAYERS) {
       for (const [i, stop] of harmonizedStops(spec).entries()) {
         const hsl = rgbToHslBytes(stop.r * 255, stop.g * 255, stop.b * 255);
-        expect(hsl.l, `${spec.key} stop ${i} lightness`).toBeGreaterThanOrEqual(TERRAIN_LIGHTNESS_MIN - 1e-6);
-        expect(hsl.l, `${spec.key} stop ${i} lightness`).toBeLessThanOrEqual(TERRAIN_LIGHTNESS_MAX + 1e-6);
-        expect(hsl.s, `${spec.key} stop ${i} saturation`).toBeLessThanOrEqual(TERRAIN_SATURATION_MAX);
+        expect(hsl.l, `${spec.key} stop ${i} lightness`).toBeGreaterThanOrEqual(
+          TERRAIN_LIGHTNESS_MIN - 1e-6,
+        );
+        expect(hsl.l, `${spec.key} stop ${i} lightness`).toBeLessThanOrEqual(
+          TERRAIN_LIGHTNESS_MAX + 1e-6,
+        );
+        expect(hsl.s, `${spec.key} stop ${i} saturation`).toBeLessThanOrEqual(
+          TERRAIN_SATURATION_MAX,
+        );
       }
     }
   });
@@ -153,7 +165,9 @@ describe('terrain texture core: contract with terrain.ts', () => {
   it('generates normals for the four layers the shader samples them for', () => {
     // terrain.ts binds uGrassN/uDirtN/uRockN/uSandN only; mud and snow are
     // albedo-only, so shipping normals for them would be dead weight.
-    const withNormals = TERRAIN_LAYERS.filter((l) => l.normals).map((l) => l.key).sort();
+    const withNormals = TERRAIN_LAYERS.filter((l) => l.normals)
+      .map((l) => l.key)
+      .sort();
     expect(withNormals).toEqual(['dirt', 'grass', 'rock', 'sand']);
     for (const spec of TERRAIN_LAYERS) {
       const { normal } = generateTerrainLayer(spec, 32);

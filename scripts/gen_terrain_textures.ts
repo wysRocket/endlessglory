@@ -15,7 +15,7 @@ import { mkdirSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import sharp from 'sharp';
-import { TERRAIN_LAYERS, generateTerrainLayer } from '../src/render/terrain_texture_core';
+import { generateTerrainLayer, TERRAIN_LAYERS } from '../src/render/terrain_texture_core';
 
 const SIZE = 1024;
 const HERE = path.dirname(fileURLToPath(import.meta.url));
