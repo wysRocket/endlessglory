@@ -40,6 +40,42 @@ export function applyTemplateTint(
   mat.color.lerp(tintScratch.set(tint), strength);
 }
 
+/** The environment half of the same policy, for props, dungeon dressing, and
+ *  scenery: everything that is NOT a character.
+ *
+ *  Why a second entry point instead of reusing applyHouseStyleMaterial with the
+ *  'body' role: the faceting half does not transfer. A creature body is faceted
+ *  on purpose, because that is what makes a textured Meshy mesh and an
+ *  untextured Quaternius one read as one material vocabulary. A kit prop is
+ *  different: its bevels ARE its silhouette language, and forcing flatShading on
+ *  a barrel band or a smooth-shaded roof reads as damage rather than as style.
+ *  So this applies the specular and palette halves and leaves authored shading
+ *  alone.
+ *
+ *  This exists because the policy had already been reinvented by hand three
+ *  times (dungeon.ts, jail_scene.ts, weapon_vfx.ts each carried their own
+ *  `metalness = 0; roughness = max(0.85, ...)` pair) while props, foliage, and
+ *  biome scenery got no correction at all beyond a metalness cap of 0.85, which
+ *  is still very nearly full metal. */
+export function applyHouseSurfaceMaterial(mat: StyleableMaterial): void {
+  if (!mat.color) return;
+  const isStandard = (mat as THREE.MeshStandardMaterial).isMeshStandardMaterial === true;
+  const plan = houseStyle({
+    r: mat.color.r,
+    g: mat.color.g,
+    b: mat.color.b,
+    roughness: isStandard ? (mat.roughness ?? HOUSE_ROUGHNESS_MAX) : HOUSE_ROUGHNESS_MAX,
+    metalness: isStandard ? (mat.metalness ?? 0) : 0,
+    hasMap: mat.map != null,
+    role: 'body',
+  });
+  mat.color.setRGB(plan.r, plan.g, plan.b, THREE.LinearSRGBColorSpace);
+  if (isStandard) {
+    mat.roughness = plan.roughness;
+    mat.metalness = plan.metalness;
+  }
+}
+
 /** Write the house surface style onto a material. Runs on EVERY graphics tier:
  *  a Lambert or Basic material has no roughness or metalness, so only the
  *  palette and faceting halves land there. Never wired to the FPS governor, and

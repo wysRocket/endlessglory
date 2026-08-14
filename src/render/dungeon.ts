@@ -44,6 +44,7 @@ import {
   placeMarshWallDressing,
 } from './delve_marsh_dressing';
 import { sharedUniforms } from './gfx';
+import { applyHouseSurfaceMaterial, type StyleableMaterial } from './house_style_material';
 import { radialGlowTexture } from './textures';
 
 const FLAME_EMISSIVE_HIGH = 2.2;
@@ -922,7 +923,18 @@ export class DungeonInteriors {
     } else if (src) {
       const std = src.clone();
       std.vertexColors = false;
-      std.metalness = 0;
+      // Was a hand-rolled `metalness = 0; roughness = max(0.85, ...)` pair, one
+      // of three independent copies of the house policy in this tree. Now the
+      // shared applier owns the dielectric and palette halves.
+      //
+      // The 0.85 floor is kept and re-applied deliberately: it is NOT the same
+      // as the house band. The house clamp is [0.45, 0.9], so a source stone
+      // authored at 0.5 would come out of the shared pass GLOSSIER than it
+      // shipped. Crypt stone wanting the rough end is local art direction
+      // living inside the house band, the same standing as MAT_OVERRIDES in
+      // props.ts, so it survives the unification rather than being flattened
+      // by it.
+      applyHouseSurfaceMaterial(std as StyleableMaterial);
       std.roughness = Math.max(0.85, std.roughness);
       mat = std;
     } else {

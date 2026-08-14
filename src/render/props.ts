@@ -13,6 +13,7 @@ import { terrainHeight, waterLevel } from '../sim/world';
 import { loadGltf } from './assets/loader';
 import { registerPreload } from './assets/preload';
 import { GFX, sharedUniforms, surfaceMat } from './gfx';
+import { applyHouseSurfaceMaterial, type StyleableMaterial } from './house_style_material';
 
 // Static world props: buildings, tents, campfires, mines, ruins, docks,
 // fences, graveyards — all real CC0 glTF assets (Quaternius medieval village +
@@ -302,6 +303,25 @@ function convertMaterial(
       emissiveIntensity: (ov?.emissiveIntensity ?? 1) * 0.6,
     });
   }
+  // One shared surface policy for the whole world, not a per-kit guess. Before
+  // this, a prop's only specular correction was the metalness cap two dozen
+  // lines up, and 0.85 is still very nearly full metal: a kit barrel whose
+  // glTF omits metallicFactor takes the spec default of 1.0 and shipped as a
+  // shiny metal barrel under the one key light.
+  applyHouseSurfaceMaterial(mat as StyleableMaterial);
+
+  // Explicit MAT_OVERRIDES win over the blanket policy, because they ARE the
+  // deliberate exceptions: the village bell is bronze and the ore vein is
+  // copper, and clamping those to the dielectric body ceiling would flatten
+  // exactly the two surfaces someone already hand-tuned. Re-applied after the
+  // house pass rather than skipped before it, so an override that sets only a
+  // colour still picks up house specular.
+  if (GFX.standardMaterials) {
+    const std = mat as THREE.MeshStandardMaterial;
+    if (ov?.roughness !== undefined) std.roughness = ov.roughness;
+    if (ov?.metalness !== undefined) std.metalness = ov.metalness;
+  }
+
   mat.name = `${kit}:${s.name}`;
   matConvCache.set(key, mat);
   return mat;
