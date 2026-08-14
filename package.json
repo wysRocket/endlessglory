@@ -80,6 +80,7 @@
     "admin:grant": "node scripts/grant_admin.mjs",
     "voices:gen": "node scripts/gen_npc_voices.mjs",
     "voices:lines": "node scripts/gen_npc_lines.mjs",
+    "terrain:textures": "tsx scripts/gen_terrain_textures.ts",
     "sfx:gen": "node scripts/gen_sfx.mjs",
     "sfx:ui": "node scripts/gen_ui_sfx.mjs",
     "sfx:manifest": "node scripts/build_sfx_manifest.mjs",
